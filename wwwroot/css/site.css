@@ -1,0 +1,124 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+    color: #280501;
+    user-select: none;
+    font-family: "Lato", sans-serif;
+}
+
+h1 {
+    font-size: 4.5em;
+}
+
+h4, h5 {
+    color: #DDD7D6;
+}
+
+.top-5 {
+    top: 5%;
+}
+
+.top-25 {
+    top: 25%;
+}
+
+.top-50 {
+    top: 50%;
+}
+
+#logo {
+    max-width: 22.5vh;
+    margin-top: 10vh;
+    margin-bottom: 10vh;
+    transform: scale(0.85);
+    transition: 0.5s all;
+    cursor: pointer;
+    padding-left: 2.5vw;
+}
+
+    #logo:hover {
+       filter: brightness(0.6);
+    }
+
+#banner {
+    max-width: 22vh;
+}
+
+#comic-display {
+    max-width: 75vw;
+    max-height: 650px;
+}
+
+.user-pfp, .site-option, .small-option {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    font-size: 16px;
+    border-radius: 100%;
+    background-color: #1CA8DF;
+    text-align: center;
+    font-family: 'Heebo', sans-serif;
+    user-select: none;
+    transition: 0.2s;
+}
+
+    .site-option.destructive {
+        background-color: #1e1e1e;
+    }
+
+    .site-option:hover,
+    .small-option:hover {
+        filter: brightness(80%);
+        -webkit-animation: shake 1s;
+        animation: shake 1s;
+    }
+
+.site-option {
+    width: 48px;
+    height: 48px;
+    line-height: 48px !important;
+    font-size: 24px !important;
+    user-select: none;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 5px 5px 0px rgba(0, 0, 0, .15);
+}
+
+    .site-option.page-control {
+        width: 30px;
+        height: 30px;
+        line-height: 30px !important;
+        font-size: 15px !important;
+        font-weight: 700;
+        margin-right: 10px;
+    }
+
+    .site-option.disabled {
+        cursor: default;
+    }
+
+
+.small-option {
+    width: 24px;
+    height: 24px;
+    line-height: 24px !important;
+    font-size: 16px !important;
+}
