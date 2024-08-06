@@ -7,25 +7,33 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/hoohub.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/material-symbols/index.css" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Trocchi&display=swap" rel="stylesheet">
+    @RenderSection("Styles", required: false)
 </head>
+<div class="background-stripe"></div>
 <body>
     <header>
         <a asp-page="/Index">
-            <img id="logo" class="d-block mb-2 mt-2" src="~/img/hoo_logo_alt.png" />
+            <img id="logo" class="d-inline-block mb-2 mt-2" src="~/img/hoo_logo_alt.png" />
         </a>
     </header>
+    
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer text-muted">
+        <div class="container text-center mx-auto">
+            <span class="footer-item">Contact</span>
+            <span class="footer-item">Cookies</span>
+        </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

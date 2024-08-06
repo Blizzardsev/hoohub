@@ -1,0 +1,55 @@
+﻿#visi-greet img {
+    width: 250px;
+}
+
+#visi-greet img, h4 {
+    color: lightgray;
+    filter: grayscale() contrast(50%) opacity(45%) brightness(110%);
+}
+
+input {
+    height: 50px;
+    line-height: 50px;
+    font-size: 50px;
+    min-width: 367.5px !important;
+    max-width: 367.5px !important;
+}
+
+    input.two-factor {
+        border: none !important;
+        background: none !important;
+        font-size: 42px;
+        caret-color: #1CA8DF;
+        font-family: 'Heebo', sans-serif;
+        color: #1CA8DF !important;
+        direction: unset;
+        transition: 0.5s;
+    }
+
+    input.two-factor:hover, input.two-factor:read-only {
+        filter: brightness(140%);
+    }
+
+    input.two-factor:focus,
+    input.two-factor:hover {
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+        outline-style: none !important;
+    }
+
+.btn-logo {
+    width: 80px;
+    transition: 1s;
+    opacity: 100%;
+    cursor: pointer;
+    filter: brightness(60%) grayscale(80%);
+}
+
+    .btn-logo:hover {
+        filter: brightness(80%) grayscale(40%);
+    }
+
+    .btn-logo.selected {
+        filter: brightness(100%) grayscale(0%);
+    }

@@ -4,10 +4,10 @@
     ViewData["Title"] = "Hoo.";
 }
 
-<div class="container position-absolute top-2">
+<div class="container">
     <img id="banner" class="mb-md-4 d-block m-auto" src="~/img/hoo_banner.png" />
 </div>
-<div class="container position-absolute top-25 mb-2 mt-2">
+<div class="container mb-2 mt-2">
     @if (Model.Comic != null)
     {
         string imageSource = Model.Comic != null ? $@"data:image/jpg;base64, {Model.Comic.GetImageAsBase64String()}" : "~/img/notfound.png";

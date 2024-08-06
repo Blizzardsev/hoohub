@@ -13,8 +13,9 @@ html {
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    scrollbar-color: #280501 #DDD7D6;
+    scrollbar-width: thin;
 }
 
 body {
@@ -24,8 +25,37 @@ body {
     font-family: "Lato", sans-serif;
 }
 
+footer {
+    border: none !important;
+    position: fixed !important;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px;
+}
+
+.footer-item {
+    cursor: pointer;
+    margin-left: .25vw;
+    margin-right: .25vw;
+    transition: filter .5s;
+    background-color: #1e1e1e;
+    color: #fff;
+    border-radius: 65px;
+    line-height: 1em;
+    font-size: 0.75em;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+    .footer-item:hover {
+        filter: brightness(0.6);
+    }
+
 h1 {
-    font-size: 4.5em;
+    font-size: 2.5em;
 }
 
 h4, h5 {
@@ -34,6 +64,10 @@ h4, h5 {
 
 .top-5 {
     top: 5%;
+}
+
+.top-20 {
+    top: 20%;
 }
 
 .top-25 {
@@ -49,7 +83,7 @@ h4, h5 {
     margin-top: 10vh;
     margin-bottom: 10vh;
     transform: scale(0.85);
-    transition: 0.5s all;
+    transition: 0.5s filter;
     cursor: pointer;
     padding-left: 2.5vw;
 }
@@ -59,13 +93,19 @@ h4, h5 {
     }
 
 #banner {
-    max-width: 22vh;
+    max-width: 20vh;
 }
 
 #comic-display {
     max-width: 75vw;
-    max-height: 650px;
+    max-height: 65vh;
 }
+
+@media (max-height: 650px) {
+    #comic-display {
+        max-height: 350px;
+    }
+  }
 
 .user-pfp, .site-option, .small-option {
     width: 32px;
@@ -73,16 +113,13 @@ h4, h5 {
     line-height: 32px;
     font-size: 16px;
     border-radius: 100%;
-    background-color: #1CA8DF;
+    color: #fff;
+    background-color: #1e1e1e;
     text-align: center;
     font-family: 'Heebo', sans-serif;
     user-select: none;
     transition: 0.2s;
 }
-
-    .site-option.destructive {
-        background-color: #1e1e1e;
-    }
 
     .site-option:hover,
     .small-option:hover {
@@ -98,7 +135,6 @@ h4, h5 {
     font-size: 24px !important;
     user-select: none;
     cursor: pointer;
-    color: white;
     box-shadow: 0 5px 5px 0px rgba(0, 0, 0, .15);
 }
 
@@ -115,10 +151,79 @@ h4, h5 {
         cursor: default;
     }
 
-
 .small-option {
     width: 24px;
     height: 24px;
     line-height: 24px !important;
     font-size: 16px !important;
+}
+
+input,
+textarea,
+select,
+.form-control,
+.form-control:focus,
+.form-control:read-only {
+    color: #280501;
+    background-color: #DDD7D6;
+    border: 2px solid transparent;
+    transition: all .2s;
+    scrollbar-color: #280501 #DDD7D6;
+    scrollbar-width: thin;
+    box-shadow: none;
+    margin-bottom: 10px;
+    min-width: 367.5px !important;
+    max-width: 367.5px !important;
+    font-weight: 700;
+    font-size: 1.15em;
+}
+
+    input:hover,
+    textarea:hover,
+    select:hover,
+    .form-control:hover {
+        box-shadow: none;
+        filter: brightness(90%);
+    }
+
+    input:autofill,
+    input:-webkit-autofill {
+        background: inherit;
+        color: #280501 !important;
+        background-color: #fff !important;
+        border: 1px solid #280501 !important
+    }
+
+    input:read-only,
+    textarea:read-only,
+    select:disabled {
+        color: rgba(255,255,255,.45) !important;
+        border: 1px solid #5f5f60 !important
+    }
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    margin-left: auto;
+    margin-right: auto
+}
+
+.background-stripe {
+    background-color: #fff;
+    opacity: 0.2;
+    background-image:  linear-gradient(#280501 2px, transparent 2px), linear-gradient(90deg, #280501 2px, transparent 2px), linear-gradient(#280501 1px, transparent 1px), linear-gradient(90deg, #280501 1px, #fff 1px);
+    background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+    background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+    height: 100vh;
+    width: 10vw;
+    position: absolute;
+    z-index: 0;
+    float: left;
+    margin-left: 0vw;
+    margin-top: 0%;
+    top: 0;
+    left: 0;
+    box-shadow: 20px 0 10px -10px rgba(0,0,0,.25);
+    -webkit-transition: background-image 0.2s ease-in-out;
+    transition: background-image 0.2s ease-in-out;
 }

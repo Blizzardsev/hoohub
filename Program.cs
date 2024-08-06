@@ -13,6 +13,7 @@ builder.Services.AddSession(options => {
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
 builder.Services.AddWebOptimizer(pipeline =>
 {
     pipeline.MinifyJsFiles("js/*");
@@ -20,14 +21,13 @@ builder.Services.AddWebOptimizer(pipeline =>
     pipeline.MinifyHtmlFiles("html/*");
 });
 
+// Identity scaffolding
 builder.Services.AddDbContext<HooHubContext>();
-
 builder.Services.AddDefaultIdentity<HooHubUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = true;
     options.User.RequireUniqueEmail = true;
 }).AddRoles<IdentityRole>().AddEntityFrameworkStores<HooHubContext>();
-
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.ExpireTimeSpan = TimeSpan.FromHours(7);
@@ -73,6 +73,8 @@ app.UseEndpoints(endpoints =>
     // Prevent users accessing pages we don't use as part of Identity, that are bundled in the framework
     var disabledRoutes = new[]
     {
+        "Identity/Account/AccessDenied",
+        "Identity/Account/Lockout",
         "Identity/Account/StatusMessage",
         "Identity/Account/ConfirmEmailChange",
         "Identity/Account/Manage/Layout",
