@@ -37,6 +37,9 @@ namespace hoohub.Enums
         [Description("")]
         TwoFactorChallengeIssued,
 
+		[Description("")]
+        TwoFactorCodeIssued,
+
         [Description("")]
 		ComicCreated,
 

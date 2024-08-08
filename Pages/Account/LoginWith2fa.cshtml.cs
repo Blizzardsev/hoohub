@@ -2,131 +2,159 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using hoohub.Data;
+using hoohub.Enums;
+using hoohub.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using hoohub.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
+using RequiredAttribute = System.ComponentModel.DataAnnotations.RequiredAttribute;
 
 namespace hoohub.Areas.Identity.Pages.Account
 {
     public class LoginWith2faModel : PageModel
     {
+        public readonly HooHubContext _context;
         private readonly SignInManager<HooHubUser> _signInManager;
         private readonly UserManager<HooHubUser> _userManager;
-        private readonly ILogger<LoginWith2faModel> _logger;
+        private readonly SmtpService _smtpService;
 
         public LoginWith2faModel(
+            HooHubContext context,
             SignInManager<HooHubUser> signInManager,
             UserManager<HooHubUser> userManager,
-            ILogger<LoginWith2faModel> logger)
+            SmtpService smtpService)
         {
+            _context = context;
             _signInManager = signInManager;
             _userManager = userManager;
-            _logger = logger;
+            _smtpService = smtpService;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        public bool RememberMe { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
             /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
+            /// The 2FA code the user must supply.
             /// </summary>
-            [Required]
-            [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [Required(ErrorMessage = "Two-factor code must be provided", AllowEmptyStrings = false)]
             [DataType(DataType.Text)]
-            [Display(Name = "Authenticator code")]
+            [MaxLength(6)]
+            [Display(Name = "Check your email for your two-factor code.", Prompt = "123456")]
             public string TwoFactorCode { get; set; }
-
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Display(Name = "Remember this machine")]
-            public bool RememberMachine { get; set; }
         }
 
-        public async Task<IActionResult> OnGetAsync(bool rememberMe, string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
-            // Ensure the user has gone through the username & password screen first
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-
-            if (user == null)
+            HooHubUser user = null;
+            try
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
-            }
+                // Ensure the user has gone through the username & password screen first
+                user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
 
-            ReturnUrl = returnUrl;
-            RememberMe = rememberMe;
+                if (user == null)
+                {
+                    return RedirectToPage("../Index");
+                }
+
+                ReturnUrl = returnUrl;
+                _smtpService.SendEmail(
+                    name: user.Handle,
+                    address: user.Email,
+                    subject: "Your Hoo-factor code",
+                    body: TemplateService.GetTemplateSubstitutions(
+                        "",
+                        substitutions: new Dictionary<string, string>()
+                        {
+                            { "{toName}", user.Handle },
+                            { "{twoFactorCode}", await _userManager.GenerateTwoFactorTokenAsync(user, TokenOptions.DefaultEmailProvider) }
+                        }));
+
+                _context.Events.Add(new Event(
+                    eventType: EventTypes.TwoFactorCodeIssued,
+                    details: $"Two-factor code email was sent to user {user.GetEventLogString()}."));
+
+                await _context.SaveChangesAsync();
+                return Page();
+            }
+            catch (Exception exception)
+            {
+                _context.Events.Add(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to send two-factor code email to {(user == null ? "unknown user" : user.GetEventLogString())}. Error: {exception.Message}, trace: {exception.StackTrace}"));
+
+                await _context.SaveChangesAsync();
+                return RedirectToPage("/Error", new { area = "" });
+            }
+        }
+
+        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+        {
+            try
+            {
+                returnUrl ??= Url.Content("~/");
+
+                if (!ModelState.IsValid)
+                {
+                    return Page();
+                }
+
+                var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+                if (user == null)
+                {
+                    return RedirectToPage("../Index");
+                }
+
+                var result = await _signInManager.TwoFactorSignInAsync(
+                    provider: TokenOptions.DefaultEmailProvider,
+                    code: Input.TwoFactorCode,
+                    isPersistent: true,
+                    rememberClient: true);
+
+                if (result.Succeeded)
+                {
+                    user.AccessFailedCount = 0;
+                    user.LastLoginDate = DateTime.Now;
+                    user.LastLoginIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+
+                    _context.Events.Add(new Event(
+                        eventType: EventTypes.UserLoggedIn,
+                        details: $"User {user.GetEventLogString()} logged in."));
+
+                    await _context.SaveChangesAsync();
+                    return Url.IsLocalUrl(returnUrl) ? LocalRedirect(returnUrl) : RedirectToPage("./");
+                }
+                else if (result.IsLockedOut)
+                {
+                    _context.Events.Add(new Event(
+                        eventType: EventTypes.UserLockedOut,
+                        details: $"User {user.GetEventLogString()} locked out; 2FA attempts exceeded."));
+
+                    await _context.SaveChangesAsync();
+                    return RedirectToPage("./Lockout");
+                }
+                else
+                {
+                    ModelState.AddModelError("error", "Invalid authenticator code.");
+                    return Page();
+                }
+            }
+            catch (Exception exception)
+            {
+                ModelState.AddModelError("error", "Failed to process 2FA request. Please try again.");
+                await _context.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to process 2FA request: {exception.Message} | Stacktrace: {exception.StackTrace}"));
+
+                await _context.SaveChangesAsync();
+            }
 
             return Page();
-        }
-
-        public async Task<IActionResult> OnPostAsync(bool rememberMe, string returnUrl = null)
-        {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
-            returnUrl = returnUrl ?? Url.Content("~/");
-
-            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
-            if (user == null)
-            {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
-            }
-
-            var authenticatorCode = Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
-
-            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, Input.RememberMachine);
-
-            var userId = await _userManager.GetUserIdAsync(user);
-
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("User with ID '{UserId}' logged in with 2fa.", user.Id);
-                return LocalRedirect(returnUrl);
-            }
-            else if (result.IsLockedOut)
-            {
-                _logger.LogWarning("User with ID '{UserId}' account locked out.", user.Id);
-                return RedirectToPage("./Lockout");
-            }
-            else
-            {
-                _logger.LogWarning("Invalid authenticator code entered for user with ID '{UserId}'.", user.Id);
-                ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
-                return Page();
-            }
         }
     }
 }
