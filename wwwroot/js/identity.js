@@ -33,10 +33,10 @@ $("input").keydown(function (event) {
  * @param {*} element - The form to submit
  */
 function identitySubmit(element) {
-    const form = $(element).closest("form")
-    const button = $(form).find(".option-button")
+    let form = $(element).closest("form")
+    let button = $(element).closest(".submit-form")
 
-    if (form.valid() && !$(button).hasClass("disabled")) {
+    if (form.valid() && !$(element).hasClass("disabled")) {
         $(form).find("input").prop("readonly", true)
 
         $(button).addClass("disabled")
@@ -46,13 +46,4 @@ function identitySubmit(element) {
             form.submit()
         }, 500);
     }
-}
-
-/**
- * After a brief delay, redirect to the site home page
- */
-function resetRedirect() {
-    setTimeout(() => {
-        location.href = '/Index'
-    }, 2000);
 }

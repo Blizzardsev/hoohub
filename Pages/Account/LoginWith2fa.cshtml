@@ -1,39 +1,29 @@
 ﻿@page
 @model LoginWith2faModel
 @{
-    ViewData["Title"] = "Two-factor authentication";
+    ViewData["Title"] = "Hoo-factor authentication required";
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr />
-<p>Your login is protected with an authenticator app. Enter your authenticator code below.</p>
-<div class="row">
-    <div class="col-md-4">
-        <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
-            <input asp-for="RememberMe" type="hidden" />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.TwoFactorCode" class="form-control" autocomplete="off" />
-                <label asp-for="Input.TwoFactorCode" class="form-label"></label>
-                <span asp-validation-for="Input.TwoFactorCode" class="text-danger"></span>
+<div class="container content-panel text-center">
+    <h3 class="text-center mb-4">Hoo-factor authentication required</h3>
+    <h5 class="mb-4">Enter the code you received to continue</h5>
+    <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+        <div class="row d-flex justify-content-center text-center mx-auto w-75">
+            <div class="form-group">
+                <input asp-for="Input.TwoFactorCode" class="form-control" aria-required="true" />
             </div>
-            <div class="checkbox mb-3">
-                <label asp-for="Input.RememberMachine" class="form-label">
-                    <input asp-for="Input.RememberMachine" />
-                    @Html.DisplayNameFor(m => m.Input.RememberMachine)
-                </label>
+        </div>
+        <div class="row mt-2 d-flex justify-content-center mx-auto">
+            <div class="col d-inline">
+                <div onclick="identitySubmit(this)" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow">keyboard_double_arrow_right</div>
+                <br />
+                <span class="option-tip">Continue</span>
             </div>
-            <div>
-                <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-            </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
-<p>
-    Don't have access to your authenticator device? You can
-    <a id="recovery-code-login" asp-page="./LoginWithRecoveryCode" asp-route-returnUrl="@Model.ReturnUrl">log in with a recovery code</a>.
-</p>
 
 @section Scripts {
+    <script type="text/javascript" src="~/js/identity.js" asp-append-version="true"></script>
     <partial name="_ValidationScriptsPartial" />
 }

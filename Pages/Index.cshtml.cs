@@ -3,9 +3,9 @@ using hoohub.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Drawing;
 
 namespace hoohub.Pages
 {
@@ -20,36 +20,29 @@ namespace hoohub.Pages
             _hooContext = hooContext;
         }
 
-        public async Task<IActionResult> OnGetAsync(string comicGuid = "")
+        public async Task<IActionResult> OnGetAsync(string comic = "")
         {
             try
             {
-                Comic? comic = null;
-                if (!string.IsNullOrEmpty(comicGuid))
+                Comic? comicToDisplay = null;
+                if (!string.IsNullOrEmpty(comic))
                 {
-                    comic = await _hooContext.Comics.SingleOrDefaultAsync(comic => comic.Guid == comicGuid && !comic.IsHidden);
+                    comicToDisplay = await _hooContext.Comics.SingleOrDefaultAsync(comicItem => comicItem.Guid == comic && !comicItem.IsHidden);
                 }
 
-                if (comic == null)
+                if (comicToDisplay == null)
                 {
-                    //comic = await _hooContext.Comics.OrderByDescending(comic => comic.ComicNumber).FirstOrDefaultAsync();
-                    comic = new Comic(
-                        comicTitle: "Directions",
-                        comicNumber: "000",
-                        comicDescription: "",
-                        imageData: System.IO.File.ReadAllBytes("C:\\Users\\Blizz\\Pictures\\Misc\\Cute Stuff\\Commissions and Gifts\\RaionArt\\HooDoodles\\000.png"),
-                        tags: new List<string>(),
-                        isHidden: false);
+                    comicToDisplay = await _hooContext.Comics.OrderByDescending(comic => comic.ComicNumber).FirstOrDefaultAsync();
                 }
 
-                Comic = comic;
+                Comic = comicToDisplay;
                 return Page();
             }
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: Enums.EventTypes.Error,
-                    details: $"Failed to load comic GUID {comicGuid}: {exception.Message}",
+                    details: $"Failed to load comic GUID {comic}: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 return RedirectToPage("./Error");
             }

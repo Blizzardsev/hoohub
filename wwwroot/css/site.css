@@ -1,3 +1,9 @@
+/* Highlights all element borders */
+/*
+* {
+    outline: 1px solid #f00 !important;
+  }*/
+
 html {
   font-size: 14px;
 }
@@ -31,7 +37,7 @@ footer {
     bottom: 0;
     width: 100%;
     white-space: nowrap;
-    line-height: 60px;
+    line-height: 40px !important;
 }
 
 .footer-item {
@@ -53,6 +59,12 @@ footer {
     .footer-item:hover {
         filter: brightness(0.6);
     }
+
+.content-panel {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%)
+}
 
 h1 {
     font-size: 2.5em;
@@ -79,10 +91,7 @@ h4, h5 {
 }
 
 #logo {
-    max-width: 22.5vh;
-    margin-top: 10vh;
-    margin-bottom: 10vh;
-    transform: scale(0.85);
+    width: 200px;
     transition: 0.5s filter;
     cursor: pointer;
     padding-left: 2.5vw;
@@ -93,19 +102,36 @@ h4, h5 {
     }
 
 #banner {
-    max-width: 20vh;
+    max-width: 17.5vh;
 }
 
 #comic-display {
     max-width: 75vw;
-    max-height: 65vh;
+    max-height: 75vh;
 }
 
 @media (max-height: 650px) {
     #comic-display {
         max-height: 350px;
     }
+    .hide-on-low-height {
+        display: none !important;
+    }
   }
+
+#site-nav {
+    font-size: 2.5em;
+    float: right;
+    transition: all .5s;
+    cursor: pointer;
+    margin-right: 2vw;
+    margin-top: 2vh;
+}
+
+    #site-nav:hover {
+        font-weight: 700;
+        filter: brightness(80%);
+    }
 
 .user-pfp, .site-option, .small-option {
     width: 32px;
@@ -126,6 +152,22 @@ h4, h5 {
         filter: brightness(80%);
         -webkit-animation: shake 1s;
         animation: shake 1s;
+    }
+
+.pfp-roundel {
+    position: fixed;
+    width: 64px !important;
+    height: 64px !important;
+    cursor: pointer;
+    box-shadow: 0 5px 5px 0 rgba(0,0,0,.15);
+    bottom: 4vh;
+    right: 2vw;
+    border-radius: 50%;
+    transition: filter 0.2s;
+}
+
+    .pfp-roundel:hover{ 
+        filter:brightness(80%);
     }
 
 .site-option {
@@ -158,6 +200,45 @@ h4, h5 {
     font-size: 16px !important;
 }
 
+#site-menu {
+    display: none;
+    position: fixed;
+    right: 0;
+    margin-right: 1.4vw;
+    overflow: hidden;
+    transition: .2s;
+    background-color: #fff;
+    border: 2px solid #1e1e1e;
+    padding: 8px 6px 8px 6px;
+    border-radius: 50px;
+    z-index: 100;
+    box-shadow: 0 5px 5px 0 rgba(0,0,0,.15);
+    margin-top: 4vh;
+}
+
+    #site-menu.active {
+        display: block;
+        font-weight: 700;
+    }
+
+    #site-menu .site-option {
+        display: inline-block;
+    }
+
+    #site-menu .container {
+        display: inline-grid;
+    }
+
+    #site-menu img {
+        width: 24px;
+        margin-bottom: 10px;
+    }
+
+.site-menu-option {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
 input,
 textarea,
 select,
@@ -174,7 +255,7 @@ select,
     margin-bottom: 10px;
     min-width: 367.5px !important;
     max-width: 367.5px !important;
-    font-weight: 700;
+    font-weight: 400;
     font-size: 1.15em;
 }
 
@@ -191,14 +272,18 @@ select,
         background: inherit;
         color: #280501 !important;
         background-color: #fff !important;
-        border: 1px solid #280501 !important
+        border: 1px solid #280501 !important;
+        font-weight: 700;
     }
 
     input:read-only,
     textarea:read-only,
     select:disabled {
-        color: rgba(255,255,255,.45) !important;
-        border: 1px solid #5f5f60 !important
+        background-color: #84706D !important
+    }
+
+    input:focus {
+        font-weight: 700;
     }
 
 .form-group input,
@@ -217,7 +302,7 @@ select,
     height: 100vh;
     width: 10vw;
     position: absolute;
-    z-index: 0;
+    z-index: -100;
     float: left;
     margin-left: 0vw;
     margin-top: 0%;
@@ -227,3 +312,29 @@ select,
     -webkit-transition: background-image 0.2s ease-in-out;
     transition: background-image 0.2s ease-in-out;
 }
+
+/* HTML: <div class="loader"></div> */
+.loader {
+    display: block;
+    margin: auto;
+    width: 18px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #280501;
+    animation: l2 1.5s infinite;
+  }
+  @keyframes l2 {
+    0%,
+    100%{transform:translate(-35px);box-shadow:  0     0 #84706D, 0     0 #DFDAD9}
+    40% {transform:translate( 35px);box-shadow: -15px  0 #84706D,-30px  0 #DFDAD9}
+    50% {transform:translate( 35px);box-shadow:  0     0 #84706D, 0     0 #DFDAD9}
+    90% {transform:translate(-35px);box-shadow:  15px  0 #84706D, 30px  0 #DFDAD9}
+  }
+  /* F,A,C
+  @keyframes l2 {
+    0%,
+    100%{transform:translate(-35px);box-shadow:  0     0 #B24C34, 0     0 #F680A2}
+    40% {transform:translate( 35px);box-shadow: -15px  0 #B24C34,-30px  0 #F680A2}
+    50% {transform:translate( 35px);box-shadow:  0     0 #B24C34, 0     0 #F680A2}
+    90% {transform:translate(-35px);box-shadow:  15px  0 #B24C34, 30px  0 #F680A2}
+  }*/

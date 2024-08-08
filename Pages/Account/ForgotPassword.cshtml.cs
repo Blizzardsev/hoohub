@@ -2,81 +2,113 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using hoohub.Data;
+using hoohub.Enums;
+using hoohub.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace hoohub.Areas.Identity.Pages.Account
 {
     public class ForgotPasswordModel : PageModel
     {
+        private readonly HooHubContext _context;
         private readonly UserManager<HooHubUser> _userManager;
-        private readonly IEmailSender _emailSender;
+        private readonly SmtpService _smtpService;
 
-        public ForgotPasswordModel(UserManager<HooHubUser> userManager, IEmailSender emailSender)
+        public ForgotPasswordModel(HooHubContext context, UserManager<HooHubUser> userManager, SmtpService smtpService)
         {
+            _context = context;
             _userManager = userManager;
-            _emailSender = emailSender;
+            _smtpService = smtpService;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        public bool IsFirstTimeLogin { get; set; }
+
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; }
+            [Required(ErrorMessage = "Email address must be provided", AllowEmptyStrings = false)]
+            [Display(Prompt = "hate@everything.hoo")]
+            public string Login { get; set; }
+        }
+
+        public async Task<IActionResult> OnGetAsync(string? email = null)
+        {
+            Input = new InputModel
+            {
+                Login = string.IsNullOrWhiteSpace(email) ? string.Empty : email
+            };
+            if (!string.IsNullOrEmpty(email))
+            {
+                var user = await _userManager.FindByNameAsync(Input.Login);
+                IsFirstTimeLogin = user == null ? false : user.FirstLogin;
+            }
+
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(Input.Email);
+                var user = await _userManager.FindByNameAsync(Input.Login);
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
-                    return RedirectToPage("./ForgotPasswordConfirmation");
+                    await _context.Events.AddAsync(new Event(
+                        eventType: EventTypes.UserPasswordResetRequested,
+                        details: $"A password reset was requested for {Input.Login}, but no account with this login exists."));
+                    await _context.SaveChangesAsync();
+
+                    ModelState.AddModelError("error", $"Sorry, we couldn't find an account for {Input.Login}.");
+                    return Page();
                 }
 
-                // For more information on how to enable account confirmation and password reset please
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
-                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                // Generate the password reset URL
+                var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(await _userManager.GeneratePasswordResetTokenAsync(user)));
                 var callbackUrl = Url.Page(
                     "/Account/ResetPassword",
                     pageHandler: null,
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
 
-                await _emailSender.SendEmailAsync(
-                    Input.Email,
-                    "Reset Password",
-                    $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                // Send email, redirect
+                try
+                {
+                    _smtpService.SendEmail(
+                        name: user.Handle,
+                        address: user.Email,
+                        subject: "Reset your password",
+                        body: TemplateService.GetTemplateSubstitutions(
+                            template: "", // TODO: Email template
+                            substitutions: new Dictionary<string, string>()
+                            {
+                                { "{toName}", user.Handle},
+                                { "{buttonUrl}", callbackUrl }
+                            }));
 
-                return RedirectToPage("./ForgotPasswordConfirmation");
+                    _context.Events.Add(new Event(
+                        eventType: EventTypes.UserPasswordResetRequested,
+                        details: $"Password reset email was sent to user {user.GetEventLogString()}."));
+
+                    await _context.SaveChangesAsync();
+                    return RedirectToPage("./ForgotPasswordConfirmation");
+                }
+                catch (Exception exception)
+                {
+                    _context.Events.Add(new Event(
+                        eventType: EventTypes.UserPasswordResetRequested,
+                        details: $"Failed to send password reset email to user {user.GetEventLogString()}. Error: {exception.Message} | Stacktrace: {exception.StackTrace}"));
+
+                    await _context.SaveChangesAsync();
+                    return RedirectToPage("/Error", new { area = "" });
+                }
             }
 
             return Page();

@@ -4,6 +4,8 @@ using hoohub.Enums;
 using hoohub.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using System.Drawing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -117,56 +119,74 @@ using (var _scope = app.Services.CreateScope())
 	var _hooContext = _scope.ServiceProvider.GetRequiredService<HooHubContext>();
 	_hooContext.Database.Migrate();
 
+    if (!_hooContext.Comics.Any() && Debugger.IsAttached)
+    {
+        // Default comic
+        _hooContext.Comics.Add(new Comic(
+            comicTitle: "Directions",
+            comicNumber: "000",
+            comicDescription: "",
+            imageData: (byte[])new ImageConverter().ConvertTo(hoohub.Properties.Resources.default_comic, typeof(byte[])),
+            tags: new List<string>(),
+            isHidden: false));
+        _hooContext.SaveChanges();
+    }
+
     using var userStore = _scope.ServiceProvider.GetService<IUserStore<HooHubUser>>();
     using var emailStore = (IUserEmailStore<HooHubUser>)userStore;
     using var userManager = _scope.ServiceProvider.GetService<UserManager<HooHubUser>>();
 
-    accountSettings.ForEach(accountSettings =>
+    if (!_hooContext.Users.Any())
     {
-        if (!_hooContext.Users.AsEnumerable().Any(user => string.Equals(user.Email, accountSettings.Email, StringComparison.OrdinalIgnoreCase)))
+        foreach (var settings in accountSettings)
         {
-            var user = Activator.CreateInstance<HooHubUser>();
-            user.Guid = Guid.NewGuid().ToString();
-            user.Handle = accountSettings.Handle;
-            user.TwoFactorEnabled = false;
-            user.IsDisabled = false;
-
-            userStore.SetUserNameAsync(
-                user: user,
-                userName: user.Email,
-                cancellationToken: CancellationToken.None).Wait();
-
-            emailStore.SetEmailAsync(
-                user: user,
-                email: user.Email,
-                cancellationToken: CancellationToken.None).Wait();
-
-            var result = userManager.CreateAsync(
-                user: user,
-                password: Guid.NewGuid().ToString()).Result;
-
-            if (result.Succeeded)
+            if (!_hooContext.Users.AsEnumerable().Any(user => string.Equals(user.Email, settings.Email, StringComparison.OrdinalIgnoreCase)))
             {
-                userManager.ConfirmEmailAsync(user, userManager.GenerateEmailConfirmationTokenAsync(user).Result).Wait();
+                var user = Activator.CreateInstance<HooHubUser>();
+                user.Guid = Guid.NewGuid().ToString();
+                user.Handle = settings.Handle;
+                user.TwoFactorEnabled = false;
+                user.IsDisabled = false;
+                user.TwoFactorEnabled = true;
 
-                _hooContext.Events.Add(new Event(
-                    eventType: EventTypes.UserCreated,
-                    details: $"User {accountSettings.Handle} created."));
-            }
-            else
-            {
-                var errorString = string.Empty;
-                foreach (var error in result.Errors)
+                userStore.SetUserNameAsync(
+                    user: user,
+                    userName: settings.Email,
+                    cancellationToken: CancellationToken.None).Wait();
+
+                emailStore.SetEmailAsync(
+                    user: user,
+                    email: settings.Email,
+                    cancellationToken: CancellationToken.None).Wait();
+
+                var result = userManager.CreateAsync(
+                    user: user,
+                    password: $"!!HooHoo{Guid.NewGuid()}").Result;
+
+                if (result.Succeeded)
                 {
-                    errorString += $"{error.Description}{Environment.NewLine}";
+                    userManager.ConfirmEmailAsync(user, userManager.GenerateEmailConfirmationTokenAsync(user).Result).Wait();
+
+                    _hooContext.Events.Add(new Event(
+                        eventType: EventTypes.UserCreated,
+                        details: $"User {settings.Handle} created."));
                 }
-                _hooContext.Events.Add(new Event(
-                    eventType: EventTypes.Error,
-                    details: $"Failed to create root user: {errorString}"));
-                _hooContext.SaveChanges();
+                else
+                {
+                    var errorString = string.Empty;
+                    foreach (var error in result.Errors)
+                    {
+                        errorString += $"{error.Description}{Environment.NewLine}";
+                    }
+                    _hooContext.Events.Add(new Event(
+                        eventType: EventTypes.Error,
+                        details: $"Failed to create root user: {errorString}"));
+                }
             }
         }
-    });
+    }
+
+    _hooContext.SaveChanges();
 }
 
 app.Run();

@@ -4,10 +4,8 @@
     ViewData["Title"] = "Hoo.";
 }
 
-<div class="container">
-    <img id="banner" class="mb-md-4 d-block m-auto" src="~/img/hoo_banner.png" />
-</div>
-<div class="container mb-2 mt-2">
+<div class="container content-panel text-center">
+    <img id="banner" class="mb-md-2 d-block m-auto animate__animated animate__fadeIn animate__fast" src="~/img/hoo_banner.png" />
     @if (Model.Comic != null)
     {
         string imageSource = Model.Comic != null ? $@"data:image/jpg;base64, {Model.Comic.GetImageAsBase64String()}" : "~/img/notfound.png";

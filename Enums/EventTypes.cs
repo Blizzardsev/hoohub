@@ -17,6 +17,9 @@ namespace hoohub.Enums
         UserCreated,
 
         [Description("")]
+        UserLoginAttempt,
+
+        [Description("")]
 		UserLoggedIn,
 
 		[Description("")]
@@ -28,7 +31,13 @@ namespace hoohub.Enums
 		[Description("")]
 		UserLockedOut,
 
-		[Description("")]
+        [Description("")]
+        UserPasswordResetRequested,
+
+        [Description("")]
+        TwoFactorChallengeIssued,
+
+        [Description("")]
 		ComicCreated,
 
 		[Description("")]

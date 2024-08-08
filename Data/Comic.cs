@@ -4,15 +4,44 @@ namespace hoohub.Data
 {
     public class Comic
     {
-        [Timestamp]
-        public byte[] Version { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string Guid { get; init; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string ComicNumber { get; init; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string ComicTitle { get; init; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string ComicDescription { get; init; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public DateTime PublishDate { get; init; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public byte[] ImageData { get; init; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string Tags { get; init; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool IsHidden { get; init; }
 
         public Comic()

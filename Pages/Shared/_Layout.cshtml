@@ -1,4 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@inject SignInManager<HooHubUser> _signInManager
+@inject UserManager<HooHubUser> _userManager
+
+@{
+    var signedIn = _signInManager.IsSignedIn(User);
+    var user = _userManager.GetUserAsync(User).Result;
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -21,7 +29,37 @@
         <a asp-page="/Index">
             <img id="logo" class="d-inline-block mb-2 mt-2" src="~/img/hoo_logo_alt.png" />
         </a>
+        <span id="site-nav" class="navbar-option interactive material-symbols-outlined align-middle" onclick="toggleMenu(this)">menu</span>
     </header>
+
+    <div id="site-menu">
+        <div class="container box-shadow">
+            <img src="~/img/hoo_logo_no_tagline.png" />
+            <a asp-page="/Index">
+                <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow" title="Home">home</div>
+            </a>
+            <a asp-page="/Archive">
+                <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Archive">grid_on</div>
+            </a>
+            @if (!signedIn)
+            {
+                <a asp-page="/Manage/Index">
+                    <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Manage">settings</div>
+                </a>
+                <a asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Account/Logout")">
+                    <div class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log out">logout</div>
+                </a>
+            }
+            else
+            {
+                <a asp-page="/Account/Login" asp-route-returnUrl="@Url.Page("/Account/Login")">
+                    <div class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log in">login</div>
+                </a>
+            }
+        </div>
+    </div>
+
+    <img class="pfp-roundel" style="width: 48px;" src="https://pbs.twimg.com/profile_images/1818811622338494464/YzQZoSDH_400x400.png" />
     
     <div class="container">
         <main role="main" class="pb-3">

@@ -1,16 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
+using System.Drawing;
 
 namespace hoohub.Data
 {
     public class HooHubUser : IdentityUser
     {
-        /// <summary>
-        /// Concurrency token.
-        /// </summary>
-        [Timestamp]
-        public byte[] Version { get; set; }
-
         /// <summary>
         /// 
         /// </summary>
@@ -19,7 +13,7 @@ namespace hoohub.Data
         /// <summary>
         /// 
         /// </summary>
-        public bool IsDisabled { get; set; }
+        public bool IsDisabled { get; set; } = false;
 
         /// <summary>
         /// 
@@ -29,12 +23,22 @@ namespace hoohub.Data
         /// <summary>
         /// 
         /// </summary>
-        public string Handle { get; set; }
+        public string Handle { get; set; } = string.Empty;
 
         /// <summary>
-        /// Whether this user has logged in before and set their password.
+        /// 
         /// </summary>
-        public bool FirstLogin { get; set; } = false;
+        public string LastLoginIpAddress { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool FirstLogin { get; set; } = true;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public byte[] DisplayPicture { get; set; } = (byte[])new ImageConverter().ConvertTo(Properties.Resources.default_pfp, typeof(byte[]));
 
         public HooHubUser()
         {
@@ -45,5 +49,11 @@ namespace hoohub.Data
             Guid = System.Guid.NewGuid().ToString();
             Handle = handle;
         }
+
+        /// <summary>
+        /// Returns the handle and ID of this user in the format <see cref="Handle"/> (Guid: <see cref="Guid"/>).
+        /// </summary>
+        /// <returns>The handle and ID of this user in the format <see cref="Handle"/> (Guid: <see cref="Guid"/>).</returns>
+        public string GetEventLogString() => $"{Handle} (Guid: {Id})";
     }
 }
