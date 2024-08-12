@@ -1,6 +1,4 @@
-﻿using Microsoft.IdentityModel.Protocols.Configuration;
-
-namespace hoohub.Configuration
+﻿namespace hoohub.Configuration
 {
     /// <summary>
     /// Application-wide configuration.

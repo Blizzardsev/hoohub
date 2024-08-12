@@ -20,7 +20,7 @@ builder.Services.AddWebOptimizer(pipeline =>
 {
     pipeline.MinifyJsFiles("js/*");
     pipeline.MinifyCssFiles("css/*");
-    pipeline.MinifyHtmlFiles("html/*");
+    //pipeline.MinifyHtmlFiles("html/*");
 });
 
 // Identity scaffolding
@@ -32,6 +32,8 @@ builder.Services.AddDefaultIdentity<HooHubUser>(options =>
 }).AddRoles<IdentityRole>().AddEntityFrameworkStores<HooHubContext>();
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
     options.ExpireTimeSpan = TimeSpan.FromHours(7);
     options.SlidingExpiration = true;
 });
@@ -103,7 +105,15 @@ app.UseEndpoints(endpoints =>
         "Identity/Account/Manage/EnableAuthenticator",
         "Identity/Account/Manage/Index",
         "Identity/Account/Manage/SetPassword",
-        "Identity/Account/Register"
+        "Identity/Account/Register",
+        "Identity/Account/ForgotPassword",
+        "Identity/Account/ForgotPasswordConfirmation",
+        "Identity/Account/Login",
+        "Identity/Account/LoginWith2fa",
+        "Identity/Account/Logout",
+        "Identity/Account/ResetPassword",
+        "Identity/Account/ResetPasswordConfirmation",
+        "Identity/Account/Lockout",
     };
     foreach (var route in disabledRoutes)
     {
@@ -143,7 +153,7 @@ using (var _scope = app.Services.CreateScope())
             if (!_hooContext.Users.AsEnumerable().Any(user => string.Equals(user.Email, settings.Email, StringComparison.OrdinalIgnoreCase)))
             {
                 var user = Activator.CreateInstance<HooHubUser>();
-                user.Guid = Guid.NewGuid().ToString();
+                user.Id = Guid.NewGuid().ToString();
                 user.Handle = settings.Handle;
                 user.TwoFactorEnabled = false;
                 user.IsDisabled = false;

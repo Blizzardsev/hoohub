@@ -8,18 +8,22 @@
     <link rel="stylesheet" href="~/css/identity.css" />
 }
 
-<div class="container content-panel">
+<div class="container content-panel animate__animated animate__fadeIn">
     <form id="account" method="post">
         <div class="row d-flex justify-content-center text-center mx-auto w-75">
             <div class="col row align-content-center">
                 <h1 class="text-center mb-4">Hoo's there?</h1>
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 <div class="form-group">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="new-email" aria-required="true" />
+                    <input asp-for="Input.Email" class="form-control" aria-required="true" autocomplete="on"/>
                 </div>
                 <div class="form-group">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                    <input asp-for="Input.Password" class="form-control" aria-required="true" placeholder="password" />
                 </div>
+                @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                {
+                    <p class="warning-tag animate__animated animate__headShake">@Model.ErrorMessage</p>
+                }
                 <div class="row mt-2 mb-4 d-flex justify-content-center mx-auto">
                     <div class="col d-inline">
                         <div onclick="identitySubmit(this)" class="site-option option-button submit-form material-symbols-outlined align-items-center justify-content-center box-shadow">keyboard_double_arrow_right</div>

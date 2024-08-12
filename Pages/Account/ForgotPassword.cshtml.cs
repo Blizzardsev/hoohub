@@ -75,7 +75,7 @@ namespace hoohub.Areas.Identity.Pages.Account
                 var callbackUrl = Url.Page(
                     "/Account/ResetPassword",
                     pageHandler: null,
-                    values: new { area = "Identity", code },
+                    values: new { code },
                     protocol: Request.Scheme);
 
                 // Send email, redirect
@@ -86,7 +86,7 @@ namespace hoohub.Areas.Identity.Pages.Account
                         address: user.Email,
                         subject: "Reset your password",
                         body: TemplateService.GetTemplateSubstitutions(
-                            template: "", // TODO: Email template
+                            template: "{toName}, {buttonUrl}", // TODO: Email template
                             substitutions: new Dictionary<string, string>()
                             {
                                 { "{toName}", user.Handle},

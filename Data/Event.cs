@@ -1,5 +1,4 @@
 ﻿using hoohub.Enums;
-using System.ComponentModel.DataAnnotations;
 
 namespace hoohub.Data
 {
@@ -8,7 +7,7 @@ namespace hoohub.Data
         /// <summary>
         /// 
         /// </summary>
-        public string Guid { get; init; }
+        public string Id { get; init; }
 
         /// <summary>
         /// 
@@ -36,7 +35,7 @@ namespace hoohub.Data
 
         public Event(EventTypes eventType, string details = "", string stackTrace = "")
         {
-            Guid = System.Guid.NewGuid().ToString();
+            Id = Guid.NewGuid().ToString();
             CreatedDate = DateTime.Now;
             EventType = eventType;
             Details = details;

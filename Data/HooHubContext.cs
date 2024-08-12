@@ -1,5 +1,4 @@
-﻿using Dorssel.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -27,9 +26,9 @@ namespace hoohub.Data
 			base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new HooHubUserEntityConfiguration());
 
-            modelBuilder.Entity<Comic>().ToTable("Comics").HasKey("Guid");
-			modelBuilder.Entity<Event>().ToTable("Events").HasKey("Guid");
-            modelBuilder.Entity<HooHubUser>().ToTable("Users").HasKey("Guid");
+            modelBuilder.Entity<Comic>().ToTable("Comics").HasKey("Id");
+			modelBuilder.Entity<Event>().ToTable("Events").HasKey("Id");
+            modelBuilder.Entity<HooHubUser>().ToTable("Users").HasKey("Id");
         }
 
         public class HooHubUserEntityConfiguration : IEntityTypeConfiguration<HooHubUser>

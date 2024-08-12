@@ -1,13 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace hoohub.Data
+﻿namespace hoohub.Data
 {
     public class Comic
     {
         /// <summary>
         /// 
         /// </summary>
-        public string Guid { get; init; }
+        public string Id { get; init; }
 
         /// <summary>
         /// 
@@ -50,7 +48,7 @@ namespace hoohub.Data
 
         public Comic(string comicTitle, string comicNumber, string comicDescription, byte[] imageData, List<string> tags, bool isHidden)
         {
-            Guid = System.Guid.NewGuid().ToString();
+            Id = Guid.NewGuid().ToString();
             ComicNumber = comicNumber;
             ComicTitle = comicTitle;
             ComicDescription = comicDescription;

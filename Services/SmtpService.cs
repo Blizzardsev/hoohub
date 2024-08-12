@@ -1,7 +1,7 @@
-﻿using System.Net;
+﻿using hoohub.Configuration;
 using MailKit.Net.Smtp;
 using MimeKit;
-using hoohub.Configuration;
+using System.Net;
 
 namespace hoohub.Services
 {

@@ -64,7 +64,7 @@ namespace hoohub.Areas.Identity.Pages.Account
 
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
-                ModelState.AddModelError("error", ErrorMessage);
+                ErrorMessage = ErrorMessage;
             }
 
             returnUrl ??= Url.Content("~/");
@@ -75,7 +75,7 @@ namespace hoohub.Areas.Identity.Pages.Account
 
             if (HttpContext.Session.GetInt32("locationChange") != null && HttpContext.Session.GetInt32("locationChange") == 1)
             {
-                ModelState.AddModelError("error", "Your location has changed from your last login. Please log in again.");
+                ErrorMessage = "Your location has changed from your last login. Please log in again.";
                 HttpContext.Session.SetInt32("locationChange", 0);
             }
 
@@ -107,7 +107,7 @@ namespace hoohub.Areas.Identity.Pages.Account
 
                     if (user == null)
                     {
-                        ModelState.AddModelError("error", $"Invalid username and/or password");
+                        ErrorMessage = $"Invalid username and/or password";
 
                         await _context.Events.AddAsync(new Event(
                             eventType: EventTypes.UserLoginAttempt,
@@ -119,7 +119,7 @@ namespace hoohub.Areas.Identity.Pages.Account
 
                     if (user.IsDisabled)
                     {
-                        ModelState.AddModelError("error", "Invalid username and/or password.");
+                        ErrorMessage = "Invalid username and/or password.";
 
                         await _context.Events.AddAsync(new Event(
                             eventType: EventTypes.UserLoginAttempt,
@@ -131,7 +131,7 @@ namespace hoohub.Areas.Identity.Pages.Account
 
                     if (result.IsLockedOut)
                     {
-                        ModelState.AddModelError("error", "Too many login attempts. Please try again later.");
+                        ErrorMessage = "Too many login attempts. Please try again later.";
 
                         await _context.Events.AddAsync(new Event(
                             eventType: EventTypes.UserLoginAttempt,
@@ -143,7 +143,7 @@ namespace hoohub.Areas.Identity.Pages.Account
 
                     if (!result.Succeeded && user.FirstLogin)
                     {
-                        ModelState.AddModelError("error", "Please set your password.");
+                        ErrorMessage = "Please set your password.";
 
                         await _context.Events.AddAsync(new Event(
                             eventType: EventTypes.UserLoginAttempt,
@@ -160,7 +160,7 @@ namespace hoohub.Areas.Identity.Pages.Account
                     {
                         if (user.LastLoginIpAddress != currentIpAddress && !_appSettings.TrustedLocations.Contains(currentIpAddress) && user.TwoFactorEnabled)
                         {
-                            ModelState.AddModelError("error", "Your location has changed from your last login. Please log in again.");
+                            ErrorMessage = "Your location has changed from your last login. Please log in again.";
 
                             _context.Events.Add(new Event(
                                 eventType: EventTypes.UserLoggedIn,
@@ -211,7 +211,7 @@ namespace hoohub.Areas.Identity.Pages.Account
 
                     if (user.AccessFailedCount >= 3)
                     {
-                        ModelState.AddModelError("error", "Too many login attempts. Please try again later.");
+                        ErrorMessage = "Too many login attempts. Please try again later.";
                         if (user.LockoutEnd == null || user.LockoutEnd < DateTime.Now)
                         {
                             user.LockoutEnd = DateTime.Now.AddMinutes(10);
@@ -231,7 +231,7 @@ namespace hoohub.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        ModelState.AddModelError("error", "Invalid username and/or password.");
+                        ErrorMessage = "Invalid username and/or password.";
                         await _context.Events.AddAsync(new Event(
                             eventType: EventTypes.UserLoginAttempt,
                             details: $"User {user.GetEventLogString()} attempted login."));
@@ -243,7 +243,7 @@ namespace hoohub.Areas.Identity.Pages.Account
             }
             catch (Exception exception)
             {
-                ModelState.AddModelError("error", "Failed to process login request. Please try again.");
+                ErrorMessage = "Failed to process login request. Please try again.";
                 await _context.Events.AddAsync(new Event(
                     eventType: EventTypes.Error,
                     details: $"Failed to process login: {exception.Message} | Stacktrace: {exception.StackTrace}"));

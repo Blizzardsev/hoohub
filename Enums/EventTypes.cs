@@ -2,7 +2,7 @@
 
 namespace hoohub.Enums
 {
-	public enum EventTypes
+    public enum EventTypes
 	{
         [Description("")]
         AppStarted,

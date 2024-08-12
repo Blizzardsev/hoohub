@@ -4,6 +4,7 @@
 @{
     var signedIn = _signInManager.IsSignedIn(User);
     var user = _userManager.GetUserAsync(User).Result;
+    var displayPicture = user != null ? $@"data:image/jpg;base64,{Convert.ToBase64String(user.DisplayPicture)}" : "~/img/notfound.png";
 }
 
 <!DOCTYPE html>
@@ -41,7 +42,7 @@
             <a asp-page="/Archive">
                 <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Archive">grid_on</div>
             </a>
-            @if (!signedIn)
+            @if (signedIn)
             {
                 <a asp-page="/Manage/Index">
                     <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Manage">settings</div>
@@ -53,13 +54,16 @@
             else
             {
                 <a asp-page="/Account/Login" asp-route-returnUrl="@Url.Page("/Account/Login")">
-                    <div class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log in">login</div>
+                    <div class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log in">person</div>
                 </a>
             }
         </div>
     </div>
 
-    <img class="pfp-roundel" style="width: 48px;" src="https://pbs.twimg.com/profile_images/1818811622338494464/YzQZoSDH_400x400.png" />
+    @if (signedIn && User.Identity.IsAuthenticated)
+    {
+        <img class="pfp-roundel" style="width: 48px;" src="@(displayPicture)" title="Signed in as @user.Handle"/>
+    }
     
     <div class="container">
         <main role="main" class="pb-3">
@@ -69,8 +73,9 @@
 
     <footer class="footer text-muted">
         <div class="container text-center mx-auto">
-            <span class="footer-item">Contact</span>
-            <span class="footer-item">Cookies</span>
+            <span class="footer-item"><img class="twitter" src="~/img/twitter.png"/><a href="https://x.com/HooDoodles" target="_blank">Contact</a></span>
+            
+            <span class="footer-item"><a asp-page="Cookies">Cookies</a></span>
         </div>
     </footer>
 

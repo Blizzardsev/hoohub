@@ -1,8 +1,9 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace hoohub.Pages
+namespace hoohub.Pages.Manage
 {
-    public class ArchiveModel : PageModel
+    public class IndexModel : PageModel
     {
         public void OnGet()
         {

@@ -47,3 +47,12 @@ function resetRedirect(delay = 2000) {
         location.href = '/Index'
     }, delay);
 }
+
+/**
+ * 
+ * @param {*} content 
+ */
+function copyToClipboard(content) {
+    navigator.clipboard.writeText(content);
+    alert("")
+}

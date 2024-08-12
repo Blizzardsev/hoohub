@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System.Drawing;
 
 namespace hoohub.Pages
 {
@@ -27,12 +26,13 @@ namespace hoohub.Pages
                 Comic? comicToDisplay = null;
                 if (!string.IsNullOrEmpty(comic))
                 {
-                    comicToDisplay = await _hooContext.Comics.SingleOrDefaultAsync(comicItem => comicItem.Guid == comic && !comicItem.IsHidden);
+                    comicToDisplay = await _hooContext.Comics.SingleOrDefaultAsync(comicItem => comicItem.Id == comic && !comicItem.IsHidden);
                 }
 
                 if (comicToDisplay == null)
                 {
                     comicToDisplay = await _hooContext.Comics.OrderByDescending(comic => comic.ComicNumber).FirstOrDefaultAsync();
+                    
                 }
 
                 Comic = comicToDisplay;

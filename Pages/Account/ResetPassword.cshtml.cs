@@ -1,27 +1,25 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-#nullable disable
-
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using hoohub.Data;
+﻿using hoohub.Data;
+using hoohub.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
 
 namespace hoohub.Areas.Identity.Pages.Account
 {
     public class ResetPasswordModel : PageModel
     {
+        private readonly HooHubContext _context;
         private readonly UserManager<HooHubUser> _userManager;
+        private readonly SignInManager<HooHubUser> _signInManager;
 
-        public ResetPasswordModel(UserManager<HooHubUser> userManager)
+        public ResetPasswordModel(HooHubContext context, UserManager<HooHubUser> userManager, SignInManager<HooHubUser> signInManager)
         {
+            _context = context;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -41,17 +39,16 @@ namespace hoohub.Areas.Identity.Pages.Account
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; }
+            [Required(AllowEmptyStrings = false)]
+            [Display(Prompt = "hate@everything.hoo")]
+            public string Login { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [Required(ErrorMessage = "Passwords must be provided, match and meet strength requirements.", AllowEmptyStrings = false)]
             [DataType(DataType.Password)]
+            [MinLength(10)]
+            // Must contain at least one capital letter, one lowercase character, and one special character
+            [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!.]).*$", ErrorMessage = "Password does not meet strength requirement.")]
+            [Display(Prompt = "password")]
             public string Password { get; set; }
 
             /// <summary>
@@ -59,7 +56,7 @@ namespace hoohub.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
             [DataType(DataType.Password)]
-            [Display(Name = "Confirm password")]
+            [Display(Prompt = "confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
@@ -69,14 +66,13 @@ namespace hoohub.Areas.Identity.Pages.Account
             /// </summary>
             [Required]
             public string Code { get; set; }
-
         }
 
-        public IActionResult OnGet(string code = null)
+        public async Task<IActionResult> OnGet(string code = null)
         {
-            if (code == null)
+            if (string.IsNullOrWhiteSpace(code))
             {
-                return BadRequest("A code must be supplied for password reset.");
+                return RedirectToPage("/Error");
             }
             else
             {
@@ -90,28 +86,56 @@ namespace hoohub.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return Page();
+                if (!ModelState.IsValid)
+                {
+                    return Page();
+                }
+
+                var user = await _userManager.FindByNameAsync(Input.Login);
+                if (user == null)
+                {
+                    // Don't reveal that the user does not exist
+                    await _context.Events.AddAsync(new Event(
+                        eventType: EventTypes.UserPasswordResetRequested,
+                        details: $"A password reset was requested for {Input.Login}, but no account with this login exists."));
+                    await _context.SaveChangesAsync();
+
+                    ModelState.AddModelError("error", $"Sorry, we couldn't find an account for {Input.Login}.");
+                    return Page();
+                }
+
+                var passwordResetResult = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
+                if (passwordResetResult.Succeeded)
+                {
+                    await _context.Events.AddAsync(new Event(
+                        eventType: EventTypes.UserPasswordReset,
+                        details: $"User {user.GetEventLogString()} password reset successfully."));
+                    user.FirstLogin = false;
+                    user.LastLoginIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+
+                    await _context.SaveChangesAsync();
+                    await _signInManager.SignInAsync(user, isPersistent: true);
+
+                    return RedirectToPage("./ResetPasswordConfirmation");
+                }
+
+                foreach (var error in passwordResetResult.Errors)
+                {
+                    ModelState.AddModelError("error", error.Description);
+                }
+            }
+            catch (Exception exception)
+            {
+                ModelState.AddModelError("error", "Failed to process reset request: please try again.");
+                await _context.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to process password reset request: {exception.Message} | Stacktrace: {exception.StackTrace}"));
+
+                await _context.SaveChangesAsync();
             }
 
-            var user = await _userManager.FindByEmailAsync(Input.Email);
-            if (user == null)
-            {
-                // Don't reveal that the user does not exist
-                return RedirectToPage("./ResetPasswordConfirmation");
-            }
-
-            var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
-            if (result.Succeeded)
-            {
-                return RedirectToPage("./ResetPasswordConfirmation");
-            }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
             return Page();
         }
     }

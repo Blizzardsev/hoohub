@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace hoohub.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -29,7 +29,7 @@ namespace hoohub.Migrations
                 name: "Comics",
                 columns: table => new
                 {
-                    Guid = table.Column<string>(type: "TEXT", nullable: false),
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
                     ComicNumber = table.Column<string>(type: "TEXT", nullable: false),
                     ComicTitle = table.Column<string>(type: "TEXT", nullable: false),
                     ComicDescription = table.Column<string>(type: "TEXT", nullable: false),
@@ -40,14 +40,14 @@ namespace hoohub.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Comics", x => x.Guid);
+                    table.PrimaryKey("PK_Comics", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Events",
                 columns: table => new
                 {
-                    Guid = table.Column<string>(type: "TEXT", nullable: false),
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EventType = table.Column<int>(type: "INTEGER", nullable: false),
                     Details = table.Column<string>(type: "TEXT", nullable: false),
@@ -55,19 +55,20 @@ namespace hoohub.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Events", x => x.Guid);
+                    table.PrimaryKey("PK_Events", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
-                    Guid = table.Column<string>(type: "TEXT", nullable: false),
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
                     IsDisabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     LastLoginDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Handle = table.Column<string>(type: "TEXT", nullable: false),
-                    FirstLogin = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: true),
-                    Id = table.Column<string>(type: "TEXT", nullable: true),
+                    LastLoginIpAddress = table.Column<string>(type: "TEXT", nullable: false),
+                    FirstLogin = table.Column<bool>(type: "INTEGER", nullable: false),
+                    DisplayPicture = table.Column<byte[]>(type: "BLOB", nullable: false),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -85,7 +86,7 @@ namespace hoohub.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Guid);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -126,7 +127,7 @@ namespace hoohub.Migrations
                         name: "FK_AspNetUserClaims_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Guid",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -146,7 +147,7 @@ namespace hoohub.Migrations
                         name: "FK_AspNetUserLogins_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Guid",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -170,7 +171,7 @@ namespace hoohub.Migrations
                         name: "FK_AspNetUserRoles_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Guid",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -190,7 +191,7 @@ namespace hoohub.Migrations
                         name: "FK_AspNetUserTokens_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Guid",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 

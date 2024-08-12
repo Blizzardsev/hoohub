@@ -8,11 +8,6 @@ namespace hoohub.Data
         /// <summary>
         /// 
         /// </summary>
-        public string Guid { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public bool IsDisabled { get; set; } = false;
 
         /// <summary>
@@ -38,15 +33,19 @@ namespace hoohub.Data
         /// <summary>
         /// 
         /// </summary>
-        public byte[] DisplayPicture { get; set; } = (byte[])new ImageConverter().ConvertTo(Properties.Resources.default_pfp, typeof(byte[]));
+        public byte[] DisplayPicture { get; set; } = (byte[])new ImageConverter().ConvertTo(Properties.Resources.hoo_pfp, typeof(byte[]));
 
         public HooHubUser()
         {
+            if (DisplayPicture == null || DisplayPicture.Length == 0)
+            {
+                DisplayPicture = (byte[])new ImageConverter().ConvertTo(Properties.Resources.hoo_pfp, typeof(byte[]));
+            }
         }
 
         public HooHubUser(string handle)
         {
-            Guid = System.Guid.NewGuid().ToString();
+            Id = Guid.NewGuid().ToString();
             Handle = handle;
         }
 

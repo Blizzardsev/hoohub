@@ -1,6 +1,6 @@
 ﻿namespace hoohub.Requests
 {
-	public class BaseResult
+    public class BaseResult
 	{
 		public bool Success { get; set; }
 		public string Message { get; set; }

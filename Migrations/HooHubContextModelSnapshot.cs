@@ -147,7 +147,7 @@ namespace hoohub.Migrations
 
             modelBuilder.Entity("hoohub.Data.Comic", b =>
                 {
-                    b.Property<string>("Guid")
+                    b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ComicDescription")
@@ -176,14 +176,14 @@ namespace hoohub.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
 
                     b.ToTable("Comics", (string)null);
                 });
 
             modelBuilder.Entity("hoohub.Data.Event", b =>
                 {
-                    b.Property<string>("Guid")
+                    b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedDate")
@@ -200,14 +200,14 @@ namespace hoohub.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
 
                     b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("hoohub.Data.HooHubUser", b =>
                 {
-                    b.Property<string>("Guid")
+                    b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("AccessFailedCount")
@@ -216,6 +216,10 @@ namespace hoohub.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("DisplayPicture")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -229,9 +233,6 @@ namespace hoohub.Migrations
 
                     b.Property<string>("Handle")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDisabled")
@@ -277,7 +278,7 @@ namespace hoohub.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Guid");
+                    b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");

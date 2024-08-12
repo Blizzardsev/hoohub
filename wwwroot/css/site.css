@@ -40,6 +40,11 @@ footer {
     line-height: 40px !important;
 }
 
+.warning-tag, .text-danger {
+    color: #963636 !important; 
+    font-weight: 700 !important;
+}
+
 .footer-item {
     cursor: pointer;
     margin-left: .25vw;
@@ -58,6 +63,19 @@ footer {
 
     .footer-item:hover {
         filter: brightness(0.6);
+    }
+
+    .footer-item a {
+        color: #fff !important;
+        text-decoration: none;
+    }
+
+    .footer-item .twitter {
+        width: 10px;
+        margin-right: 4px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-bottom: 2px;
     }
 
 .content-panel {
@@ -330,11 +348,3 @@ select,
     50% {transform:translate( 35px);box-shadow:  0     0 #84706D, 0     0 #DFDAD9}
     90% {transform:translate(-35px);box-shadow:  15px  0 #84706D, 30px  0 #DFDAD9}
   }
-  /* F,A,C
-  @keyframes l2 {
-    0%,
-    100%{transform:translate(-35px);box-shadow:  0     0 #B24C34, 0     0 #F680A2}
-    40% {transform:translate( 35px);box-shadow: -15px  0 #B24C34,-30px  0 #F680A2}
-    50% {transform:translate( 35px);box-shadow:  0     0 #B24C34, 0     0 #F680A2}
-    90% {transform:translate(-35px);box-shadow:  15px  0 #B24C34, 30px  0 #F680A2}
-  }*/
