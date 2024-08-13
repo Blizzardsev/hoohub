@@ -1,7 +1,8 @@
 ﻿let menuTransitioning = false;
+let autoHideMenu = false
 
 $("html").on("click", function (event) {
-    if ($("#site-menu").is(":visible") && $(event.target).attr("id") != "site-menu" && $(event.target).closest(".container").attr("id") != "site-menu") {
+    if (autoHideMenu && $("#site-menu").is(":visible") && $(event.target).attr("id") != "site-menu" && $(event.target).closest(".container").attr("id") != "site-menu") {
         toggleMenu($("#navbar-menu"))
     }
 })
@@ -49,10 +50,34 @@ function resetRedirect(delay = 2000) {
 }
 
 /**
- * 
- * @param {*} content 
+ * Returns a GUID.
+ * @returns string GUID
+ */
+function uuidv4() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
+
+/**
+ * Copies the given content to the clipboard.
+ * @param {*} content - The content to copy to the clipboard.
  */
 function copyToClipboard(content) {
     navigator.clipboard.writeText(content);
-    alert("")
+    displayAlert("Copied!")
+}
+
+/**
+ * 
+ * @param {*} text 
+ * @param {*} delay 
+ */
+function displayAlert(text, delay = 3000) {
+    let alertId = uuidv4()
+    let alert = $(`<div id="${alertId}" class="alert animate__animated animate__bounceInDown">${text}</div>`)
+    $("header").append(alert)
+    setTimeout(function () {
+        //$(`#${alertId}`).remove()
+    }, delay)
 }

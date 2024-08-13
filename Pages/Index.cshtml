@@ -10,11 +10,40 @@
 
 <div id="comic-menu">
     <div class="container">
-        <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mb-4" title="Get link" onclick="copyToClipboard('@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id})')">link</div>
-        <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Next comic...">fast_forward</div>
-        <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Previous comic...">fast_rewind</div>
-        <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Random comic...">shuffle</div>
+        @if(Model.Comic != null)
+        {
+            <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mb-4" title="Get link" onclick="copyToClipboard('@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id})')">link</div>
+        }
+        else
+        {
+            <div class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mb-4">link</div>
+        }
+
+        @if (Model.Comic != null && !string.IsNullOrWhiteSpace(Model.NextComicId))
+        {
+            <a asp-page="/Index" asp-route-comic="@Model.NextComicId">
+                <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Next comic...">fast_forward</div>
+            </a>
+        }
+        else
+        {
+            <div class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mt-2">fast_forward</div>
+        }
+
+        @if (Model.Comic != null && !string.IsNullOrWhiteSpace(Model.PreviousComicID))
+        {
+            <a asp-page="/Index" asp-route-comic="@Model.PreviousComicID">
+                <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Previous comic...">fast_rewind</div>
+            </a>
+        }
+        else
+        {
+            <div class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mt-2">fast_rewind</div>
+        }
         
+        <a asp-page="/Index" asp-page-handler="Random">
+            <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Random comic...">shuffle</div>
+        </a>
     </div>
 </div>
 
