@@ -131,12 +131,29 @@ using (var _scope = app.Services.CreateScope())
 
     if (!_hooContext.Comics.Any() && Debugger.IsAttached)
     {
-        // Default comic
+        // Default comics
+        // TODO: Remove these once upload function is up
         _hooContext.Comics.Add(new Comic(
             comicTitle: "Directions",
             comicNumber: "000",
             comicDescription: "",
-            imageData: (byte[])new ImageConverter().ConvertTo(hoohub.Properties.Resources.default_comic, typeof(byte[])),
+            imageData: (byte[])new ImageConverter().ConvertTo(hoohub.Properties.Resources._000, typeof(byte[])),
+            tags: new List<string>(),
+            isHidden: false));
+
+        _hooContext.Comics.Add(new Comic(
+            comicTitle: "Athena",
+            comicNumber: "001",
+            comicDescription: "",
+            imageData: (byte[])new ImageConverter().ConvertTo(hoohub.Properties.Resources._001, typeof(byte[])),
+            tags: new List<string>(),
+            isHidden: false));
+
+        _hooContext.Comics.Add(new Comic(
+            comicTitle: "Struggle",
+            comicNumber: "002",
+            comicDescription: "",
+            imageData: (byte[])new ImageConverter().ConvertTo(hoohub.Properties.Resources._002, typeof(byte[])),
             tags: new List<string>(),
             isHidden: false));
         _hooContext.SaveChanges();

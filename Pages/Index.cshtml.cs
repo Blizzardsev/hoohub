@@ -20,12 +20,12 @@ namespace hoohub.Pages
         /// <summary>
         /// 
         /// </summary>
-        public string NextComicId { get; private set; }
+        public string? NextComicId { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string PreviousComicID { get; private set; }
+        public string? PreviousComicId { get; private set; }
 
         /// <summary>
         /// 
@@ -58,9 +58,11 @@ namespace hoohub.Pages
                         .OrderByDescending(comic => comic.ComicNumber).FirstOrDefaultAsync();
                 }
 
-                var nextPreviousComicIds = GetNextPreviousComicIds(comicToDisplay, _hooContext.Comics.Where(comic => !comic.IsHidden).ToList());
+                var nextPreviousComicIds = GetNextPreviousComicIds(comicToDisplay, _hooContext.Comics
+                    .OrderByDescending(comic => comic.ComicNumber)
+                    .Where(comic => !comic.IsHidden).ToList());
                 NextComicId = nextPreviousComicIds.Item1;
-                PreviousComicID = nextPreviousComicIds.Item2;
+                PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = comicToDisplay;
                 return Page();
             }
@@ -79,15 +81,18 @@ namespace hoohub.Pages
         /// 
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> OnGetRandomAsync()
+        public async Task<IActionResult> OnGetRandomComicAsync(string currentComic = "")
         {
 			try
 			{
-                var allComics = await _hooContext.Comics.Where(comic => !comic.IsHidden).ToListAsync();
-				var randomComic = await _hooContext.Comics.ElementAtAsync(new Random().Next(0, allComics.Count - 1));
-                var nextPreviousComicIds = GetNextPreviousComicIds(randomComic, _hooContext.Comics.Where(comic => !comic.IsHidden).ToList());
+                var allComics = await _hooContext.Comics
+                    .Where(comic => !comic.IsHidden && comic.Id != currentComic)
+                    .OrderByDescending(comic => comic.ComicNumber)
+                    .ToListAsync();
+				var randomComic = allComics.ElementAt(new Random().Next(0, allComics.Count));
+                var nextPreviousComicIds = GetNextPreviousComicIds(randomComic, allComics);
                 NextComicId = nextPreviousComicIds.Item1;
-                PreviousComicID = nextPreviousComicIds.Item2;
+                PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = randomComic;
                 return Page();
             }
@@ -102,6 +107,58 @@ namespace hoohub.Pages
             }
 		}
 
+        public async Task<IActionResult> OnGetFirstComicAsync()
+        {
+            try
+            {
+                var allComics = await _hooContext.Comics
+                    .Where(comic => !comic.IsHidden)
+                    .OrderByDescending(comic => comic.ComicNumber)
+                    .ToListAsync();
+                var firstComic = allComics.First();
+                var nextPreviousComicIds = GetNextPreviousComicIds(firstComic, allComics);
+                NextComicId = nextPreviousComicIds.Item1;
+                PreviousComicId = nextPreviousComicIds.Item2;
+                Comic = firstComic;
+                return Page();
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                eventType: Enums.EventTypes.Error,
+                    details: $"Failed to load first comic: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return RedirectToPage("./Error");
+            }
+        }
+
+        public async Task<IActionResult> OnGetLastComicAsync()
+        {
+            try
+            {
+                var allComics = await _hooContext.Comics
+                    .Where(comic => !comic.IsHidden)
+                    .OrderByDescending(comic => comic.ComicNumber)
+                    .ToListAsync();
+                var lastComic = allComics.Last();
+                var nextPreviousComicIds = GetNextPreviousComicIds(lastComic, allComics);
+                NextComicId = nextPreviousComicIds.Item1;
+                PreviousComicId = nextPreviousComicIds.Item2;
+                Comic = lastComic;
+                return Page();
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                eventType: Enums.EventTypes.Error,
+                    details: $"Failed to load last comic: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return RedirectToPage("./Error");
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -111,12 +168,10 @@ namespace hoohub.Pages
         private Tuple<string, string> GetNextPreviousComicIds(Comic currentComic, List<Comic> comics)
         {
             var currentIndex = comics.IndexOf(currentComic);
-            var nextComicId = comics.IndexOf(comics.Last()) > currentIndex ? comics[currentIndex++].Id : string.Empty;
-            var previousComicId = 0 < currentIndex ? comics[currentIndex--].Id : string.Empty;
+            var previousComicId = currentIndex + 1 <= comics.Count - 1 ? comics[currentIndex + 1].Id : string.Empty;
+            var nextComicId  = currentIndex - 1 >= 0 ? comics[currentIndex - 1].Id : string.Empty;
 
-            return new Tuple<string, string>(
-                nextComicId,
-                previousComicId);
+            return new Tuple<string, string>(nextComicId, previousComicId);
         }
     }
 }

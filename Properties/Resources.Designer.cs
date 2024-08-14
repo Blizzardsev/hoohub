@@ -63,9 +63,29 @@ namespace hoohub.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap default_comic {
+        internal static System.Drawing.Bitmap _000 {
             get {
-                object obj = ResourceManager.GetObject("default_comic", resourceCulture);
+                object obj = ResourceManager.GetObject("000", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _001 {
+            get {
+                object obj = ResourceManager.GetObject("001", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _002 {
+            get {
+                object obj = ResourceManager.GetObject("002", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

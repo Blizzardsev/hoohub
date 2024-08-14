@@ -30,9 +30,9 @@
             <div class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mt-2">fast_forward</div>
         }
 
-        @if (Model.Comic != null && !string.IsNullOrWhiteSpace(Model.PreviousComicID))
+        @if (Model.Comic != null && !string.IsNullOrWhiteSpace(Model.PreviousComicId))
         {
-            <a asp-page="/Index" asp-route-comic="@Model.PreviousComicID">
+            <a asp-page="/Index" asp-route-comic="@Model.PreviousComicId">
                 <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Previous comic...">fast_rewind</div>
             </a>
         }
@@ -41,8 +41,15 @@
             <div class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mt-2">fast_rewind</div>
         }
         
-        <a asp-page="/Index" asp-page-handler="Random">
-            <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Random comic...">shuffle</div>
+        <a asp-page="/Index" asp-page-handler="RandomComic">
+            <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2 mb-2" title="Random comic...">shuffle</div>
+        </a>
+
+        <a asp-page="/Index" asp-page-handler="FirstComic">
+            <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-4" title="Jump to start...">history</div>
+        </a>
+        <a asp-page="/Index" asp-page-handler="LastComic">
+            <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Jump to end...">update</div>
         </a>
     </div>
 </div>

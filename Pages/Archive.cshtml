@@ -1,4 +1,20 @@
 ﻿@page
 @model hoohub.Pages.ArchiveModel
 @{
+    ViewData["Title"] = "Archive";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/archive.css" />
+}
+
+@Html.AntiForgeryToken()
+
+<img id="banner" class="mb-md-2 d-block m-auto animate__animated animate__fadeIn animate__fast" src="~/img/hoo_banner.png" />
+<div id="archive-items" class="container mx-auto mt-4">
+    <img id="hootbye" class="d-block m-auto mb-2 mt-2 animate__animated animate__fadeIn animate__fast" style="max-height: 50vh" src="~/img/hootbye.png" asp-append-version=true />
+</div>
+
+@section Scripts {
+    <script type="text/javascript" src="~/js/archive.js" asp-append-version="true"></script>
 }

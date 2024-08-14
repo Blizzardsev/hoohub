@@ -1,0 +1,14 @@
+﻿.archive-comic {
+	padding: 2%;
+	width: 15vw;
+	cursor: pointer;
+	transition: 0.5s;
+}
+
+	.archive-comic:hover {
+		filter: brightness(80%);
+	}
+
+#hootbye.hidden {
+	display: none !important;
+}
