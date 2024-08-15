@@ -281,7 +281,7 @@ select,
 .form-control:read-only {
     color: #280501;
     background-color: #DDD7D6;
-    border: 2px solid transparent;
+    border: 2px solid transparent !important;
     transition: all .2s;
     scrollbar-color: #280501 #DDD7D6;
     scrollbar-width: thin;

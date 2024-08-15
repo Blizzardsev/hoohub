@@ -81,3 +81,13 @@ function displayAlert(text, delay = 3000) {
         $(`#${alertId}`).remove()
     }, delay)
 }
+
+/**
+* Returns true when an element is scrolled to the bottom.
+* @param {*} element - The element to test
+* @returns - true if the element is scrolled to the bottom
+*/
+function elementIsScrolledToBottom(element) {
+    console.log(element.scrollTop)
+    return element.scrollTop > 0 && Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) <= 1
+}

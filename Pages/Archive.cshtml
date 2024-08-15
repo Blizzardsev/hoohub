@@ -10,9 +10,9 @@
 
 @Html.AntiForgeryToken()
 
-<img id="banner" class="mb-md-2 d-block m-auto animate__animated animate__fadeIn animate__fast" src="~/img/hoo_banner.png" />
-<div id="archive-items" class="container mx-auto mt-4">
-    <img id="hootbye" class="d-block m-auto mb-2 mt-2 animate__animated animate__fadeIn animate__fast" style="max-height: 50vh" src="~/img/hootbye.png" asp-append-version=true />
+<img id="banner" class="mb-md-4 d-block m-auto animate__animated animate__fadeIn animate__fast" src="~/img/hoo_banner.png" />
+<input class="form-control mx-auto mb-2" asp-for="@Model.TagInput" />
+<div id="archive-items" class="row mx-auto mt-4 justify-content-center">
 </div>
 
 @section Scripts {

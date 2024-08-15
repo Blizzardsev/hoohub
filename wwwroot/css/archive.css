@@ -1,4 +1,7 @@
-﻿.archive-comic {
+﻿#archive-items {
+}
+
+.archive-comic {
 	padding: 2%;
 	width: 15vw;
 	cursor: pointer;
@@ -8,6 +11,10 @@
 	.archive-comic:hover {
 		filter: brightness(80%);
 	}
+
+#hootbye {
+	max-width: 40vw;
+}
 
 #hootbye.hidden {
 	display: none !important;

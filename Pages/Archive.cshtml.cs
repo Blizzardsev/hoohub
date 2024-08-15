@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace hoohub.Pages
 {
@@ -12,6 +13,12 @@ namespace hoohub.Pages
     public class ArchiveModel : PageModel
     {
         private readonly HooHubContext _hooContext;
+
+        [DataType(DataType.Text)]
+        [MaxLength(200)]
+        [Display(Prompt = "enter one or more tags")]
+        [RegularExpression("^[a-zA-Z-' ,]+$")]
+        public string TagInput { get; set; }
 
         /// <summary>
         /// 
@@ -43,6 +50,11 @@ namespace hoohub.Pages
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="startAtComic"></param>
+        /// <returns></returns>
         public async Task<JsonResult> OnGetComics(string startAtComic = "")
         {
             try
