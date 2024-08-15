@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
+using NUglify.Helpers;
+using Org.BouncyCastle.Crypto.Macs;
 using System.ComponentModel.DataAnnotations;
 
 namespace hoohub.Pages
@@ -16,7 +18,7 @@ namespace hoohub.Pages
 
         [DataType(DataType.Text)]
         [MaxLength(200)]
-        [Display(Prompt = "enter one or more tags")]
+        [Display(Prompt = "enter tags, number or the name of a comic")]
         [RegularExpression("^[a-zA-Z-' ,]+$")]
         public string TagInput { get; set; }
 
@@ -54,21 +56,33 @@ namespace hoohub.Pages
         /// 
         /// </summary>
         /// <param name="startAtComic"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
-        public async Task<JsonResult> OnGetComics(string startAtComic = "")
+        public async Task<JsonResult> OnGetComics(
+            string startAtComic = "",
+            string query = "")
         {
             try
             {
                 var allComics = _hooContext.Comics
+                    .AsEnumerable()
                     .Where(comic => !comic.IsHidden)
                     .OrderByDescending(comic => comic.ComicNumber)
                     .ToList();
+
+                if (!string.IsNullOrWhiteSpace(query))
+                {
+                    allComics = allComics.AsEnumerable()
+                        .Where(comic => comic.GetComicNameContainsTerms(query) || comic.GetComicNumberContainsTerms(query) || comic.GetTagsContainsTerms(query))
+                        .ToList();
+                }
+
                 var startIndex = allComics.Any(comic => comic.Id == startAtComic)
                     ? allComics.IndexOf(allComics.First(comic => comic.Id == startAtComic))
                     : 0;
 
                 return new JsonResult(new ArchiveResult(
-                    success: true,
+                success: true,
                     archiveComicData: allComics
                         .Skip(startIndex)
                         .Take(20)

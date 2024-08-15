@@ -11,7 +11,7 @@ $(window).on("scroll", function () {
 })
 
 function getIsWindowScrolledToBottom() {
-    return window.scrollY + window.innerHeight >= document.body.scrollHeight
+    return (window.scrollY + window.innerHeight) >= (document.body.scrollHeight - 50)
 }
 
 /**
@@ -34,7 +34,8 @@ function getComics() {
             dataType: "json",
             data: {
                 __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
-                startAtComic: $(displayedComics).length > 0 ? $($(displayedComics)[displayedComics.length - 1]).data("guid") : ""
+                startAtComic: $(displayedComics).length > 0 ? $($(displayedComics)[displayedComics.length - 1]).data("guid") : "",
+                query: $("#archive-query").val()
             },
             success: function (result) {
                 if ($(displayedComics).length === 0) {
