@@ -186,6 +186,7 @@ h4, h5 {
     right: 2vw;
     border-radius: 50%;
     transition: filter 0.2s;
+    z-index: 150;
 }
 
     .pfp-roundel:hover{ 
@@ -263,20 +264,27 @@ h4, h5 {
     padding-bottom: 10px;
 }
 
-.alert {
+.alert-container {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    z-index: 200;
+}
+
+.alert-content {
     text-align: center;
     font-size: 1.5em;
-    z-index: 200;
-    position: sticky;
+    z-index: 250;
     background: rgba(40,5,1,90%);
     color: #fff;
-    width: 25%;
+    width: 35%;
     margin: auto;
     border-radius: 50px;
     box-shadow: 0 5px 5px 0 rgba(0,0,0,.15);
     margin-bottom: 10px;
     padding-left: 5%;
     padding-right: 5%;
+    position: relative;
 }
 
 input,

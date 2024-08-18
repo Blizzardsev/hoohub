@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
-using NUglify.Helpers;
-using Org.BouncyCastle.Crypto.Macs;
 using System.ComponentModel.DataAnnotations;
 
 namespace hoohub.Pages
@@ -72,29 +70,36 @@ namespace hoohub.Pages
 
                 if (!string.IsNullOrWhiteSpace(query))
                 {
-                    allComics = allComics.AsEnumerable()
+                    allComics = allComics
+                        .AsEnumerable()
                         .Where(comic => comic.GetComicNameContainsTerms(query) || comic.GetComicNumberContainsTerms(query) || comic.GetTagsContainsTerms(query))
                         .ToList();
+                    if (allComics.Count == 0)
+                    {
+                        return new JsonResult(new ArchiveResult(
+                            success: true,
+                            endOfResults: true));
+                    }
                 }
 
-                var startIndex = allComics.Any(comic => comic.Id == startAtComic)
-                    ? allComics.IndexOf(allComics.First(comic => comic.Id == startAtComic))
-                    : 0;
+                var startFromComic = allComics.FirstOrDefault(comic => comic.Id == startAtComic);
+                var startIndex = startFromComic != null
+                    ? allComics.IndexOf(startFromComic)
+                    : -1;
 
+                var archiveComics = allComics.Skip(startIndex + 1).Take(20);
                 return new JsonResult(new ArchiveResult(
-                success: true,
-                    archiveComicData: allComics
-                        .Skip(startIndex)
-                        .Take(20)
-                        .Select(comic => new ArchiveComicData(comic))
-                        .ToList()));
+                    success: true,
+                    endOfResults: archiveComics.Last().Id == allComics.Last().Id,
+                    archiveComicData: archiveComics.Select(comic => new ArchiveComicData(comic)).ToList()));
             }
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
-                eventType: Enums.EventTypes.Error,
+                    eventType: Enums.EventTypes.Error,
                     details: $"Failed to load comic archive for starting comic GUID {startAtComic}: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: false));
             }
         }

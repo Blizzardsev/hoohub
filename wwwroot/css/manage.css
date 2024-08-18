@@ -1,5 +1,5 @@
 ﻿.tab-header {
-    color: "#84706D";
+    color: #84706D;
     background-color: #DFDAD9;
     border: 2px solid #DFDAD9;
     border-bottom: none;
@@ -13,13 +13,13 @@
     padding-left: 5%;
     padding-right: 5%;
     margin-right: 1.5%;
+    font-weight: 700;
 }
 
     .tab-header.selected {
         color: #fff;
         background-color: #280501;
         border-color: #280501;
-        font-weight: 700;
     }
 
     .tab-header:not(.selected):hover {

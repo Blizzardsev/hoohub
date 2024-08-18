@@ -1,6 +1,9 @@
 ﻿let archiveLoadInProgress = false
 let lastScrollPosition = 0
 
+let archiveSearchTimeout = undefined;
+let archiveSearchPending = false;
+
 $(document).ready(function () {
     getComics()
 })
@@ -15,8 +18,18 @@ $(window).on("scroll", function () {
     lastScrollPosition = window.scrollY
 })
 
+/**
+ * 
+ */
 $("#archive-query").on("keyup", function () {
-    
+    if (archiveSearchPending || archiveLoadInProgress) {
+        clearTimeout(archiveSearchTimeout)
+    }
+    archiveSearchPending = true
+    archiveSearchTimeout = setTimeout(() => {
+        archiveSearchPending = false
+        getComics(newSearch=true)
+    }, 1250);
 })
 
 /**
@@ -31,7 +44,7 @@ function getIsWindowScrolledToBottom() {
  * 
  * @returns
  */
-function getComics() {
+function getComics(newSearch=false) {
     if (archiveLoadInProgress) {
         return
     }
@@ -48,36 +61,50 @@ function getComics() {
             dataType: "json",
             data: {
                 __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
-                startAtComic: $(displayedComics).length > 0 ? $($(displayedComics)[displayedComics.length - 1]).data("guid") : "",
+                startAtComic: $(displayedComics).length === 0 || newSearch
+                    ? ""
+                    : $($(displayedComics)[displayedComics.length - 1]).data("guid"),
                 query: $("#archive-query").val()
             },
             success: function (result) {
-                if ($(displayedComics).length === 0) {
-                    $("#archive-items").empty()
+                if (result.success) {
+                    if ($(displayedComics).length === 0 || newSearch) {
+                        $("#archive-items").empty()
+                    }
+                    else {
+                        $("#loader").remove()
+                    }
+                    
+                    if (result.endOfResults) {
+                        displayAlert("End of results")
+                    }
+                    if (result.archiveComicData.length > 0) {
+                        let newComics = []
+                        result.archiveComicData.forEach(function (comic) {
+                            newComics.push(`
+                                <div class="col-auto animate__animated animate__fadeIn">
+                                    <img 
+                                        data-guid="${comic.guid}" 
+                                        data-display-name="${comic.displayName}"
+                                        data-display-description="${comic.description}"
+                                        data-tags="${comic.tags.replace(",", ", ")}"
+                                        class="archive-comic" src="data:image/jpg;base64,${comic.imageData}" 
+                                        title="View ${comic.displayName}..." 
+                                        onclick="showComicFullView(this)"/>
+                                </div>
+                            `)
+                        })
+                        $("#archive-items").append(newComics.join(""))
+                    }
                 }
                 else {
+                    displayAlert("Failed to load comics")
                     $("#loader").remove()
                 }
-                let newComics = []
-                result.archiveComicData.forEach(function (comic) {
-                    newComics.push(`
-                        <div class="col-auto animate__animated animate__fadeIn">
-                            <img 
-                                data-guid="${comic.guid}" 
-                                data-display-name="${comic.displayName}"
-                                data-display-description="${comic.description}"
-                                data-tags="${comic.tags.replace(",", ", ")}"
-                                class="archive-comic" src="data:image/jpg;base64,${comic.imageData}" title="View ${comic.displayName}..." onclick="comicFullView(this)"/>
-                        </div>
-                    `)
-                })
-                $("#archive-items").append(newComics.join(""))
             },
             failure: function () {
-                displayAlert("Failed to load archive: please try again later")
-                if ($(".archive-comic").length === 0) {
-                    $("#archive-items").append(`Failed to load archive: please try again later`)
-                }
+                displayAlert("Failed to load comics")
+                $("#loader").remove()
             },
             complete: function () {
                 setTimeout(function () {
@@ -89,6 +116,27 @@ function getComics() {
     }, 500)
 }
 
-function comicFullView() {
+/**
+ * 
+ * @param {any} comic
+ */
+function showComicFullView(comic) {
+    $("header").append(`
+        <div class="archive-comic-view-container animate__animated animate__fadeIn" onclick="hideComicFullView(this)">
+            <div class="archive-comic-view-content">
+                <h2 class="mb-4">${$(comic).data("display-name")}</h2>
+                <img class="mb-4" src="${$(comic).attr("src")}">
+            </div>
+        </div>
+    `)
+    $("body").addClass("no-scroll")
+}
 
+/**
+ * 
+ * @param {any} element
+ */
+function hideComicFullView(element) {
+    $(element).remove()
+    $("body").removeClass("no-scroll")
 }

@@ -60,7 +60,7 @@ namespace hoohub.Data
         /// <param name="imageData"></param>
         /// <param name="tags"></param>
         /// <param name="isHidden"></param>
-        public Comic(string comicTitle, string comicNumber, string comicDescription, byte[] imageData, List<string> tags, bool isHidden)
+        public Comic(string comicTitle, string comicNumber, string comicDescription, byte[] imageData, string tags, bool isHidden)
         {
             Id = Guid.NewGuid().ToString();
             ComicNumber = comicNumber;

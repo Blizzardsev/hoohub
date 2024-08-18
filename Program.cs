@@ -138,7 +138,7 @@ using (var _scope = app.Services.CreateScope())
             comicNumber: "000",
             comicDescription: "",
             imageData: (byte[])new ImageConverter().ConvertTo(hoohub.Properties.Resources._000, typeof(byte[])),
-            tags: new List<string>(),
+            tags: string.Empty,
             isHidden: false));
 
         _hooContext.Comics.Add(new Comic(
@@ -146,7 +146,7 @@ using (var _scope = app.Services.CreateScope())
             comicNumber: "001",
             comicDescription: "",
             imageData: (byte[])new ImageConverter().ConvertTo(hoohub.Properties.Resources._001, typeof(byte[])),
-            tags: new List<string>(),
+            tags: string.Empty,
             isHidden: false));
 
         _hooContext.Comics.Add(new Comic(
@@ -154,7 +154,7 @@ using (var _scope = app.Services.CreateScope())
             comicNumber: "002",
             comicDescription: "",
             imageData: (byte[])new ImageConverter().ConvertTo(hoohub.Properties.Resources._002, typeof(byte[])),
-            tags: new List<string>(),
+            tags: string.Empty,
             isHidden: false));
         _hooContext.SaveChanges();
     }

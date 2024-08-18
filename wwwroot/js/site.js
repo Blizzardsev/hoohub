@@ -75,8 +75,12 @@ function copyToClipboard(content) {
  */
 function displayAlert(text, delay = 3000) {
     let alertId = uuidv4()
-    let alert = $(`<div id="${alertId}" class="alert animate__animated animate__bounceInDown">${text}</div>`)
-    $("main").append(alert)
+    let alert = $(`
+        <div class="alert-container" id="${alertId}">
+            <div class="alert-content animate__animated animate__bounceInDown">${text}</div>
+        </div>
+    `)
+    $("header").append(alert)
     setTimeout(function () {
         $(`#${alertId}`).remove()
     }, delay)
