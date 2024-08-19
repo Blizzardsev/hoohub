@@ -18,7 +18,7 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
-    pipeline.MinifyJsFiles("js/*");
+    //pipeline.MinifyJsFiles("js/*");
     pipeline.MinifyCssFiles("css/*");
     //pipeline.MinifyHtmlFiles("html/*");
 });

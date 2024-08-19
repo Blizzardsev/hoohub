@@ -78,7 +78,8 @@ namespace hoohub.Pages
                     {
                         return new JsonResult(new ArchiveResult(
                             success: true,
-                            endOfResults: true));
+                            endOfResults: true,
+                            archiveComicData: new List<ArchiveComicData>()));
                     }
                 }
 
@@ -90,8 +91,10 @@ namespace hoohub.Pages
                 var archiveComics = allComics.Skip(startIndex + 1).Take(20);
                 return new JsonResult(new ArchiveResult(
                     success: true,
-                    endOfResults: archiveComics.Last().Id == allComics.Last().Id,
-                    archiveComicData: archiveComics.Select(comic => new ArchiveComicData(comic)).ToList()));
+                    endOfResults: archiveComics.Count() == 0 || archiveComics.Last().Id == allComics.Last().Id,
+                    archiveComicData: archiveComics.Count() == 0 
+                        ? new List<ArchiveComicData>()
+                        : archiveComics.Select(comic => new ArchiveComicData(comic)).ToList()));
             }
             catch (Exception exception)
             {
@@ -100,7 +103,7 @@ namespace hoohub.Pages
                     details: $"Failed to load comic archive for starting comic GUID {startAtComic}: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
-                return new JsonResult(new BaseResult(success: false));
+                return new JsonResult(new BaseResult(success: false, message: exception.Message));
             }
         }
     }

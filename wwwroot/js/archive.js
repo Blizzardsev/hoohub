@@ -5,7 +5,7 @@ let archiveSearchTimeout = undefined;
 let archiveSearchPending = false;
 
 $(document).ready(function () {
-    getComics()
+    getComics(false, false)
 })
 
 /**
@@ -44,7 +44,7 @@ function getIsWindowScrolledToBottom() {
  * 
  * @returns
  */
-function getComics(newSearch=false) {
+function getComics(newSearch=false, displayEndOfResultsPrompt=true) {
     if (archiveLoadInProgress) {
         return
     }
@@ -75,7 +75,7 @@ function getComics(newSearch=false) {
                         $("#loader").remove()
                     }
                     
-                    if (result.endOfResults) {
+                    if (result.endOfResults && displayEndOfResultsPrompt) {
                         displayAlert("End of results")
                     }
                     if (result.archiveComicData.length > 0) {
@@ -86,8 +86,9 @@ function getComics(newSearch=false) {
                                     <img 
                                         data-guid="${comic.guid}" 
                                         data-display-name="${comic.displayName}"
-                                        data-display-description="${comic.description}"
-                                        data-tags="${comic.tags.replace(",", ", ")}"
+                                        data-display-publish-date="${comic.displayPublishDate}"
+                                        data-description="${comic.description}"
+                                        data-display-tags="${comic.displayTags}"
                                         class="archive-comic" src="data:image/jpg;base64,${comic.imageData}" 
                                         title="View ${comic.displayName}..." 
                                         onclick="showComicFullView(this)"/>
@@ -122,10 +123,13 @@ function getComics(newSearch=false) {
  */
 function showComicFullView(comic) {
     $("header").append(`
-        <div class="archive-comic-view-container animate__animated animate__fadeIn" onclick="hideComicFullView(this)">
+        <div class="archive-comic-view-container animate__animated animate__fadeIn animate__faster" onclick="hideComicFullView(this)">
             <div class="archive-comic-view-content">
-                <h2 class="mb-4">${$(comic).data("display-name")}</h2>
+                <h2 class="">${$(comic).data("display-name")}</h2>
+                <h5 class="fst-italic mb-4">${$(comic).data("display-publish-date")}</h5>
                 <img class="mb-4" src="${$(comic).attr("src")}">
+                <h5 class="fst-italic">${$(comic).data("description")}</h5>
+                <h5 class="fst-italic">Tags | ${$(comic).data("display-tags")}</h5>
             </div>
         </div>
     `)

@@ -10,8 +10,8 @@
     cursor: pointer;
     padding-top: 10px;
     padding-bottom: 10px;
-    padding-left: 5%;
-    padding-right: 5%;
+    padding-left: 2%;
+    padding-right: 2%;
     margin-right: 1.5%;
     font-weight: 700;
 }
@@ -48,3 +48,36 @@
     .tab-body.selected {
         display: block;
     }
+
+#new-comic-preview,
+#me-pfp-preview {
+    width: 500px;
+    height: 500px;
+    border: 2px solid #280501;
+    border-radius: 5px;
+    margin: auto;
+    display: block;
+    transition: filter 0.5s;
+    cursor: pointer;
+    object-fit: scale-down;
+}
+
+    #new-comic-preview:hover {
+        filter: brightness(80%);
+    }
+
+input {
+    min-width: 100% !important;
+    max-width: 100% !important;
+}
+
+.text-warning {
+    text-align: center;
+    display: block;
+    margin-top: -5px;
+}
+
+.hint-text {
+    color: #808080;
+    font-style: italic;
+}

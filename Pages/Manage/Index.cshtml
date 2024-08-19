@@ -1,4 +1,5 @@
 ﻿@page
+@using hoohub.Services
 @model hoohub.Pages.Manage.IndexModel
 @{
     ViewData["Title"] = "Manage";
@@ -8,7 +9,9 @@
     <link rel="stylesheet" href="~/css/manage.css" asp-append-version="true"/>
 }
 
-<div class="container content-panel">
+@Html.AntiForgeryToken()
+
+<div class="container content-panel animate__animated animate__fadeIn">
     <div class="row vw-75 mx-auto">
         <div data-tab-id="0" class="col-auto tab-header selected" onclick="switchTab(0)">
             <span>New comic</span>
@@ -19,25 +22,63 @@
         <div data-tab-id="2" class="col-auto tab-header" onclick="switchTab(2)">
             <span>Site options</span>
         </div>
+        <div data-tab-id="3" class="col-auto tab-header" onclick="switchTab(3)">
+            <span>Me</span>
+        </div>
     </div>
     <div class="row">
         <div data-tab-id="0" class="container tab-body selected">
             <h3 class="mb-4">New comic</h3>
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi nibh lorem, pulvinar ac laoreet volutpat, dictum sed est. Sed in odio lorem. Donec sit amet mi lorem. Aenean vel malesuada ex. Integer feugiat nibh a orci suscipit egestas. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nunc tortor nibh, convallis in dictum a, scelerisque vel quam. Sed nec leo suscipit, congue risus vel, iaculis enim. Pellentesque ultricies ac nibh id luctus. Suspendisse feugiat dui id pellentesque tristique. Sed congue nisi a urna vehicula, non feugiat urna luctus. Praesent nec venenatis turpis, at eleifend nibh. Mauris et quam sit amet urna facilisis elementum. Sed at nulla fringilla, elementum diam sit amet, molestie tellus. Sed eget est venenatis, dapibus ipsum quis, interdum nibh. Mauris sit amet lectus nec lacus placerat aliquam nec eu massa.
-                <br /><br />
-                Cras quis ullamcorper augue. Nullam dignissim vitae ante at blandit. Vestibulum in pretium odio. In volutpat libero et vehicula fringilla. In hac habitasse platea dictumst. Morbi pellentesque venenatis magna et dictum. Sed viverra pharetra leo, non accumsan nunc sollicitudin vitae. Etiam at lacus lectus. Donec bibendum congue vestibulum. Aliquam non tellus ultrices, vestibulum quam sed, fringilla turpis. Integer elit dolor, dictum at urna at, pulvinar tristique nunc. Morbi rutrum vitae mauris eu posuere. Fusce ultrices felis ipsum. Phasellus enim magna, fringilla sit amet nisl ac, varius hendrerit dui. Integer id ex pulvinar, dictum eros quis, ornare ante.
-                <br /><br />
-                Cras dapibus eleifend ante a hendrerit. Fusce sed ipsum sed tellus blandit hendrerit nec at mi. Proin dapibus ultricies ante. Phasellus rutrum mollis dolor, vitae rutrum turpis dignissim sit amet. Nulla vitae hendrerit neque, vitae pharetra nisi. Sed laoreet nunc non ex cursus, at aliquam lorem feugiat. Suspendisse scelerisque vehicula erat in sollicitudin. Fusce lacinia tortor a mauris aliquam, vitae commodo mi euismod.
-                <br /><br />
-                Proin quis lacus lorem. Aenean dictum, nisl et congue suscipit, nisi dui consequat nulla, sit amet condimentum ex sem ac erat. Aenean vestibulum neque et congue porttitor. Aliquam elementum convallis dapibus. Aliquam ac faucibus dolor. Proin quis sapien sollicitudin, venenatis nulla id, blandit felis. Praesent egestas, nunc sit amet auctor ultricies, sem lacus tincidunt sapien, quis mattis ante erat eget nisl. Morbi in aliquam nunc. Nulla facilisis eu risus quis accumsan. Integer eu nisl auctor nibh volutpat suscipit a nec mi. Suspendisse iaculis neque at volutpat placerat. Pellentesque tortor massa, venenatis a risus eu, faucibus posuere eros. Aenean quis velit malesuada, dictum augue ac, tincidunt elit.
-                <br /><br />
-                Integer euismod lorem magna, sit amet porta magna scelerisque ac. Vestibulum sed nunc pulvinar, volutpat urna et, pellentesque enim. Vivamus eu cursus nisl. Maecenas bibendum condimentum dignissim. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Duis ut lobortis sem, sit amet convallis magna. Duis efficitur tellus consequat massa consectetur, at mollis ligula hendrerit. Phasellus id sem ut nunc aliquam fringilla. Vestibulum blandit finibus tincidunt. Donec dictum vitae arcu ac bibendum.
-                <br /><br />
-                In tincidunt sagittis mi, eget tempus mi. Vestibulum venenatis varius mi et imperdiet. Morbi nec magna ut odio ultrices elementum ac at ante. Proin vitae facilisis elit, consequat malesuada libero. Maecenas ornare quam sit amet quam luctus, sit amet eleifend tellus efficitur. Maecenas ut pulvinar erat. Quisque blandit metus sem, ut sodales mauris viverra et. Aliquam auctor aliquam diam non interdum. Praesent maximus, enim et molestie mattis, mi ipsum vestibulum urna, eget placerat massa lectus maximus enim. Proin et diam eu sapien fermentum tempus. Nam dapibus diam purus, a egestas ex iaculis euismod.
-                <br /><br />
-                Donec at ipsum nec purus aliquam laoreet sed id eros. Proin tincidunt, orci vitae rutrum facilisis, magna orci fringilla ante, vel efficitur tortor sem et purus. Pellentesque dignissim pretium nisi. Suspendisse vehicula tortor et ornare aliquam. Suspendisse sollicitudin efficitur velit. Integer felis risus, suscipit eget vulputate et, dictum efficitur eros. Suspendisse ultrices turpis diam, nec dignissim quam viverra quis. Donec scelerisque scelerisque purus. In efficitur lectus vel efficitur porttitor. Suspendisse viverra orci vitae elit sollicitudin, a malesuada dui imperdiet. Praesent luctus congue sapien non ornare. Nulla facilisi.
-            </p>
+            <div class="row">
+                <div class="col">
+                    <h5 class="text-center mb-2">Preview</h5>
+                    <img id="new-comic-preview" title="Upload a comic..." class="animate__animated animate__fadeIn" src="~/img/hoo_logo_placeholder.png" data-placeholder="@($@"data:image/jpg;base64, {FormattingService.GetBitmapAsBase64String(Properties.Resources.hoo_logo_placeholder)}")" onclick="$('#new-comic-image-data').click()" />
+                </div>
+                <div class="col">
+                    <form id="new-comic-form" class="w-75 mx-auto" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        <div class="form-group">
+                            <input class="d-none" id="new-comic-image-data" asp-for="ManageInputModel.NewComicInput.ImageData" accept=".png,.jpg,.jpeg"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" asp-for="ManageInputModel.NewComicInput.ComicNumber"></label>
+                            <input id="new-comic-comic-number" asp-for="ManageInputModel.NewComicInput.ComicNumber" class="form-control" />
+                            <span asp-validation-for="ManageInputModel.NewComicInput.ComicNumber" class="text-warning"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" asp-for="ManageInputModel.NewComicInput.ComicTitle"></label>
+                            <input id="new-comic-comic-title" asp-for="ManageInputModel.NewComicInput.ComicTitle" class="form-control" />
+                            <span asp-validation-for="ManageInputModel.NewComicInput.ComicTitle" class="text-warning"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" asp-for="ManageInputModel.NewComicInput.ComicDescription"></label>
+                            <input id="new-comic-comic-description" asp-for="ManageInputModel.NewComicInput.ComicDescription" class="form-control" />
+                            <span asp-validation-for="ManageInputModel.NewComicInput.ComicDescription" class="text-warning"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" asp-for="ManageInputModel.NewComicInput.Tags"></label>
+                            <input id="new-comic-comic-tags" asp-for="ManageInputModel.NewComicInput.Tags" class="form-control" />
+                            <span asp-validation-for="ManageInputModel.NewComicInput.Tags" class="text-warning"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" asp-for="ManageInputModel.NewComicInput.IsHidden"></label>
+                            <br />
+                            <label class="form-label hint-text">Hidden posts will not be visible by default</label>
+                        </div>
+                        <label class="switch form-group mb-4 row justify-content-center mx-auto scale-75">
+                            <input id="new-comic-is-hidden" type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                        <div class="row mt-4 d-flex justify-content-center mx-auto">
+                            <div class="col-auto mx-auto">
+                                <div class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="postNewComic(this)">history_edu</div>
+                                <br />
+                                <span class="option-tip">Publish</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
         <div data-tab-id="1" class="container tab-body">
             <h3 class="mb-4">Manage comics</h3>
@@ -45,9 +86,13 @@
         <div data-tab-id="2" class="container tab-body">
             <h3 class="mb-4">Site options</h3>
         </div>
+        <div data-tab-id="3" class="container tab-body">
+            <h3 class="mb-4">Me</h3>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <script type="text/javascript" src="~/js/manage.js" asp-append-version="true"></script>
+    <partial name="_ValidationScriptsPartial" />
 }

@@ -93,6 +93,16 @@ namespace hoohub.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap hoo_logo_placeholder {
+            get {
+                object obj = ResourceManager.GetObject("hoo_logo_placeholder", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap hoo_pfp {
             get {
                 object obj = ResourceManager.GetObject("hoo_pfp", resourceCulture);

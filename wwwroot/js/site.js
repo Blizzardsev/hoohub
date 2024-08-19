@@ -87,6 +87,29 @@ function displayAlert(text, delay = 3000) {
 }
 
 /**
+ * 
+ * @returns 
+ */
+function displayLoading() {
+    let loaderId = uuidv4()
+    let loader = $(`
+        <div class="loading-container" id="${loaderId}">
+            <div class="loader">
+        </div>
+    `)
+    $("header").append(loader)
+    return loaderId
+}
+
+/**
+ * 
+ * @param {*} loaderId 
+ */
+function hideLoading(loaderId) {
+    $(`#${loaderId}`).remove()
+}
+
+/**
 * Returns true when an element is scrolled to the bottom.
 * @param {*} element - The element to test
 * @returns - true if the element is scrolled to the bottom
@@ -94,4 +117,35 @@ function displayAlert(text, delay = 3000) {
 function elementIsScrolledToBottom(element) {
     console.log(element.scrollTop)
     return element.scrollTop > 0 && Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) <= 1
+}
+
+/**
+ * Sets the lock state of a form, determining if the controls on the form (select, input and textarea) elements may be interacted with.
+ * @param {*} form - The form to evaluate for controls to lock/unlock
+ * @param {*} state - The locked/unlocked state to set (true to lock)
+ */
+function setFormLockState(form, state) {
+    $(form).find("input").prop("readonly", state)
+    $(form).find("select").prop("readonly", state)
+    $(form).find("textarea").prop("readonly", state)
+    $(form).find(":checkbox").prop("disabled", state)
+
+    if (state) {
+        $(form).find('select option:not(:selected)').prop('disabled', true)
+    }
+    else {
+        $(form).find('select option').prop('disabled', false)
+        $(form).find('select option[default]').prop('disabled', true)
+    }
+}
+
+/**
+ * Clears all input-type nodes for a given form. Select fields are set to their first value
+ * @param {*} form 
+ */
+function clearForm(form) {
+    $(form).find("input").val("")
+    $(form).find("textarea").val("")
+    $(form).find("select").prop("selectedIndex", 0)
+    $(form).find(":checkbox").prop("checked", false)
 }
