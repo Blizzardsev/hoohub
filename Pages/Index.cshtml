@@ -41,7 +41,7 @@
             <div class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mt-2">fast_rewind</div>
         }
         
-        <a asp-page="/Index" asp-page-handler="RandomComic">
+        <a asp-page="/Index" asp-page-handler="RandomComic" asp-route-currentComic="@(Model.Comic != null ? Model.Comic.Id : string.Empty)">
             <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2 mb-2" title="Random comic...">shuffle</div>
         </a>
 

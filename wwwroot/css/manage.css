@@ -51,7 +51,7 @@
 
 #new-comic-preview,
 #manage-comic-preview,
-#me-pfp-preview {
+#manage-me-preview {
     width: 500px;
     height: 500px;
     border: 2px solid #280501;
@@ -63,16 +63,24 @@
     object-fit: scale-down;
 }
 
-    #manage-comic-preview {
+    #manage-comic-preview,
+    #manage-me-preview {
         width: 200px;
         height: 200px;
         top: 10%;
         position: relative;
     }
 
+    #manage-me-preview {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
     #new-comic-preview:hover,
     #manage-comic-preview:hover,
-    #me-pfp-preview:hover {
+    #manage-me-preview:hover {
         filter: brightness(80%);
     }
 

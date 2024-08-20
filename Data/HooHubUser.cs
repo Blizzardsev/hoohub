@@ -53,6 +53,6 @@ namespace hoohub.Data
         /// Returns the handle and ID of this user in the format <see cref="Handle"/> (Guid: <see cref="Guid"/>).
         /// </summary>
         /// <returns>The handle and ID of this user in the format <see cref="Handle"/> (Guid: <see cref="Guid"/>).</returns>
-        public string GetEventLogString() => $"{Handle} (Guid: {Id})";
+        public string GetEventLogString() => $"{Handle} (GUID: {Id})";
     }
 }

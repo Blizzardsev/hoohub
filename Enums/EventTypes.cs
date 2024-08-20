@@ -4,49 +4,61 @@ namespace hoohub.Enums
 {
     public enum EventTypes
 	{
-        [Description("")]
+        [Description("App started")]
         AppStarted,
 
-        [Description("")]
+        [Description("Warning")]
 		Warning,
 
-		[Description("")]
+		[Description("Error")]
 		Error,
 
-        [Description("")]
+        [Description("User created")]
         UserCreated,
 
-        [Description("")]
+        [Description("User login attempt")]
         UserLoginAttempt,
 
-        [Description("")]
+        [Description("User logged in")]
 		UserLoggedIn,
 
-		[Description("")]
+		[Description("User logged out")]
 		UserLoggedOut,
 
-		[Description("")]
+		[Description("User password reset")]
 		UserPasswordReset,
 
-		[Description("")]
+		[Description("User locked out")]
 		UserLockedOut,
 
-        [Description("")]
+        [Description("User password reset requested")]
         UserPasswordResetRequested,
 
-        [Description("")]
+        [Description("User profile updated")]
+        UserUpdated,
+
+        [Description("Two factor challenge issued")]
         TwoFactorChallengeIssued,
 
-		[Description("")]
+		[Description("Two factor code issued")]
         TwoFactorCodeIssued,
 
-        [Description("")]
+        [Description("Comic created")]
 		ComicCreated,
 
-		[Description("")]
+		[Description("Comic updated")]
 		ComicUpdated,
 
-		[Description("")]
-		ComicDeleted
-	}
+		[Description("Comic deleted")]
+		ComicDeleted,
+
+		[Description("Comic released")]
+		ComicReleased,
+
+		[Description("Maintenance")]
+        Maintenance,
+
+        [Description("Email sent")]
+        EmailSent
+    }
 }

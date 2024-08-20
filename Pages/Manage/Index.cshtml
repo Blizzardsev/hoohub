@@ -25,6 +25,9 @@
         <div data-tab-id="3" class="col-auto tab-header" onclick="switchTab(3)">
             <span>Me</span>
         </div>
+        <div data-tab-id="4" class="col-auto tab-header" onclick="switchTab(4)">
+            <span>Logs</span>
+        </div>
     </div>
     <div class="row">
         <div data-tab-id="0" class="container tab-body selected">
@@ -139,7 +142,7 @@
                                     <label class="form-label hint-text">Hidden posts will not be visible by default</label>
                                 </div>
                                 <label class="switch form-group mb-4 row justify-content-center mx-auto scale-75">
-                                    <input id="new-comic-is-hidden" type="checkbox">
+                                    <input id="manage-comic-is-hidden" type="checkbox">
                                     <span class="slider"></span>
                                 </label>
                             </form>
@@ -147,7 +150,7 @@
                     </div>
                     <div class="row mt-4 d-flex justify-content-center mx-auto">
                         <div class="col-auto mx-auto">
-                            <div id="manage-comic-update" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow disabled" onclick="postManageComic(this)">update</div>
+                            <div id="manage-comic-update" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow disabled" onclick="patchComic(this)">update</div>
                             <br />
                             <span class="option-tip">Update</span>
                         </div>
@@ -160,6 +163,33 @@
         </div>
         <div data-tab-id="3" class="container tab-body">
             <h3 class="mb-4">Me</h3>
+            <div class="container mx-auto my-auto">
+                <form id="manage-me-form" class="w-50 mx-auto" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                    <img id="manage-me-preview" title="Upload a display picture..." class="animate__animated animate__fadeIn" src="@($@"data:image/jpg;base64, {Model.DisplayPictureOnLoad}")" data-placeholder="@($@"data:image/jpg;base64, {Model.DisplayPictureOnLoad}")" onclick="$('#manage-me-image-data').click()" />
+                    <br />
+                    <span asp-validation-for="ManageInputModel.ManageComicInput.ImageData" class="text-warning"></span>
+
+                    <div class="form-group">
+                        <input class="d-none" id="manage-me-image-data" asp-for="ManageInputModel.ManageMeInput.ImageData" accept=".png,.jpg,.jpeg" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" asp-for="ManageInputModel.ManageMeInput.Handle"></label>
+                        <input id="manage-me-handle" asp-for="ManageInputModel.ManageMeInput.Handle" class="form-control w-75"/>
+                        <span asp-validation-for="ManageInputModel.ManageMeInput.Handle" class="text-warning"></span>
+                    </div>
+                </form>
+                <div class="row mt-4 d-flex justify-content-center mx-auto">
+                    <div class="col-auto mx-auto">
+                        <div class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="patchProfile(this)">update</div>
+                        <br />
+                        <span class="option-tip">Update</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-tab-id="4" class="container tab-body">
+            <h3 class="mb-4">Logs</h3>
         </div>
     </div>
 </div>

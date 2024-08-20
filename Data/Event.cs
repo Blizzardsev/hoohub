@@ -29,10 +29,19 @@ namespace hoohub.Data
         /// </summary>
         public string StackTrace { get; init; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public Event()
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="eventType"></param>
+        /// <param name="details"></param>
+        /// <param name="stackTrace"></param>
         public Event(EventTypes eventType, string details = "", string stackTrace = "")
         {
             Id = Guid.NewGuid().ToString();
@@ -41,5 +50,11 @@ namespace hoohub.Data
             Details = details;
             StackTrace = stackTrace;
         }
+
+        /// <summary>
+        /// Returns a <see cref="TimeSpan"/> representing the age of this event.
+        /// </summary>
+        /// <returns><see cref="TimeSpan"/> representing the age of this event.</returns>
+        public TimeSpan GetAge() => DateTime.Now - CreatedDate;
     }
 }

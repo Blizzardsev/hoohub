@@ -29,8 +29,6 @@ namespace hoohub.Data
         /// </summary>
         public DateTime PublishDate { get; init; }
 
-        // TODO: scheduling comics
-
         /// <summary>
         /// 
         /// </summary>

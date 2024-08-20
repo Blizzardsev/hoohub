@@ -91,6 +91,24 @@ namespace hoohub.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to dd/MM/yyyy.
+        /// </summary>
+        internal static string DateFormat {
+            get {
+                return ResourceManager.GetString("DateFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to dd/MM/yyyy HH:mm.
+        /// </summary>
+        internal static string DatetimeFormat {
+            get {
+                return ResourceManager.GetString("DatetimeFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap hoo_logo_placeholder {

@@ -1,4 +1,5 @@
 ﻿let validExtensions = ["png", "jpeg", "jpg"]
+let profilePicturePreviewSource = null
 
 $(document).ready(function() {
     getManageComicsList()
@@ -34,6 +35,23 @@ $("#manage-comic-image-data").on("change", function () {
     }
     else {
         $("#manage-comic-preview").attr("src", $("#manage-comic-preview").data("placeholder"))
+    }
+})
+
+/**
+ * 
+ */
+$("#manage-me-image-data").on("change", function () {
+    let imageFile = document.getElementById("manage-me-image-data").files[0]
+
+    if (getFileExtensionValid(imageFile)) {
+        $("#manage-me-preview").removeClass("animate__fadeIn")
+        profilePicturePreviewSource = URL.createObjectURL(imageFile)
+        $("#manage-me-preview").attr("src", profilePicturePreviewSource)
+        $("#manage-me-preview").addClass("animate__fadeIn")
+    }
+    else {
+        $("#manage-me-preview").attr("src", $("#manage-me-preview").data("placeholder"))
     }
 })
 
@@ -97,15 +115,14 @@ function postNewComic(element) {
                     $("#new-comic-preview").attr("src", $("#new-comic-preview").data("placeholder"))
                 }
                 else {
-                    hideLoading(loaderId)
-                    displayAlert("Failed to post comic")
+                    displayAlert(result.message)
                 }
             },
             failure: function () {
-                hideLoading(loaderId)
                 displayAlert("Failed to post comics")
             },
             complete: function () {
+                hideLoading(loaderId)
                 $(element).removeClass("disabled")
                 setFormLockState(newComicForm, false)
             }
@@ -180,18 +197,20 @@ function loadManageComic(element, comicGuid) {
                 $(element).addClass("selected")
                 setFormLockState($("#manage-comic-form"), false)
                 
-                $("#manage-comic-image-data").val("")
+                $("#manage-comic-image-data").val(null)
                 $("#manage-comic-preview").attr("src", `data:image/jpg;base64,${result.imageData}`)
                 $("#manage-comic-comic-guid").val(result.guid)
                 $("#manage-comic-comic-number").val(result.comicNumber)
                 $("#manage-comic-comic-title").val(result.comicTitle)
                 $("#manage-comic-comic-description").val(result.comicDescription)
                 $("#manage-comic-comic-tags").val(result.tags)
-                $("#new-comic-is-hidden").prop("checked", result.isHidden)
+                $("#manage-comic-is-hidden").prop("checked", result.isHidden)
                 $("#manage-comic-update").removeClass("disabled")
+
+                $("#manage-comic-form").validate()
             }
             else {
-                displayAlert("Failed to load comic")
+                displayAlert(result.message)
             }
         },
         failure: function () {
@@ -205,7 +224,7 @@ function loadManageComic(element, comicGuid) {
  */
 function manageComicPreviewClick() {
     if (!$("#manage-comic-form").hasClass("locked")) {
-        $('#manage-comic-preview').attr("onclick", $('#manage-comic-image-data').click())
+        $('#manage-comic-image-data').click()
     }
 }
 
@@ -215,9 +234,103 @@ function manageComicPreviewClick() {
  * @returns 
  */
 function patchComic(element) {
-    if ($(element).hasClass("disabled")) {
+    let manageComicForm = $("#manage-comic-form")
+
+    $(manageComicForm).validate()
+    if ($(element).hasClass("disabled") || !$(manageComicForm).valid()) {
         return
     }
-    
     $(element).addClass("disabled")
+
+    let formData = new FormData()
+    formData.append("__RequestVerificationToken", $('input[name="__RequestVerificationToken"]').val())
+    formData.append("comicGuid", $("#manage-comic-comic-guid").val())
+    formData.append("comicNumber", $("#manage-comic-comic-number").val())
+    formData.append("comicTitle", $("#manage-comic-comic-title").val())
+    formData.append("comicDescription", $("#manage-comic-comic-description").val())
+    formData.append("imageData", $("#manage-comic-image-data").prop("files")[0])
+    formData.append("tags", $("#manage-comic-comic-tags").val())
+    formData.append("isHidden", $("#manage-comic-is-hidden").is(":checked"))
+
+    setFormLockState(manageComicForm, true)
+    let loaderId = displayLoading()
+    setTimeout(function () {
+        $.ajax({
+            type: "PATCH",
+            url: "?handler=Comic",
+            data: formData,
+            processData: false, 
+            contentType: false,
+            success: function (result) {
+                if (result.success) {
+                    displayAlert("Comic updated!")
+                }
+                else {
+                    displayAlert(result.message)
+                }
+
+                getManageComicsList($("#manage-comics-refresh"))
+            },
+            failure: function () {
+                displayAlert("Failed to update comic")
+            },
+            complete: function () {
+                hideLoading(loaderId)
+                $(element).removeClass("disabled")
+                setFormLockState(manageComicForm, false)
+            }
+        })
+    }, 500)
+}
+
+/**
+ * 
+ * @param {*} element 
+ * @returns 
+ */
+function patchProfile(element) {
+    let manageMeForm = $("#manage-me-form")
+
+    $(manageMeForm).validate()
+    if ($(element).hasClass("disabled") || !$(manageMeForm).valid()) {
+        return
+    }
+    $(element).addClass("disabled")
+
+    let formData = new FormData()
+    formData.append("__RequestVerificationToken", $('input[name="__RequestVerificationToken"]').val())
+    formData.append("handle", $("#manage-me-handle").val())
+    formData.append("imageData", $("#manage-me-image-data").prop("files")[0])
+
+    setFormLockState(manageMeForm, true)
+    let loaderId = displayLoading()
+    setTimeout(function () {
+        $.ajax({
+            type: "PATCH",
+            url: "?handler=Me",
+            data: formData,
+            processData: false, 
+            contentType: false,
+            success: function (result) {
+                if (result.success) {
+                    displayAlert("Profile updated!")
+                    $(".pfp-roundel").attr("title", `Signed in as ${$("#manage-me-handle").val()}`)
+                    $(".pfp-roundel").attr("src", profilePicturePreviewSource)
+                }
+                else {
+                    displayAlert(result.message)
+                }
+
+                getManageComicsList($("#manage-comics-refresh"))
+            },
+            failure: function () {
+                displayAlert("Failed to update profile")
+            },
+            complete: function () {
+                hideLoading(loaderId)
+                $(element).removeClass("disabled")
+                setFormLockState(manageMeForm, false)
+            }
+        })
+    }, 500)
 }

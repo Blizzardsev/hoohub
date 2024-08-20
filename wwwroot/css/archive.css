@@ -1,8 +1,10 @@
 ﻿.archive-comic {
 	padding: 2%;
 	width: 15vw;
+	height: 15vw;
 	cursor: pointer;
-	transition: 0.5s;
+	transition: .5s;
+	object-fit: cover;
 }
 
 	.archive-comic:hover {
@@ -37,5 +39,7 @@
 	}
 
 		.archive-comic-view-content img {
-			width: 70vh;
+			width: 62vh;
+			height: 62vh;
+			object-fit: contain;
 		}

@@ -1,10 +1,21 @@
-﻿using System.Drawing;
+﻿using hoohub.Properties;
+using System.Drawing;
 using System.Drawing.Imaging;
 
 namespace hoohub.Services
 {
     public class FormattingService
     {
+        /// <summary>
+        /// Given a <see cref="DateTime"/> object, returns a formatted representation based on format declared in
+        /// <see cref="Resources.DatetimeFormat"/>.
+        /// </summary>
+        /// <param name="dateTime">The datetime to return a string for.</param>
+        /// <returns>Formatted datetime string.</returns> 
+        public static string GetDateTimeAsString(DateTime dateTime, bool includeTime = true) => includeTime
+            ? dateTime.ToString(Resources.DatetimeFormat)
+            : dateTime.ToString(Resources.DateFormat);
+
         /// <summary>
         /// 
         /// </summary>

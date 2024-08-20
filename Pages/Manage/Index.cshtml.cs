@@ -21,6 +21,8 @@ namespace hoohub.Pages.Manage
         [BindProperty]
         public ManageInput ManageInputModel { get; set; } = new ManageInput();
 
+        public string DisplayPictureOnLoad { get; set; }
+
         public IndexModel(HooHubContext hooContext, UserManager<HooHubUser> userManager)
         {
             _hooContext = hooContext;
@@ -117,7 +119,17 @@ namespace hoohub.Pages.Manage
 
             public class ManageMe()
             {
-                
+                [Display(Name = "Handle", Prompt = "hoo")]
+                [Required(AllowEmptyStrings = false, ErrorMessage = "Handle must be provided")]
+                [MinLength(1)]
+                [MaxLength(10)]
+                [RegularExpression("^[A-Za-z]+$", ErrorMessage = "Handle cannot contain numbers, symbols or whitespace")]
+                public string Handle { get; set; }
+
+                [Required(ErrorMessage = "Profile must have a picture")]
+                [MinLength(1)]
+                [MaxLength(1)]
+                public IFormFile ImageData { get; set; }
             }
 
             public NewComic NewComicInput;
@@ -139,6 +151,9 @@ namespace hoohub.Pages.Manage
         /// </summary>
         public void OnGet()
         {
+            var currentUser = _userManager.GetUserAsync(User).Result;
+            DisplayPictureOnLoad = Convert.ToBase64String(currentUser.DisplayPicture);
+            ManageInputModel.ManageMeInput.Handle = currentUser.Handle;
         }
 
         /// <summary>
@@ -267,6 +282,17 @@ namespace hoohub.Pages.Manage
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="comicGuid"></param>
+        /// <param name="comicNumber"></param>
+        /// <param name="comicTitle"></param>
+        /// <param name="comicDescription"></param>
+        /// <param name="tags"></param>
+        /// <param name="isHidden"></param>
+        /// <param name="imageData"></param>
+        /// <returns></returns>
         public async Task<JsonResult> OnPatchComicAsync(
             string comicGuid,
             string comicNumber,
@@ -291,14 +317,14 @@ namespace hoohub.Pages.Manage
                         message: $"Comic {comicNumber} already exists"));
                 }
 
-                if (imageData == null)
+                if ((comic.ImageData == null || comic.ImageData.Length == 0) && imageData == null)
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
                         message: $"A comic image file is required"));
                 }
 
-                if (!_comicUploadFileExtensions.Contains(imageData.FileName.Split(".").Last()))
+                if (imageData != null && !_comicUploadFileExtensions.Contains(imageData.FileName.Split(".").Last()))
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
@@ -326,6 +352,54 @@ namespace hoohub.Pages.Manage
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: Enums.EventTypes.Error,
                     details: $"Failed to update comic GUID {comicGuid}: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: false));
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="handle"></param>
+        /// <param name="imageData"></param>
+        /// <returns></returns>
+        public async Task<JsonResult> OnPatchMeAsync(string handle, IFormFile imageData = null)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            try
+            {
+                if ((user.DisplayPicture == null || user.DisplayPicture.Length == 0) && imageData == null)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"A profile picture is required"));
+                }
+
+                if (imageData != null && !_comicUploadFileExtensions.Contains(imageData.FileName.Split(".").Last()))
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"Profile pictures must be uploaded in jpg or png format"));
+                }
+
+                user.Handle = handle;
+                user.DisplayPicture = imageData != null
+                    ? FormattingService.GetIFormFileAsBytes(imageData)
+                    : user.DisplayPicture;
+
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: Enums.EventTypes.UserUpdated,
+                    details: $"{user.Handle} updated their profile."));
+                await _hooContext.SaveChangesAsync();
+
+                return new JsonResult(new BaseResult(success: true));
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: Enums.EventTypes.Error,
+                    details: $"Failed to update profile for {user.GetEventLogString()}: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: false));
