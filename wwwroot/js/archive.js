@@ -40,9 +40,12 @@ function getIsWindowScrolledToBottom() {
     return ((window.scrollY + window.innerHeight) >= (document.body.scrollHeight + 20) && window.scrollY > lastScrollPosition)
 }
 
+
 /**
  * 
- * @returns
+ * @param {*} newSearch 
+ * @param {*} displayEndOfResultsPrompt 
+ * @returns 
  */
 function getComics(newSearch=false, displayEndOfResultsPrompt=true) {
     if (archiveLoadInProgress) {
@@ -125,7 +128,7 @@ function showComicFullView(comic) {
     $("header").append(`
         <div class="archive-comic-view-container animate__animated animate__fadeIn animate__faster" onclick="hideComicFullView(this)">
             <div class="archive-comic-view-content">
-                <h2 class="">${$(comic).data("display-name")}</h2>
+                <h2>${$(comic).data("display-name")}</h2>
                 <h5 class="fst-italic mb-4">${$(comic).data("display-publish-date")}</h5>
                 <img class="mb-4" src="${$(comic).attr("src")}">
                 <h5 class="fst-italic">${$(comic).data("description")}</h5>

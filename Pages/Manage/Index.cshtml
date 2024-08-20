@@ -16,7 +16,7 @@
         <div data-tab-id="0" class="col-auto tab-header selected" onclick="switchTab(0)">
             <span>New comic</span>
         </div>
-        <div data-tab-id="1" class="col-auto tab-header" onclick="switchTab(1)">
+        <div data-tab-id="1" class="col-auto tab-header" onclick="switchTab(1);getManageComicsList($('#manage-comics-refresh'))">
             <span>Manage comics</span>
         </div>
         <div data-tab-id="2" class="col-auto tab-header" onclick="switchTab(2)">
@@ -33,6 +33,8 @@
                 <div class="col">
                     <h5 class="text-center mb-2">Preview</h5>
                     <img id="new-comic-preview" title="Upload a comic..." class="animate__animated animate__fadeIn" src="~/img/hoo_logo_placeholder.png" data-placeholder="@($@"data:image/jpg;base64, {FormattingService.GetBitmapAsBase64String(Properties.Resources.hoo_logo_placeholder)}")" onclick="$('#new-comic-image-data').click()" />
+                    <br />
+                    <span asp-validation-for="ManageInputModel.NewComicInput.ImageData" class="text-warning"></span>
                 </div>
                 <div class="col">
                     <form id="new-comic-form" class="w-75 mx-auto" enctype="multipart/form-data">
@@ -82,6 +84,76 @@
         </div>
         <div data-tab-id="1" class="container tab-body">
             <h3 class="mb-4">Manage comics</h3>
+            <div class="row overflow-hidden">
+                <div class="col overflow-hidden">
+                    <div id="manage-comics-list">
+                    </div>
+                    <div class="row mt-4 d-flex justify-content-center mx-auto">
+                        <div class="col-auto mx-auto">
+                            <div id="manage-comics-refresh" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="getManageComicsList(this)">refresh</div>
+                            <br />
+                            <span class="option-tip">Refresh</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col mx-auto overflow-auto">
+                    <div class="row">
+                        <div class="col-auto mx-auto">
+                            <img id="manage-comic-preview" title="Upload a comic..." class="animate__animated animate__fadeIn" src="~/img/hoo_logo_placeholder.png" data-placeholder="@($@"data:image/jpg;base64, {FormattingService.GetBitmapAsBase64String(Properties.Resources.hoo_logo_placeholder)}")" onclick="manageComicPreviewClick()" />
+                            <br />
+                            <span asp-validation-for="ManageInputModel.ManageComicInput.ImageData" class="text-warning"></span>
+                        </div>
+                        <div class="col mx-auto">
+                            <form id="manage-comic-form" class="w-100 mx-auto" enctype="multipart/form-data">
+                                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                                <div class="form-group">
+                                    <input class="d-none" id="manage-comic-image-data" asp-for="ManageInputModel.ManageComicInput.ImageData" accept=".png,.jpg,.jpeg" />
+                                </div>
+                                <div class="form-group">
+                                    <input id="manage-comic-comic-guid" asp-for="ManageInputModel.ManageComicInput.ComicGuid" class="form-control" type="hidden" />
+                                    <span asp-validation-for="ManageInputModel.ManageComicInput.ComicGuid" class="text-warning"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ComicNumber"></label>
+                                    <input id="manage-comic-comic-number" asp-for="ManageInputModel.ManageComicInput.ComicNumber" class="form-control" />
+                                    <span asp-validation-for="ManageInputModel.ManageComicInput.ComicNumber" class="text-warning"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ComicTitle"></label>
+                                    <input id="manage-comic-comic-title" asp-for="ManageInputModel.ManageComicInput.ComicTitle" class="form-control" />
+                                    <span asp-validation-for="ManageInputModel.ManageComicInput.ComicTitle" class="text-warning"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ComicDescription"></label>
+                                    <input id="manage-comic-comic-description" asp-for="ManageInputModel.ManageComicInput.ComicDescription" class="form-control" />
+                                    <span asp-validation-for="ManageInputModel.ManageComicInput.ComicDescription" class="text-warning"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.Tags"></label>
+                                    <input id="manage-comic-comic-tags" asp-for="ManageInputModel.ManageComicInput.Tags" class="form-control" />
+                                    <span asp-validation-for="ManageInputModel.ManageComicInput.Tags" class="text-warning"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.IsHidden"></label>
+                                    <br />
+                                    <label class="form-label hint-text">Hidden posts will not be visible by default</label>
+                                </div>
+                                <label class="switch form-group mb-4 row justify-content-center mx-auto scale-75">
+                                    <input id="new-comic-is-hidden" type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row mt-4 d-flex justify-content-center mx-auto">
+                        <div class="col-auto mx-auto">
+                            <div id="manage-comic-update" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow disabled" onclick="postManageComic(this)">update</div>
+                            <br />
+                            <span class="option-tip">Update</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div data-tab-id="2" class="container tab-body">
             <h3 class="mb-4">Site options</h3>

@@ -132,10 +132,12 @@ function setFormLockState(form, state) {
 
     if (state) {
         $(form).find('select option:not(:selected)').prop('disabled', true)
+        $(form).addClass("locked")
     }
     else {
         $(form).find('select option').prop('disabled', false)
         $(form).find('select option[default]').prop('disabled', true)
+        $(form).removeClass("locked")
     }
 }
 

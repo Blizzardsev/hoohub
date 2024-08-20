@@ -12,37 +12,39 @@ namespace hoohub.Data
         /// <summary>
         /// 
         /// </summary>
-        public string ComicNumber { get; init; }
+        public string ComicNumber { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string ComicTitle { get; init; }
+        public string ComicTitle { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public string ComicDescription { get; init; }
+        public string ComicDescription { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         public DateTime PublishDate { get; init; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public byte[] ImageData { get; init; }
+        // TODO: scheduling comics
 
         /// <summary>
         /// 
         /// </summary>
-        public string Tags { get; init; }
+        public byte[] ImageData { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public bool IsHidden { get; init; }
+        public string Tags { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsHidden { get; set; }
 
         /// <summary>
         /// 

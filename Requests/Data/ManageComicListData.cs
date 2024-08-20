@@ -1,4 +1,5 @@
 ﻿using hoohub.Data;
+using System.Web;
 
 namespace hoohub.Requests.Data
 {
@@ -24,7 +25,7 @@ namespace hoohub.Requests.Data
         public ManageComicListData(Comic comic)
         {
             Guid = comic.Id;
-            DisplayName = comic.GetComicDisplayName();
+            DisplayName = HttpUtility.HtmlEncode(comic.GetComicDisplayName());
         }
     }
 }
