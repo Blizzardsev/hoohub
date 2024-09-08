@@ -46,7 +46,7 @@ namespace hoohub.Requests.Data
         {
             Guid = comic.Id;
             DisplayName = HttpUtility.HtmlEncode(comic.GetComicDisplayName());
-            DisplayPublishDate = comic.PublishDate.ToString("dddd, dd | MM | yyyy");
+            DisplayPublishDate = comic.PublishDate.ToLocalTime().ToString("dddd, dd | MM | yyyy");
             DisplayTags = string.IsNullOrWhiteSpace(comic.Tags)
                 ? "(No tags)"
                 : HttpUtility.HtmlEncode(comic.Tags.Replace(",", ", "));

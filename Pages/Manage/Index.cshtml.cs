@@ -1,10 +1,15 @@
 using hoohub.Data;
+using hoohub.Enums;
+using hoohub.Requests.Data;
 using hoohub.Requests.Results;
 using hoohub.Services;
+using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
@@ -21,7 +26,7 @@ namespace hoohub.Pages.Manage
         [BindProperty]
         public ManageInput ManageInputModel { get; set; } = new ManageInput();
 
-        public string DisplayPictureOnLoad { get; set; }
+        public string DisplayPictureOnLoad { get; set; } = string.Empty;
 
         public IndexModel(HooHubContext hooContext, UserManager<HooHubUser> userManager)
         {
@@ -31,7 +36,7 @@ namespace hoohub.Pages.Manage
 
         public class ManageInput
         {
-            public class NewComic()
+            public class NewComic
             {
                 [Required(ErrorMessage = "Comic must have an image")]
                 [MinLength(1)]
@@ -44,14 +49,14 @@ namespace hoohub.Pages.Manage
                 [MinLength(3)]
                 [MaxLength(3)]
                 [RegularExpression("^((00[0-9])|(0[0-9][0-9])|([0-9][0-9][0-9]))$", ErrorMessage = "Comic number must be in the correct format (E.G 001)")]
-                public string ComicNumber { get; set; }
+                public string ComicNumber { get; set; } = string.Empty;
 
                 [Display(Name = "Comic title", Prompt = "hate everything")]
                 [Required(AllowEmptyStrings = false, ErrorMessage = "Comic must have a title")]
                 [DataType(DataType.Text)]
                 [MinLength(1)]
                 [MaxLength(30)]
-                public string ComicTitle { get; set; }
+                public string ComicTitle { get; set; } = string.Empty;
 
                 [Display(Name = "Comic description", Prompt = "hate everything")]
                 [MaxLength(100)]
@@ -67,6 +72,22 @@ namespace hoohub.Pages.Manage
                 [Display(Name = "Hidden")]
                 [Required]
                 public bool IsHidden { get; set; } = false;
+
+                [Display(Name = "Schedule for")]
+                [DataType(DataType.DateTime)]
+                public DateTime ScheduleFor { get; set; } = DateTime.UtcNow;
+
+                public NewComic()
+                {
+                    var utcNow = DateTime.UtcNow;
+                    ScheduleFor = new DateTime(
+                        year: utcNow.Year,
+                        month: utcNow.Month,
+                        day: utcNow.Day + 1,
+                        hour: 16,
+                        minute: 00,
+                        second: 00).ToUniversalTime();
+                }
             }
 
             public class ManageComic()
@@ -74,7 +95,7 @@ namespace hoohub.Pages.Manage
                 [Required(AllowEmptyStrings = false, ErrorMessage = "Comic GUID must be provided")]
                 [MinLength(36)]
                 [MaxLength(36)]
-                public string ComicGuid { get; set; }
+                public string ComicGuid { get; set; } = string.Empty;
 
                 [Required(ErrorMessage = "Comic must have an image")]
                 [MinLength(1)]
@@ -87,14 +108,14 @@ namespace hoohub.Pages.Manage
                 [MinLength(3)]
                 [MaxLength(3)]
                 [RegularExpression("^((00[0-9])|(0[0-9][0-9])|([0-9][0-9][0-9]))$", ErrorMessage = "Comic number must be in the correct format (E.G 001)")]
-                public string ComicNumber { get; set; }
+                public string ComicNumber { get; set; } = string.Empty;
 
                 [Display(Name = "Comic title", Prompt = "hate everything")]
                 [Required(AllowEmptyStrings = false, ErrorMessage = "Comic must have a title")]
                 [DataType(DataType.Text)]
                 [MinLength(1)]
                 [MaxLength(30)]
-                public string ComicTitle { get; set; }
+                public string ComicTitle { get; set; } = string.Empty;
 
                 [Display(Name = "Comic description", Prompt = "hate everything")]
                 [MaxLength(100)]
@@ -149,11 +170,17 @@ namespace hoohub.Pages.Manage
         /// <summary>
         /// 
         /// </summary>
-        public void OnGet()
+        public async Task<IActionResult> OnGet()
         {
             var currentUser = _userManager.GetUserAsync(User).Result;
+            if (currentUser == null)
+            {
+                return RedirectToPage("/Index");
+            }
+
             DisplayPictureOnLoad = Convert.ToBase64String(currentUser.DisplayPicture);
             ManageInputModel.ManageMeInput.Handle = currentUser.Handle;
+            return Page();
         }
 
         /// <summary>
@@ -172,7 +199,9 @@ namespace hoohub.Pages.Manage
             string comicDescription,
             IFormFile imageData,
             string tags,
-            bool isHidden)
+            bool isHidden,
+            bool isScheduled,
+            DateTime? scheduleFor)
         {
             try
             {
@@ -197,17 +226,25 @@ namespace hoohub.Pages.Manage
                         message: $"Comics must be uploaded in jpg or png format"));
                 }
 
+                if (isScheduled && scheduleFor.HasValue && DateTime.UtcNow > scheduleFor)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "Cannot schedule a post for a date in the past"));
+                }
+
                 var newComic = new Comic(
                     comicNumber: comicNumber,
                     comicTitle: comicTitle,
                     comicDescription: string.IsNullOrWhiteSpace(comicDescription) ? string.Empty : comicDescription,
                     imageData: FormattingService.GetIFormFileAsBytes(imageData),
                     tags: string.IsNullOrWhiteSpace(tags) ? string.Empty : tags,
-                    isHidden: isHidden);
+                    isHidden: isHidden,
+                    scheduledDate: scheduleFor != null && isScheduled ? scheduleFor.Value.ToUniversalTime() : null);
                 await _hooContext.Comics.AddAsync(newComic);
                 await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.ComicCreated,
-                    details: $"Comic GUID {newComic.Id} created."));
+                    eventType: EventTypes.ComicCreated,
+                    details: $"Comic GUID {newComic.Id} created{(isScheduled ? $" and scheduled for {FormattingService.GetDateTimeAsString(scheduleFor.Value.ToUniversalTime())}" : string.Empty)}."));
 
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: true));
@@ -300,7 +337,7 @@ namespace hoohub.Pages.Manage
             string comicDescription,
             string tags,
             bool isHidden,
-            IFormFile imageData = null)
+            IFormFile imageData)
         {
             try
             {
@@ -334,14 +371,15 @@ namespace hoohub.Pages.Manage
                 comic.ComicNumber = comicNumber;
                 comic.ComicTitle = comicTitle;
                 comic.ComicDescription = comicDescription;
-                comic.ImageData = imageData != null 
-                    ? FormattingService.GetIFormFileAsBytes(imageData) 
-                    : comic.ImageData;
+                if (imageData != null )
+                {
+                    comic.ImageData = FormattingService.GetIFormFileAsBytes(imageData);
+                }
                 comic.Tags = tags;
                 comic.IsHidden = isHidden;
 
                 await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.ComicUpdated,
+                    eventType: EventTypes.ComicUpdated,
                     details: $"Comic GUID {comic.Id} was updated by ${_userManager.GetUserAsync(User).Result.GetEventLogString()}"));
                 await _hooContext.SaveChangesAsync();
 
@@ -350,7 +388,7 @@ namespace hoohub.Pages.Manage
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.Error,
+                    eventType: EventTypes.Error,
                     details: $"Failed to update comic GUID {comicGuid}: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
@@ -364,16 +402,23 @@ namespace hoohub.Pages.Manage
         /// <param name="handle"></param>
         /// <param name="imageData"></param>
         /// <returns></returns>
-        public async Task<JsonResult> OnPatchMeAsync(string handle, IFormFile imageData = null)
+        public async Task<JsonResult> OnPatchMeAsync(string handle, IFormFile? imageData = null)
         {
             var user = await _userManager.GetUserAsync(User);
             try
             {
+                if (user == null)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "You must be signed in to perform this action"));
+                }
+
                 if ((user.DisplayPicture == null || user.DisplayPicture.Length == 0) && imageData == null)
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
-                        message: $"A profile picture is required"));
+                        message: "A profile picture is required"));
                 }
 
                 if (imageData != null && !_comicUploadFileExtensions.Contains(imageData.FileName.Split(".").Last()))
@@ -384,12 +429,13 @@ namespace hoohub.Pages.Manage
                 }
 
                 user.Handle = handle;
-                user.DisplayPicture = imageData != null
-                    ? FormattingService.GetIFormFileAsBytes(imageData)
-                    : user.DisplayPicture;
+                if (imageData != null)
+                {
+                    user.DisplayPicture = FormattingService.GetIFormFileAsBytes(imageData);
+                }
 
                 await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.UserUpdated,
+                    eventType: EventTypes.UserUpdated,
                     details: $"{user.Handle} updated their profile."));
                 await _hooContext.SaveChangesAsync();
 
@@ -400,6 +446,60 @@ namespace hoohub.Pages.Manage
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: Enums.EventTypes.Error,
                     details: $"Failed to update profile for {user.GetEventLogString()}: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: false));
+            }
+        }
+    
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="eventType"></param>
+        /// <param name="eventDetails"></param>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
+        public async Task<JsonResult> OnGetLogsAsync(
+            string eventType = "any",
+            string eventDetails = "",
+            OrderByTypes orderBy = OrderByTypes.Descending)
+        {
+            try
+            {
+                eventType = string.IsNullOrWhiteSpace(eventType) ? "any" : eventType.ToLower().Replace(" ", "");
+                var events = _hooContext.Events
+                    .AsNoTracking()
+                    .OrderByDescending(eventItem => eventItem.CreatedDate)
+                    .Take(10000)
+                    .AsEnumerable();
+
+                if (events.Any() && Enum.TryParse(value: eventType.Replace(" ", ""), ignoreCase: true, result: out EventTypes filterEventType))
+                {
+                    events = events.Where(eventLine => eventLine.EventType == filterEventType);
+                }
+                else if (events.Any() && !string.IsNullOrWhiteSpace(eventType) && eventType != "any")
+                {
+                    events = events.Where(eventLine => FormattingService.GetEnumDescription(eventLine.EventType).Contains(eventType, StringComparison.OrdinalIgnoreCase));
+                }
+
+                if (events.Any() && !string.IsNullOrWhiteSpace(eventDetails))
+                {
+                    events = events.Where(eventLine => eventLine.Details.Contains(eventDetails, StringComparison.OrdinalIgnoreCase));
+                }
+
+                events = orderBy == OrderByTypes.Ascending
+                    ? events.OrderBy(eventLine => eventLine.CreatedDate)
+                    : events.OrderByDescending(eventLine => eventLine.CreatedDate);
+
+                return new JsonResult(new EventsResult(
+                    success: true, 
+                    eventData: events.Select(eventItem => new EventData(eventItem)).ToList()));
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to fetch log entries: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: false));

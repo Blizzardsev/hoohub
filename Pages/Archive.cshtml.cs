@@ -72,7 +72,7 @@ namespace hoohub.Pages
                 {
                     allComics = allComics
                         .AsEnumerable()
-                        .Where(comic => comic.GetComicNameContainsTerms(query) || comic.GetComicNumberContainsTerms(query) || comic.GetTagsContainsTerms(query))
+                        .Where(comic => comic.GetComicTitleContainsTerms(query) || comic.GetComicNumberContainsTerms(query) || comic.GetTagsContainsTerms(query))
                         .ToList();
                     if (allComics.Count == 0)
                     {

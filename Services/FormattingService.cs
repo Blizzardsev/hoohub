@@ -1,6 +1,8 @@
 ﻿using hoohub.Properties;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using SkiaSharp;
 
 namespace hoohub.Services
 {
@@ -19,18 +21,6 @@ namespace hoohub.Services
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="bitmap"></param>
-        /// <returns></returns>
-        public static string GetBitmapAsBase64String(Bitmap bitmap)
-        {
-            using var memoryStream = new MemoryStream();
-            bitmap.Save(stream: memoryStream, format: ImageFormat.Png);
-            return Convert.ToBase64String(memoryStream.ToArray());
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
         public static byte[] GetIFormFileAsBytes(IFormFile file)
@@ -38,6 +28,23 @@ namespace hoohub.Services
             using var memoryStream = new MemoryStream();
             file.CopyTo(memoryStream);
             return memoryStream.ToArray();
+        }
+
+        /// <summary>
+        /// Returns the Description for a given enum value, if it exists.
+        /// Otherwise, return the enum's implementation of .ToString().
+        /// </summary>
+        /// <param name="value">The enum value to return the description at tribute value for.</param>
+        /// <returns>Enum description, if it exists. Otherwise, the enum's implementation of .ToString().</returns>
+        public static string GetEnumDescription(Enum value)
+        {
+            var fieldInfo = value.GetType().GetField(value.ToString());
+            if (fieldInfo == null)
+            {
+                return string.Empty;
+            }
+            var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            return attributes.Length > 0 ? attributes[0].Description : value.ToString();
         }
     }
 }

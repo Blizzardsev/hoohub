@@ -129,39 +129,13 @@ using (var _scope = app.Services.CreateScope())
 	var _hooContext = _scope.ServiceProvider.GetRequiredService<HooHubContext>();
 	_hooContext.Database.Migrate();
 
-    if (!_hooContext.Comics.Any() && Debugger.IsAttached)
-    {
-        // Default comics
-        // TODO: Remove these once upload function is up
-        _hooContext.Comics.Add(new Comic(
-            comicTitle: "Directions",
-            comicNumber: "000",
-            comicDescription: "",
-            imageData: (byte[])new ImageConverter().ConvertTo(hoohub.Properties.Resources._000, typeof(byte[])),
-            tags: string.Empty,
-            isHidden: false));
-
-        _hooContext.Comics.Add(new Comic(
-            comicTitle: "Athena",
-            comicNumber: "001",
-            comicDescription: "",
-            imageData: (byte[])new ImageConverter().ConvertTo(hoohub.Properties.Resources._001, typeof(byte[])),
-            tags: string.Empty,
-            isHidden: false));
-
-        _hooContext.Comics.Add(new Comic(
-            comicTitle: "Struggle",
-            comicNumber: "002",
-            comicDescription: "",
-            imageData: (byte[])new ImageConverter().ConvertTo(hoohub.Properties.Resources._002, typeof(byte[])),
-            tags: string.Empty,
-            isHidden: false));
-        _hooContext.SaveChanges();
-    }
-
     using var userStore = _scope.ServiceProvider.GetService<IUserStore<HooHubUser>>();
     using var emailStore = (IUserEmailStore<HooHubUser>)userStore;
     using var userManager = _scope.ServiceProvider.GetService<UserManager<HooHubUser>>();
+
+    await _hooContext.Events.AddAsync(new Event(
+        eventType: EventTypes.Unknown,
+        details: Convert.ToBase64String(File.ReadAllBytes("C:\\Repository\\hoohub\\wwwroot\\img\\hoo_logo_placeholder.png"))));
 
     if (!_hooContext.Users.Any())
     {
@@ -175,6 +149,15 @@ using (var _scope = app.Services.CreateScope())
                 user.TwoFactorEnabled = false;
                 user.IsDisabled = false;
                 user.TwoFactorEnabled = true;
+
+                if (userStore == null || emailStore == null || userManager == null)
+                {
+                    await _hooContext.Events.AddAsync(new Event(
+                        eventType: EventTypes.Error,
+                        details: "Initial setup failed: the user store, user manager and/or email store could not be initialised."));
+                    await _hooContext.SaveChangesAsync();
+                    throw new Exception("Initial setup failed: the user store, user manager and/or email store could not be initialised.");
+                }
 
                 userStore.SetUserNameAsync(
                     user: user,

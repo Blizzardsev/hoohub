@@ -7,27 +7,27 @@ namespace hoohub.Data
         /// <summary>
         /// 
         /// </summary>
-        public string Id { get; init; }
+        public string Id { get; init; } = Guid.NewGuid().ToString();
 
         /// <summary>
         /// 
         /// </summary>
-        public DateTime CreatedDate { get; init; }
+        public DateTime CreatedDate { get; init; } = DateTime.UtcNow;
 
         /// <summary>
         /// 
         /// </summary>
-        public EventTypes EventType { get; init; }
+        public EventTypes EventType { get; init; } = EventTypes.Unknown;
 
         /// <summary>
         /// 
         /// </summary>
-        public string Details { get; init; }
+        public string Details { get; init; } = string.Empty;
 
         /// <summary>
         /// 
         /// </summary>
-        public string StackTrace { get; init; }
+        public string StackTrace { get; init; } = string.Empty;
 
         /// <summary>
         /// 
@@ -44,8 +44,6 @@ namespace hoohub.Data
         /// <param name="stackTrace"></param>
         public Event(EventTypes eventType, string details = "", string stackTrace = "")
         {
-            Id = Guid.NewGuid().ToString();
-            CreatedDate = DateTime.Now;
             EventType = eventType;
             Details = details;
             StackTrace = stackTrace;
@@ -55,6 +53,6 @@ namespace hoohub.Data
         /// Returns a <see cref="TimeSpan"/> representing the age of this event.
         /// </summary>
         /// <returns><see cref="TimeSpan"/> representing the age of this event.</returns>
-        public TimeSpan GetAge() => DateTime.Now - CreatedDate;
+        public TimeSpan GetAge() => DateTime.UtcNow - CreatedDate;
     }
 }

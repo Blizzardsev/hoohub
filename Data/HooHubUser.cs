@@ -13,7 +13,7 @@ namespace hoohub.Data
         /// <summary>
         /// 
         /// </summary>
-        public DateTime LastLoginDate { get; set; } = new DateTime(1900, 1, 1);
+        public DateTime LastLoginDate { get; set; } = DateTime.UtcNow.AddYears(-99);
 
         /// <summary>
         /// 
@@ -35,6 +35,9 @@ namespace hoohub.Data
         /// </summary>
         public byte[] DisplayPicture { get; set; } = (byte[])new ImageConverter().ConvertTo(Properties.Resources.hoo_pfp, typeof(byte[]));
 
+        /// <summary>
+        /// 
+        /// </summary>
         public HooHubUser()
         {
             if (DisplayPicture == null || DisplayPicture.Length == 0)
@@ -43,6 +46,10 @@ namespace hoohub.Data
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="handle"></param>
         public HooHubUser(string handle)
         {
             Id = Guid.NewGuid().ToString();

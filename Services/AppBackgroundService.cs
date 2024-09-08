@@ -3,6 +3,7 @@ using hoohub.Data;
 using hoohub.Enums;
 using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
+using NUglify.Helpers;
 
 namespace hoohub.Services
 {
@@ -47,6 +48,20 @@ namespace hoohub.Services
                             eventType: EventTypes.Maintenance,
                             details: $"{eventLinesToRemove.Count()} stale application event {(eventLinesToRemove.Count() == 1 ? "line was" : "lines were")} deleted."));
                     }
+
+                    // Publish any scheduled comics
+                    var comicsToPublish = _hooContext.Comics
+                        .Where(comic => comic.PublishDate <= DateTime.Now && comic.IsHidden)
+                        .AsEnumerable();
+                    comicsToPublish.ForEach(async comic =>
+                    {
+                        comic.IsHidden = false;
+                        comic.PublishDate = DateTime.Now;
+                        comic.ScheduledDate = null;
+                        await _hooContext.Events.AddAsync(new Event(
+                            eventType: EventTypes.ComicReleased,
+                            details: $"Comic GUID {comic.Id} ({comic.GetComicDisplayName()}) met scheduled date and was released."));
+                    });
                 }
                 catch (Exception maintenanceException)
                 {

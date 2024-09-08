@@ -97,6 +97,8 @@ function postNewComic(element) {
     formData.append("imageData", $("#new-comic-image-data").prop("files")[0])
     formData.append("tags", $("#new-comic-comic-tags").val())
     formData.append("isHidden", $("#new-comic-is-hidden").is(":checked"))
+    formData.append("isScheduled", $("#new-comic-is-scheduled").is(":checked"))
+    formData.append("scheduleFor", $("#new-comic-scheduled-for").val())
 
     setFormLockState(newComicForm, true)
     let loaderId = displayLoading()
@@ -194,18 +196,20 @@ function loadManageComic(element, comicGuid) {
         },
         success: function (result) {
             if (result.success) {
-                $(element).addClass("selected")
-                setFormLockState($("#manage-comic-form"), false)
+                setTimeout(function () {
+                    $(element).addClass("selected")
+                    setFormLockState($("#manage-comic-form"), false)
                 
-                $("#manage-comic-image-data").val(null)
-                $("#manage-comic-preview").attr("src", `data:image/jpg;base64,${result.imageData}`)
-                $("#manage-comic-comic-guid").val(result.guid)
-                $("#manage-comic-comic-number").val(result.comicNumber)
-                $("#manage-comic-comic-title").val(result.comicTitle)
-                $("#manage-comic-comic-description").val(result.comicDescription)
-                $("#manage-comic-comic-tags").val(result.tags)
-                $("#manage-comic-is-hidden").prop("checked", result.isHidden)
-                $("#manage-comic-update").removeClass("disabled")
+                    $("#manage-comic-image-data").val(null)
+                    $("#manage-comic-preview").attr("src", `data:image/jpg;base64,${result.imageData}`)
+                    $("#manage-comic-comic-guid").val(result.guid)
+                    $("#manage-comic-comic-number").val(result.comicNumber)
+                    $("#manage-comic-comic-title").val(result.comicTitle)
+                    $("#manage-comic-comic-description").val(result.comicDescription)
+                    $("#manage-comic-comic-tags").val(result.tags)
+                    $("#manage-comic-is-hidden").prop("checked", result.isHidden)
+                    $("#manage-comic-update").removeClass("disabled")
+                })
 
                 $("#manage-comic-form").validate()
             }

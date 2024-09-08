@@ -59,6 +59,9 @@ namespace hoohub.Enums
         Maintenance,
 
         [Description("Email sent")]
-        EmailSent
+        EmailSent,
+
+        [Description("Unknown")]
+        Unknown
     }
 }
