@@ -103,8 +103,8 @@ input {
 #manage-comics-list,
 #manage-events-list {
     transition: 0.5s;
-    min-height: 50vh;
-    max-height: 50vh;
+    min-height: 58vh;
+    max-height: 58vh;
     overflow-y: scroll;
     scrollbar-color: #280501 #DFDAD9;
     scrollbar-width: thin;

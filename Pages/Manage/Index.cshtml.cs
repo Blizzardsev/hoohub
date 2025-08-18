@@ -4,6 +4,7 @@ using hoohub.Requests.Data;
 using hoohub.Requests.Results;
 using hoohub.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,6 +12,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
 
 namespace hoohub.Pages.Manage
 {
@@ -210,6 +212,14 @@ namespace hoohub.Pages.Manage
         {
             try
             {
+                var currentUser = _userManager.GetUserAsync(User).Result;
+                if (currentUser == null)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"You are not authorised to perform this action"));
+                }
+
                 if (_hooContext.Comics.Any(comic => comic.ComicNumber == comicNumber))
                 {
                     return new JsonResult(new BaseResult(
@@ -245,6 +255,12 @@ namespace hoohub.Pages.Manage
                         message: "Scheduled comics must have a date and/or time"));
                 }
 
+                if (isScheduled)
+                {
+                    // Make sure hidden if scheduled
+                    isHidden = true;
+                }
+
                 var newComic = new Comic(
                     comicNumber: comicNumber,
                     comicTitle: comicTitle,
@@ -252,12 +268,13 @@ namespace hoohub.Pages.Manage
                     imageData: FormattingService.GetIFormFileAsBytes(imageData),
                     tags: string.IsNullOrWhiteSpace(tags) ? string.Empty : tags,
                     isHidden: isScheduled ? true : isHidden,
+                    uploadedById: currentUser.Id,
                     scheduledDate: scheduleFor != null && isScheduled ? scheduleFor.Value.ToUniversalTime() : null);
 
                 await _hooContext.Comics.AddAsync(newComic);
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.ComicCreated,
-                    details: $"Comic GUID {newComic.Id} created{(isScheduled ? $" and scheduled for {FormattingService.GetDateTimeAsString(scheduleFor.Value.ToUniversalTime())}" : string.Empty)}."));
+                    details: $"Comic GUID {newComic.Id} created by {currentUser.GetEventLogString()}{(isScheduled ? $" and scheduled for {FormattingService.GetDateTimeAsString(scheduleFor.Value.ToUniversalTime())}" : string.Empty)}."));
 
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: true));
@@ -358,6 +375,14 @@ namespace hoohub.Pages.Manage
         {
             try
             {
+                var currentUser = _userManager.GetUserAsync(User).Result;
+                if (currentUser == null)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"You are not authorised to perform this action"));
+                }
+
                 var comic = await _hooContext.Comics.SingleOrDefaultAsync(comic => comic.Id == comicGuid);
                 if (comic == null)
                 {
@@ -399,6 +424,20 @@ namespace hoohub.Pages.Manage
                         message: "Scheduled comics must have a date and/or time"));
                 }
 
+                if (isScheduled)
+                {
+                    // Make sure hidden if scheduled
+                    isHidden = true;
+                }
+
+                var comicNumberChange = $"{comic.ComicNumber} -> {comicNumber}";
+                var comicTitleChange = $"{comic.ComicTitle} -> {comicTitle}";
+                var comicDescriptionChange = $"{comic.ComicDescription} -> {comicDescription}";
+                var comicTagsChange = $"{comic.Tags} -> {tags}";
+                var comicHiddenChange = $"{FormattingService.GetBooleanAsYesNoString(comic.IsHidden)} -> {FormattingService.GetBooleanAsYesNoString(isHidden)}";
+                var comicScheduledChange = $"{(comic.ScheduledDate.HasValue ? FormattingService.GetDateTimeAsString(comic.ScheduledDate.Value) : "N/A")} " +
+                    $"-> {(scheduleFor.HasValue ? FormattingService.GetDateTimeAsString(scheduleFor.Value) : "N/A")}";
+
                 comic.ComicNumber = comicNumber;
                 comic.ComicTitle = comicTitle;
                 comic.ComicDescription = comicDescription;
@@ -408,6 +447,7 @@ namespace hoohub.Pages.Manage
                 }
                 comic.Tags = tags;
                 comic.IsHidden = isHidden;
+                comic.LastEditedById = currentUser.Id;
 
                 if (!isScheduled && comic.ScheduledDate.HasValue)
                 {
@@ -415,10 +455,22 @@ namespace hoohub.Pages.Manage
                     comic.PublishDate = DateTime.UtcNow;
                     comic.ScheduledDate = null;
                 }
+                else if (isScheduled && scheduleFor.HasValue)
+                {
+                    // Scheduled date was added
+                    comic.PublishDate = null;
+                    comic.ScheduledDate = scheduleFor.Value;
+                }
 
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.ComicUpdated,
-                    details: $"Comic GUID {comic.Id} was updated by {_userManager.GetUserAsync(User).Result.GetEventLogString()}"));
+                    details: $"Comic GUID {comic.Id} was updated by {currentUser.GetEventLogString()}:" +
+                        $"\nComic number: {comicNumberChange}" +
+                        $"\nTitle: {comicTitleChange}" +
+                        $"\nDescription: {comicDescriptionChange}" +
+                        $"\nTags: {comicTagsChange}" +
+                        $"\nHidden: {comicHiddenChange}" +
+                        $"\nScheduled date: {comicScheduledChange}"));
                 await _hooContext.SaveChangesAsync();
 
                 return new JsonResult(new BaseResult(success: true));
@@ -439,7 +491,7 @@ namespace hoohub.Pages.Manage
         /// </summary>
         /// <param name="handle">The handle of the user to set.</param>
         /// <param name="imageData">Optional replacement profile picture of the user to set.</param>
-        /// <returns></returns>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
         public async Task<JsonResult> OnPatchMeAsync(string handle, IFormFile? imageData = null)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -463,18 +515,24 @@ namespace hoohub.Pages.Manage
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
-                        message: $"Profile pictures must be uploaded in jpg or png format"));
+                        message: $"Profile pictures must be uploaded in jpg, png or gif format"));
                 }
+
+                var handleChange = $"{user.Handle} -> {handle}";
+                var profilePictureChange = "Current -> Current";
 
                 user.Handle = handle;
                 if (imageData != null)
                 {
+                    profilePictureChange = $"Current -> {imageData.FileName}";
                     user.DisplayPicture = FormattingService.GetIFormFileAsBytes(imageData);
                 }
 
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.UserUpdated,
-                    details: $"{user.Handle} updated their profile."));
+                    details: $"{user.Handle} updated their profile:" +
+                        $"\nHandle: {handleChange}" +
+                        $"\nProfile picture: {profilePictureChange}"));
                 await _hooContext.SaveChangesAsync();
 
                 return new JsonResult(new BaseResult(success: true));

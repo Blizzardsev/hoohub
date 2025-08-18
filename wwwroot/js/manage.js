@@ -167,7 +167,7 @@ function getEvents(element) {
                             <div class="row manage-events-item w-100 mx-auto">
                                 <div class="col">${event.displayCreatedDate}</div>
                                 <div class="col">${event.displayEventType}</div>
-                                <div class="col">${event.details}</div>
+                                <div class="col" style="white-space: break-spaces;">${event.details}</div>
                             </div>
                         `)
                     })
@@ -269,13 +269,15 @@ function loadManageComic(element, comicGuid) {
 
                     if (result.scheduledDate != null && result.publishDate == null) {
                         loadedComicToManageWasScheduled = true
+                        $("#manage-comic-schedule-details").show()
                         $("#manage-comic-schedule-for").val(result.scheduledDate)
                         $("#manage-comic-schedule-for").prop("readonly", false)
                         $("#manage-comic-is-scheduled").prop("checked", true)
                     }
                     else {
                         loadedComicToManageWasScheduled = false
-                        $("#manage-comic-schedule-for").val("")
+                        $("#manage-comic-schedule-details").hide()
+                        $("#manage-comic-schedule-for").val(new Date().getDate() + 1)
                         $("#manage-comic-schedule-for").prop("readonly", true)
                         $("#manage-comic-is-scheduled").prop("checked", false)
                     }
@@ -318,14 +320,25 @@ function patchComic(element) {
     if ($(element).hasClass("disabled") || !$(manageComicForm).valid()) {
         return
     }
-    
+
+    // Unscheduling a scheduled comic will make it available immediately
     if (loadedComicToManageWasScheduled
         && !$("#manage-comic-is-scheduled").is(":checked")
-        && !prompt("This comic is already scheduled for release! Are you sure you want to deschedule it?\nThe comic will be posted immediately.")) {
+        && !confirm("This comic is already scheduled for release!\nAre you sure you want to deschedule it?\nThe comic will be posted immediately.")) {
+        return;
     }
-    {
-        return
+
+    // Scheduling a released comic will hide it immediately
+    if (!loadedComicToManageWasScheduled
+        && $("#manage-comic-is-scheduled").is(":checked")
+        && !$("#manage-comic-is-hidden").is(":checked")
+        && !confirm("This comic is already released!\nAre you sure you want to schedule it?\nThe comic will no longer be available.")) {
+        return;
     }
+
+    // Make sure the post is hidden if scheduled
+
+
     $(element).addClass("disabled")
 
     let formData = new FormData()
@@ -422,4 +435,33 @@ function patchProfile(element) {
             }
         })
     }, 500)
+}
+
+/**
+ * 
+ * @param {any} element
+ */
+function toggleComicIsScheduled(element, comicType) {
+    toggleElementReadOnlyState($(`#${comicType}-comic-schedule-for`))
+    if ($(element).is(":checked")) {
+        $(`#${comicType}-comic-schedule-details`).show()
+        $(`#${comicType}-comic-schedule-for`).prop("readonly", false)
+    }
+    else {
+        $(`#${comicType}-comic-schedule-details`).hide()
+        $(`#${comicType}-comic-schedule-for`).prop("readonly", true)
+    }
+
+    $(`#${comicType}-comic-is-hidden`).prop("checked", $(element).is(":checked"))
+}
+
+/**
+ * 
+ * @param {any} element
+ */
+function toggleComicIsHidden(element, comicType) {
+    if (!$(element).is(":checked")) {
+        $(`#${comicType}-comic-schedule-details`).hide()
+        $(`#${comicType}-comic-is-scheduled`).prop("checked", false)
+    }
 }

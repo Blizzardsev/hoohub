@@ -169,6 +169,10 @@ namespace hoohub.Migrations
                     b.Property<bool>("IsHidden")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("LastEditedById")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("PublishDate")
                         .HasColumnType("TEXT");
 
@@ -176,6 +180,10 @@ namespace hoohub.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UploadedById")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

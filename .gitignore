@@ -264,3 +264,4 @@ appsettings.json
 context.db-wal
 context.db-shm
 context.db
+*.db

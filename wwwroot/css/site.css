@@ -193,13 +193,15 @@ h4, h5 {
     bottom: 4vh;
     right: 2vw;
     border-radius: 50%;
-    transition: filter 0.2s;
+    transition: all 1s;
     z-index: 150;
     object-fit: cover;
 }
 
     .pfp-roundel:hover{ 
         filter:brightness(80%);
+        width: 128px !important;
+        height: 128px !important;
     }
 
 .site-option {

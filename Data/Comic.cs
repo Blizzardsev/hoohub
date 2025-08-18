@@ -52,6 +52,16 @@
         public DateTime? ScheduledDate { get; set; } = null;
 
         /// <summary>
+        /// The ID of the user who originally uploaded this comic.
+        /// </summary>
+        public string UploadedById { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The ID of the user who most recently updated this comic.
+        /// </summary>
+        public string LastEditedById { get; set; } = string.Empty;    
+
+        /// <summary>
         /// Default constructor.
         /// </summary>
         public Comic()
@@ -67,6 +77,7 @@
         /// <param name="imageData">The comic image data to set.</param>
         /// <param name="tags">The comic tags to set.</param>
         /// <param name="isHidden">The hidden state to set.</param>
+        /// <param name="uploadedById">The uploaded by user ID to set.</param>
         /// <param name="scheduledDate">The optional scheduled date to set.</param>
         public Comic(
             string comicTitle, 
@@ -75,6 +86,7 @@
             byte[] imageData, 
             string tags,
             bool isHidden,
+            string uploadedById,
             DateTime? scheduledDate = null)
         {
             ComicNumber = comicNumber;
@@ -89,6 +101,7 @@
             ImageData = imageData;
             Tags = string.Join(",", tags);
             IsHidden = isHidden;
+            UploadedById = uploadedById;
 
             if (scheduledDate.HasValue)
             {

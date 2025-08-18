@@ -1,6 +1,7 @@
 ﻿using hoohub.Enums;
 using hoohub.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NUglify.JavaScript.Syntax;
 using System.ComponentModel;
 
 namespace hoohub.Services
@@ -61,5 +62,12 @@ namespace hoohub.Services
                 new SelectListItem(text: GetEnumDescription(OrderByTypes.Descending), value: ((int)OrderByTypes.Descending).ToString())
             }, dataValueField: "Value", dataTextField: "Text", selectedValue: ((int)defaultOrder).ToString());
         }
+
+        /// <summary>
+        /// Given a boolean expression, returns the string representation of that expression as Yes or No.
+        /// </summary>
+        /// <param name="expression">The expression to evaluate.</param>
+        /// <returns>Yes if the expression is True, otherwise No.</returns>
+        public static string GetBooleanAsYesNoString(bool expression) => expression ? "Yes" : "No";
     }
 }
