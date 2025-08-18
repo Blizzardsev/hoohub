@@ -137,6 +137,7 @@ h4, h5 {
 
 #comic-display {
     max-width: 75vw;
+    min-height: 75vh;
     max-height: 75vh;
 }
 

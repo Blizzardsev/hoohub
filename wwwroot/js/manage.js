@@ -438,8 +438,9 @@ function patchProfile(element) {
 }
 
 /**
- * 
- * @param {any} element
+ * On toggling whether the comic should be scheduled, determines visibility of corresponding controls and checked state of hidden option.
+ * @param {any} element - Calling element
+ * @param {any} comicType - Whether this is for the new comic control set, or manage comic control set
  */
 function toggleComicIsScheduled(element, comicType) {
     toggleElementReadOnlyState($(`#${comicType}-comic-schedule-for`))
@@ -456,8 +457,9 @@ function toggleComicIsScheduled(element, comicType) {
 }
 
 /**
- * 
- * @param {any} element
+ * On toggling whether the comic should be hidden, determines visibility of corresponding controls and checked state of scheduled option.
+ * @param {any} element - Calling element
+ * @param {any} comicType - Whether this is for the new comic control set, or manage comic control set
  */
 function toggleComicIsHidden(element, comicType) {
     if (!$(element).is(":checked")) {

@@ -5,6 +5,8 @@
     var signedIn = _signInManager.IsSignedIn(User);
     var user = _userManager.GetUserAsync(User).Result;
     var displayPicture = user != null ? $@"data:image/jpg;base64,{Convert.ToBase64String(user.DisplayPicture)}" : "~/img/notfound.png";
+
+    var isNightMode = Context.Request.Cookies["nightMode"] == "true";
 }
 
 <!DOCTYPE html>
@@ -57,6 +59,13 @@
                     <div role="button" tabindex="0" class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log in">person</div>
                 </a>
             }
+            <a asp-page="/Index">
+                @{
+                    var modeTitle = $"Switch to {(isNightMode ? "day" : "night")} mode";
+                    var modeMaterialIcon = isNightMode ? "clear_day" : "mode_night";
+                }
+                <div role="button" tabindex="0" class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="@(modeTitle)">@(modeMaterialIcon)</div>
+            </a>
         </div>
     </div>
 
