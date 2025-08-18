@@ -155,17 +155,31 @@
                                 <div class="form-group">
                                     <label class="form-label" asp-for="ManageInputModel.ManageComicInput.IsHidden"></label>
                                     <br />
-                                    <label class="form-label hint-text">Hidden posts will not be visible by default</label>
+                                    <label class="switch row justify-content-center scale-75">
+                                        <input id="manage-comic-is-hidden" type="checkbox">
+                                        <span class="slider"></span>
+                                    </label>
                                 </div>
-                                <div id="manage-comic-schedule-details" class="form-group">
-                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ScheduleFor"></label>
-                                    <input id="manage-comic-schedule-for" asp-for="ManageInputModel.ManageComicInput.ScheduleFor" type="datetime-local" class="form-control" readonly />
-                                    <span asp-validation-for="ManageInputModel.ManageComicInput.ScheduleFor" class="text-warning"></span>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="row">
+                                            <label class="form-label" asp-for="ManageInputModel.ManageComicInput.IsScheduled"></label>
+                                        </div>
+                                        <div class="row">
+                                            <label class="switch form-group justify-content-center scale-75">
+                                                <input id="manage-comic-is-scheduled" type="checkbox" onclick="toggleElementReadOnlyState($('#manage-comic-schedule-for'))">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div id="manage-comic-schedule-details" class="form-group">
+                                            <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ScheduleFor"></label>
+                                            <input id="manage-comic-schedule-for" asp-for="ManageInputModel.ManageComicInput.ScheduleFor" type="datetime-local" class="form-control" readonly />
+                                            <span asp-validation-for="ManageInputModel.ManageComicInput.ScheduleFor" class="text-warning"></span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <label class="switch form-group mb-4 row justify-content-center mx-auto scale-75">
-                                    <input id="manage-comic-is-hidden" type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
                             </form>
                         </div>
                     </div>

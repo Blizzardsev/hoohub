@@ -1,5 +1,8 @@
 ﻿namespace hoohub.Data
 {
+    /// <summary>
+    /// Represents a user-viewable comic; the main content of the site.
+    /// </summary>
     public class Comic
     {
         /// <summary>
@@ -26,7 +29,7 @@
         /// <summary>
         /// The date the comic was published.
         /// </summary>
-        public DateTime PublishDate { get; set; } = DateTime.UtcNow;
+        public DateTime? PublishDate { get; set; }
 
         /// <summary>
         /// The actual image file data associated with the comic.
@@ -56,7 +59,7 @@
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="Comic"/>.
+        /// Initialises a new instance of the <see cref="Comic"/> class.
         /// </summary>
         /// <param name="comicTitle">The comic title to set.</param>
         /// <param name="comicNumber">The comic number to set.</param>
@@ -77,14 +80,20 @@
             ComicNumber = comicNumber;
             ComicTitle = comicTitle;
             ComicDescription = comicDescription;
+
             if (scheduledDate == null)
             {
                 PublishDate = DateTime.UtcNow;
             }
+
             ImageData = imageData;
             Tags = string.Join(",", tags);
             IsHidden = isHidden;
-            ScheduledDate = scheduledDate;
+
+            if (scheduledDate.HasValue)
+            {
+                ScheduledDate = scheduledDate.Value;
+            }
         }
 
         /// <summary>

@@ -2,6 +2,9 @@
 
 namespace hoohub.Enums
 {
+    /// <summary>
+    /// Custom event types tracked by HooHub.
+    /// </summary>
     public enum EventTypes
 	{
         [Description("App started")]

@@ -35,7 +35,6 @@ namespace hoohub.Data
         {
             public void Configure(EntityTypeBuilder<HooHubUser> builder)
             {
-
             }
         }
     }

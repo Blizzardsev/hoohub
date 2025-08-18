@@ -171,7 +171,7 @@ namespace hoohub.Pages.Manage
         }
 
         /// <summary>
-        /// 
+        /// Returns the page.
         /// </summary>
         public async Task<IActionResult> OnGet()
         {
@@ -187,17 +187,17 @@ namespace hoohub.Pages.Manage
         }
 
         /// <summary>
-        /// 
+        /// Attempts to post a new comic, creating it and returning a <see cref="JsonResult"/> representing the result of the request.
         /// </summary>
-        /// <param name="comicNumber"></param>
-        /// <param name="comicTitle"></param>
-        /// <param name="comicDescription"></param>
-        /// <param name="imageData"></param>
-        /// <param name="tags"></param>
-        /// <param name="isHidden"></param>
-        /// <param name="isScheduled"></param>
-        /// <param name="scheduleFor"></param>
-        /// <returns></returns>
+        /// <param name="comicNumber">The number of the new comic to set. This must be unique.</param>
+        /// <param name="comicTitle">The title of the new comic to set.</param>
+        /// <param name="comicDescription">The description of the new comic to set.</param>
+        /// <param name="imageData">The content of the new comic to set.</param>
+        /// <param name="tags">The optional tags of the new comic to set.</param>
+        /// <param name="isHidden">The hidden state to the new comic to set; hidden comics are not visible publicly.</param>
+        /// <param name="isScheduled">The scheduled state of the new comic to set; scheduled comics are not visible until the scheduled date is met.</param>
+        /// <param name="scheduleFor">The scheduled date of the new comic to set; scheduled comics are not visible until the scheduled date is met.</param>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
         public async Task<JsonResult> OnPostComicAsync(
             string comicNumber,
             string comicTitle,
@@ -238,6 +238,13 @@ namespace hoohub.Pages.Manage
                         message: $"Cannot schedule for a date in the past: current time is {FormattingService.GetDateTimeAsString(DateTime.UtcNow)}"));
                 }
 
+                if (isScheduled && !scheduleFor.HasValue)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "Scheduled comics must have a date and/or time"));
+                }
+
                 var newComic = new Comic(
                     comicNumber: comicNumber,
                     comicTitle: comicTitle,
@@ -270,9 +277,9 @@ namespace hoohub.Pages.Manage
         }
 
         /// <summary>
-        /// 
+        /// Attempts to fetch a list of all comics for selection in the management menu, returning a <see cref="JsonResult"/> representing the result of the request.
         /// </summary>
-        /// <returns></returns>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
         public async Task<JsonResult> OnGetManageComicsListAsync()
         {
             try
@@ -297,10 +304,10 @@ namespace hoohub.Pages.Manage
         }
 
         /// <summary>
-        /// 
+        /// Attempts to fetch the details of a specific comic for display/editing in the manage comic menu, returning a <see cref="JsonResult"/> representing the result of the request.
         /// </summary>
-        /// <param name="comicGuid"></param>
-        /// <returns></returns>
+        /// <param name="comicGuid">The GUID of the <see cref="Comic"/> to fetch details for.</param>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
         public async Task<JsonResult> OnGetManageComicDetailsAsync(string comicGuid)
         {
             try
@@ -326,24 +333,28 @@ namespace hoohub.Pages.Manage
         }
 
         /// <summary>
-        /// 
+        /// Attempts to update an existing comic, returning a <see cref="JsonResult"/> representing the result of the request.
         /// </summary>
-        /// <param name="comicGuid"></param>
-        /// <param name="comicNumber"></param>
-        /// <param name="comicTitle"></param>
-        /// <param name="comicDescription"></param>
-        /// <param name="tags"></param>
-        /// <param name="isHidden"></param>
-        /// <param name="imageData"></param>
-        /// <returns></returns>
+        /// <param name="comicGuid">The GUID of the comic to update.</param>
+        /// <param name="comicNumber">The number of the comic to set. This must be unique.</param>
+        /// <param name="comicTitle">The title of the comic to set.</param>
+        /// <param name="comicDescription">The description of the comic to set.</param>
+        /// <param name="imageData">The content of the comic to set.</param>
+        /// <param name="tags">The optional tags of the comic to set.</param>
+        /// <param name="isHidden">The hidden state to the comic to set; hidden comics are not visible publicly.</param>
+        /// <param name="isScheduled">The scheduled state of the comic to set; scheduled comics are not visible until the scheduled date is met.</param>
+        /// <param name="scheduleFor">The scheduled date of the comic to set; scheduled comics are not visible until the scheduled date is met.</param>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
         public async Task<JsonResult> OnPatchComicAsync(
             string comicGuid,
             string comicNumber,
             string comicTitle,
             string comicDescription,
+            IFormFile imageData,
             string tags,
             bool isHidden,
-            IFormFile imageData)
+            bool isScheduled,
+            DateTime? scheduleFor)
         {
             try
             {
@@ -374,6 +385,20 @@ namespace hoohub.Pages.Manage
                         message: $"Comics must be uploaded in jpg or png format"));
                 }
 
+                if (isScheduled && scheduleFor.HasValue && DateTime.UtcNow > scheduleFor.Value.ToUniversalTime())
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"Cannot schedule for a date in the past: current time is {FormattingService.GetDateTimeAsString(DateTime.UtcNow)}"));
+                }
+
+                if (isScheduled && !scheduleFor.HasValue)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "Scheduled comics must have a date and/or time"));
+                }
+
                 comic.ComicNumber = comicNumber;
                 comic.ComicTitle = comicTitle;
                 comic.ComicDescription = comicDescription;
@@ -383,6 +408,13 @@ namespace hoohub.Pages.Manage
                 }
                 comic.Tags = tags;
                 comic.IsHidden = isHidden;
+
+                if (!isScheduled && comic.ScheduledDate.HasValue)
+                {
+                    // Scheduled date was removed
+                    comic.PublishDate = DateTime.UtcNow;
+                    comic.ScheduledDate = null;
+                }
 
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.ComicUpdated,
@@ -403,10 +435,10 @@ namespace hoohub.Pages.Manage
         }
 
         /// <summary>
-        /// 
+        /// Attempts to update the current user, returning a <see cref="JsonResult"/> representing the result of the request.
         /// </summary>
-        /// <param name="handle"></param>
-        /// <param name="imageData"></param>
+        /// <param name="handle">The handle of the user to set.</param>
+        /// <param name="imageData">Optional replacement profile picture of the user to set.</param>
         /// <returns></returns>
         public async Task<JsonResult> OnPatchMeAsync(string handle, IFormFile? imageData = null)
         {
@@ -457,11 +489,11 @@ namespace hoohub.Pages.Manage
                 return new JsonResult(new BaseResult(success: false));
             }
         }
-    
+
         /// <summary>
-        /// 
+        /// Attempts to fetch a list of all events for viewing in the management menu, returning a <see cref="JsonResult"/> representing the result of the request.
         /// </summary>
-        /// <returns></returns>
+        /// <returns><see cref="JsonResult"/> representing the result of the request</returns>
         public async Task<JsonResult> OnGetEventsAsync()
         {
             try

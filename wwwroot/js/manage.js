@@ -1,5 +1,6 @@
 ﻿let validExtensions = ["png", "jpeg", "jpg", "gif"]
 let profilePicturePreviewSource = null
+let loadedComicToManageWasScheduled = false
 
 $(document).ready(function () {
     getManageComicsList()
@@ -103,7 +104,7 @@ function postNewComic(element) {
     formData.append("tags", $("#new-comic-comic-tags").val())
     formData.append("isHidden", $("#new-comic-is-hidden").is(":checked"))
     formData.append("isScheduled", $("#new-comic-is-scheduled").is(":checked"))
-    formData.append("scheduleFor", $("#new-comic-scheduled-for").val())
+    formData.append("scheduleFor", $("#new-comic-schedule-for").val())
 
     setFormLockState(newComicForm, true)
     let loaderId = displayLoading()
@@ -266,14 +267,17 @@ function loadManageComic(element, comicGuid) {
                     $("#manage-comic-comic-description").val(result.comicDescription)
                     $("#manage-comic-comic-tags").val(result.tags)
 
-                    if (result.scheduledFor != null && result.publishDate == null) {
-                        $("#manage-comic-schedule-for").val(result.scheduledFor)
-                        $("#manage-comic-schedule-for").show()
+                    if (result.scheduledDate != null && result.publishDate == null) {
+                        loadedComicToManageWasScheduled = true
+                        $("#manage-comic-schedule-for").val(result.scheduledDate)
                         $("#manage-comic-schedule-for").prop("readonly", false)
+                        $("#manage-comic-is-scheduled").prop("checked", true)
                     }
                     else {
-                        $("#manage-comic-schedule-for").hide()
+                        loadedComicToManageWasScheduled = false
+                        $("#manage-comic-schedule-for").val("")
                         $("#manage-comic-schedule-for").prop("readonly", true)
+                        $("#manage-comic-is-scheduled").prop("checked", false)
                     }
                     
                     $("#manage-comic-is-hidden").prop("checked", result.isHidden)
@@ -314,6 +318,14 @@ function patchComic(element) {
     if ($(element).hasClass("disabled") || !$(manageComicForm).valid()) {
         return
     }
+    
+    if (loadedComicToManageWasScheduled
+        && !$("#manage-comic-is-scheduled").is(":checked")
+        && !prompt("This comic is already scheduled for release! Are you sure you want to deschedule it?\nThe comic will be posted immediately.")) {
+    }
+    {
+        return
+    }
     $(element).addClass("disabled")
 
     let formData = new FormData()
@@ -325,6 +337,8 @@ function patchComic(element) {
     formData.append("imageData", $("#manage-comic-image-data").prop("files")[0])
     formData.append("tags", $("#manage-comic-comic-tags").val())
     formData.append("isHidden", $("#manage-comic-is-hidden").is(":checked"))
+    formData.append("isScheduled", $("#manage-comic-is-scheduled").is(":checked"))
+    formData.append("scheduleFor", $("#manage-comic-schedule-for").val())
 
     setFormLockState(manageComicForm, true)
     let loaderId = displayLoading()

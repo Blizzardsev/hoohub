@@ -1,13 +1,13 @@
-﻿using hoohub.Properties;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Imaging;
-using SkiaSharp;
-using hoohub.Enums;
+﻿using hoohub.Enums;
+using hoohub.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel;
 
 namespace hoohub.Services
 {
+    /// <summary>
+    /// Helper class for formatting-related functionality.
+    /// </summary>
     public class FormattingService
     {
         /// <summary>
@@ -21,10 +21,10 @@ namespace hoohub.Services
             : dateTime.ToString(Resources.DateFormat);
 
         /// <summary>
-        /// 
+        /// Given an <see cref="IFormFile"/>, returns it in byte array format.
         /// </summary>
-        /// <param name="file"></param>
-        /// <returns></returns>
+        /// <param name="file">The <see cref="IFormFile"/> to convert.</param>
+        /// <returns>The given file in byte array format.</returns>
         public static byte[] GetIFormFileAsBytes(IFormFile file)
         {
             using var memoryStream = new MemoryStream();
