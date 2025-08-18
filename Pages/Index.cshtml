@@ -59,7 +59,9 @@
     @if (Model.Comic != null)
     {
         string imageSource = Model.Comic != null ? $@"data:image/jpg;base64, {Model.Comic.GetImageAsBase64String()}" : "~/img/notfound.png";
-        <img id="comic-display" class="d-block m-auto animate__animated animate__fadeIn animate__fast" src="@(imageSource)" />
+        var notFoundClass = Model.Comic == null ? "athena" : string.Empty;
+
+        <img id="comic-display" class="d-block m-auto animate__animated animate__fadeIn animate__fast @(notFoundClass)" src="@(imageSource)" />
     }
     else
     {
