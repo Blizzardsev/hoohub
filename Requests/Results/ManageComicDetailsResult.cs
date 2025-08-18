@@ -45,6 +45,16 @@ namespace hoohub.Requests.Results
         /// <summary>
         /// 
         /// </summary>
+        public DateTime? ScheduledDate { get; init; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DateTime? PublishDate { get; init; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="success"></param>
         /// <param name="comic"></param>
         /// <param name="message"></param>
@@ -58,6 +68,8 @@ namespace hoohub.Requests.Results
             ImageData = comic.ImageData;
             Tags = comic.Tags;
             IsHidden = comic.IsHidden;
+            ScheduledDate = comic.ScheduledDate;
+            PublishDate = comic.PublishDate;
             Message = message;
         }
     }

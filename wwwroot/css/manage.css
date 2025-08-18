@@ -100,7 +100,8 @@ input {
     font-style: italic;
 }
 
-#manage-comics-list {
+#manage-comics-list,
+#manage-events-list {
     transition: 0.5s;
     min-height: 50vh;
     max-height: 50vh;
@@ -109,7 +110,8 @@ input {
     scrollbar-width: thin;
 }
 
-.manage-comic-item {
+.manage-comic-item,
+.manage-events-item {
     color: #808080;
     background-color: #fff;
     padding-top: 5px;
@@ -120,6 +122,7 @@ input {
 }
 
     .manage-comic-item:hover,
+    .manage-events-item:hover,
     .manage-comic-item.selected {
         filter: brightness(80%)
     }

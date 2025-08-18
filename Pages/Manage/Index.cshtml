@@ -1,4 +1,5 @@
 ﻿@page
+@using hoohub.Enums
 @using hoohub.Services
 @model hoohub.Pages.Manage.IndexModel
 @{
@@ -13,20 +14,17 @@
 
 <div class="container content-panel animate__animated animate__fadeIn">
     <div class="row vw-75 mx-auto">
-        <div data-tab-id="0" class="col-auto tab-header selected" onclick="switchTab(0)">
+        <div role="button" tabindex="0" data-tab-id="0" class="col-auto tab-header selected" onclick="switchTab(0)">
             <span>New comic</span>
         </div>
-        <div data-tab-id="1" class="col-auto tab-header" onclick="switchTab(1);getManageComicsList($('#manage-comics-refresh'))">
+        <div role="button" tabindex="0" data-tab-id="1" class="col-auto tab-header" onclick="switchTab(1);getManageComicsList($('#manage-comics-refresh'))">
             <span>Manage comics</span>
         </div>
-        <div data-tab-id="2" class="col-auto tab-header" onclick="switchTab(2)">
-            <span>Site options</span>
-        </div>
-        <div data-tab-id="3" class="col-auto tab-header" onclick="switchTab(3)">
+        <div role="button" tabindex="0" data-tab-id="3" class="col-auto tab-header" onclick="switchTab(3)">
             <span>Me</span>
         </div>
-        <div data-tab-id="4" class="col-auto tab-header" onclick="switchTab(4)">
-            <span>Logs</span>
+        <div role="button" tabindex="0" data-tab-id="4" class="col-auto tab-header" onclick="switchTab(4)">
+            <span>Events</span>
         </div>
     </div>
     <div class="row">
@@ -42,7 +40,7 @@
                     <form id="new-comic-form" class="w-75 mx-auto" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                         <div class="form-group">
-                            <input class="d-none" id="new-comic-image-data" asp-for="ManageInputModel.NewComicInput.ImageData" accept=".png,.jpg,.jpeg"/>
+                            <input class="d-none" id="new-comic-image-data" asp-for="ManageInputModel.NewComicInput.ImageData" accept=".png,.jpg,.jpeg,.gif"/>
                         </div>
                         <div class="form-group">
                             <label class="form-label" asp-for="ManageInputModel.NewComicInput.ComicNumber"></label>
@@ -64,21 +62,38 @@
                             <input id="new-comic-comic-tags" asp-for="ManageInputModel.NewComicInput.Tags" class="form-control" />
                             <span asp-validation-for="ManageInputModel.NewComicInput.Tags" class="text-warning"></span>
                         </div>
-                        <div class="form-group">
+                        <div class="row">
                             <label class="form-label" asp-for="ManageInputModel.NewComicInput.IsHidden"></label>
                         </div>
-                        <label class="switch form-group mb-4 row justify-content-center mx-auto scale-75">
-                            <input id="new-comic-is-hidden" type="checkbox">
-                            <span class="slider"></span>
-                        </label>
-                        <div class="form-group">
-                            <label class="form-label" asp-for="ManageInputModel.NewComicInput.ScheduleFor"></label>
-                            <input id="new-comic-schedule-for" asp-for="ManageInputModel.NewComicInput.ScheduleFor" type="datetime-local" class="form-control" />
-                            <span asp-validation-for="ManageInputModel.NewComicInput.ScheduleFor" class="text-warning"></span>
+                        <div class="row">
+                            <label class="switch form-group scale-75">
+                                <input id="new-comic-is-hidden" type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="row">
+                            <div class="col-auto">
+                                <div class="row">
+                                    <label class="form-label" asp-for="ManageInputModel.NewComicInput.IsScheduled"></label>
+                                </div>
+                                <div class="row">
+                                    <label class="switch form-group justify-content-center scale-75">
+                                        <input id="new-comic-is-scheduled" type="checkbox" onclick="toggleElementReadOnlyState($('#new-comic-schedule-for'))">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div id="new-comic-schedule-details" class="form-group">
+                                    <label class="form-label" asp-for="ManageInputModel.NewComicInput.ScheduleFor"></label>
+                                    <input id="new-comic-schedule-for" asp-for="ManageInputModel.NewComicInput.ScheduleFor" type="datetime-local" class="form-control" readonly/>
+                                    <span asp-validation-for="ManageInputModel.NewComicInput.ScheduleFor" class="text-warning"></span>
+                                </div>
+                            </div>
                         </div>
                         <div class="row mt-4 d-flex justify-content-center mx-auto">
                             <div class="col-auto mx-auto">
-                                <div class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="postNewComic(this)">history_edu</div>
+                                <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="postNewComic(this)" title="Publish">history_edu</div>
                                 <br />
                                 <span class="option-tip">Publish</span>
                             </div>
@@ -94,7 +109,7 @@
                     </div>
                     <div class="row mt-4 d-flex justify-content-center mx-auto">
                         <div class="col-auto mx-auto">
-                            <div id="manage-comics-refresh" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="getManageComicsList(this)">refresh</div>
+                            <div role="button" tabindex="0" id="manage-comics-refresh" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="getManageComicsList(this)" title="Refresh">refresh</div>
                             <br />
                             <span class="option-tip">Refresh</span>
                         </div>
@@ -142,6 +157,11 @@
                                     <br />
                                     <label class="form-label hint-text">Hidden posts will not be visible by default</label>
                                 </div>
+                                <div id="manage-comic-schedule-details" class="form-group">
+                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ScheduleFor"></label>
+                                    <input id="manage-comic-schedule-for" asp-for="ManageInputModel.ManageComicInput.ScheduleFor" type="datetime-local" class="form-control" readonly />
+                                    <span asp-validation-for="ManageInputModel.ManageComicInput.ScheduleFor" class="text-warning"></span>
+                                </div>
                                 <label class="switch form-group mb-4 row justify-content-center mx-auto scale-75">
                                     <input id="manage-comic-is-hidden" type="checkbox">
                                     <span class="slider"></span>
@@ -151,15 +171,13 @@
                     </div>
                     <div class="row mt-4 d-flex justify-content-center mx-auto">
                         <div class="col-auto mx-auto">
-                            <div id="manage-comic-update" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow disabled" onclick="patchComic(this)">update</div>
+                            <div role="button" tabindex="0" id="manage-comic-update" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow disabled" onclick="patchComic(this)" title="Update">update</div>
                             <br />
                             <span class="option-tip">Update</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div data-tab-id="2" class="container tab-body">
         </div>
         <div data-tab-id="3" class="container tab-body">
             <div class="container mx-auto my-auto">
@@ -180,7 +198,7 @@
                 </form>
                 <div class="row mt-4 d-flex justify-content-center mx-auto">
                     <div class="col-auto mx-auto">
-                        <div class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="patchProfile(this)">update</div>
+                        <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="patchProfile(this)" title="Update">update</div>
                         <br />
                         <span class="option-tip">Update</span>
                     </div>
@@ -189,53 +207,13 @@
         </div>
         <div data-tab-id="4" class="container tab-body">
             <div class="row overflow-hidden">
-                <div class="col overflow-hidden">
-                    <div id="manage-logs-list">
-                    </div>
+                <div id="manage-events-list">
                 </div>
-                <div class="col mx-auto overflow-auto">
-                    <div class="row">
-                        <div class="col mx-auto">
-                            <form id="manage-logs-form" class="w-100 mx-auto">
-                                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                                <div class="form-group">
-                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ComicNumber"></label>
-                                    <input id="manage-comic-comic-number" asp-for="ManageInputModel.ManageComicInput.ComicNumber" class="form-control" />
-                                    <span asp-validation-for="ManageInputModel.ManageComicInput.ComicNumber" class="text-warning"></span>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ComicTitle"></label>
-                                    <input id="manage-comic-comic-title" asp-for="ManageInputModel.ManageComicInput.ComicTitle" class="form-control" />
-                                    <span asp-validation-for="ManageInputModel.ManageComicInput.ComicTitle" class="text-warning"></span>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ComicDescription"></label>
-                                    <input id="manage-comic-comic-description" asp-for="ManageInputModel.ManageComicInput.ComicDescription" class="form-control" />
-                                    <span asp-validation-for="ManageInputModel.ManageComicInput.ComicDescription" class="text-warning"></span>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.Tags"></label>
-                                    <input id="manage-comic-comic-tags" asp-for="ManageInputModel.ManageComicInput.Tags" class="form-control" />
-                                    <span asp-validation-for="ManageInputModel.ManageComicInput.Tags" class="text-warning"></span>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.IsHidden"></label>
-                                    <br />
-                                    <label class="form-label hint-text">Hidden posts will not be visible by default</label>
-                                </div>
-                                <label class="switch form-group mb-4 row justify-content-center mx-auto scale-75">
-                                    <input id="manage-comic-is-hidden" type="checkbox">
-                                    <span class="slider"></span>
-                                </label>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="row mt-4 d-flex justify-content-center mx-auto">
-                        <div class="col-auto mx-auto">
-                            <div id="manage-comic-update" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow disabled" onclick="patchComic(this)">update</div>
-                            <br />
-                            <span class="option-tip">Update</span>
-                        </div>
+                <div class="row mt-4 d-flex justify-content-center mx-auto">
+                    <div class="col-auto mx-auto">
+                        <div role="button" tabindex="0" id="logs-update" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="getEvents(this)" title="Refresh">sync</div>
+                        <br />
+                        <span class="option-tip">Refresh</span>
                     </div>
                 </div>
             </div>

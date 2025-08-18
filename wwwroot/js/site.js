@@ -142,6 +142,14 @@ function setFormLockState(form, state) {
 }
 
 /**
+ * Sets the read only state of a single element, based on its existing state.
+ * @param {*} element - The element to evaluate
+ */
+function toggleElementReadOnlyState(element) {
+    $(element).prop("readonly", !$(element).prop("readonly"))
+}
+
+/**
  * Clears all input-type nodes for a given form. Select fields are set to their first value
  * @param {*} form 
  */

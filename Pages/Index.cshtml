@@ -12,44 +12,44 @@
     <div class="container">
         @if(Model.Comic != null)
         {
-            <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mb-4" title="Get link" onclick="copyToClipboard('@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id})')">link</div>
+            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mb-4" title="Get link" onclick="copyToClipboard('@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id})')">link</div>
         }
         else
         {
-            <div class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mb-4">link</div>
+            <div role="button" tabindex="0" class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mb-4">link</div>
         }
 
         @if (Model.Comic != null && !string.IsNullOrWhiteSpace(Model.NextComicId))
         {
             <a asp-page="/Index" asp-route-comic="@Model.NextComicId">
-                <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Next comic...">fast_forward</div>
+                <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Next comic...">fast_forward</div>
             </a>
         }
         else
         {
-            <div class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mt-2">fast_forward</div>
+            <div role="button" tabindex="0" class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mt-2">fast_forward</div>
         }
 
         @if (Model.Comic != null && !string.IsNullOrWhiteSpace(Model.PreviousComicId))
         {
             <a asp-page="/Index" asp-route-comic="@Model.PreviousComicId">
-                <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Previous comic...">fast_rewind</div>
+                <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Previous comic...">fast_rewind</div>
             </a>
         }
         else
         {
-            <div class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mt-2">fast_rewind</div>
+            <div role="button" tabindex="0" class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mt-2">fast_rewind</div>
         }
         
         <a asp-page="/Index" asp-page-handler="RandomComic" asp-route-currentComic="@(Model.Comic != null ? Model.Comic.Id : string.Empty)">
-            <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2 mb-2" title="Random comic...">shuffle</div>
+            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2 mb-2" title="Random comic...">shuffle</div>
         </a>
 
         <a asp-page="/Index" asp-page-handler="FirstComic">
-            <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-4" title="Jump to start...">history</div>
+            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-4" title="Jump to start...">history</div>
         </a>
         <a asp-page="/Index" asp-page-handler="LastComic">
-            <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Jump to end...">update</div>
+            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Jump to end...">update</div>
         </a>
     </div>
 </div>

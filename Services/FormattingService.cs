@@ -3,6 +3,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using SkiaSharp;
+using hoohub.Enums;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace hoohub.Services
 {
@@ -45,6 +47,19 @@ namespace hoohub.Services
             }
             var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attributes.Length > 0 ? attributes[0].Description : value.ToString();
+        }
+
+        /// <summary>
+        /// Returns a list of sort options for use in a filter.
+        /// </summary>
+        /// <param name="defaultOrder">The <see cref="OrderByTypes"/> value that should be selected by default.</param>
+        /// <returns><see cref="SelectList"/> of options as described by <see cref="OrderByTypes"/>.</returns>
+        public static SelectList GetOrderBySelectListWithDefault(OrderByTypes defaultOrder)
+        {
+            return new SelectList(items: new List<SelectListItem>() {
+                new SelectListItem(text: GetEnumDescription(OrderByTypes.Ascending), value: ((int)OrderByTypes.Ascending).ToString()),
+                new SelectListItem(text: GetEnumDescription(OrderByTypes.Descending), value: ((int)OrderByTypes.Descending).ToString())
+            }, dataValueField: "Value", dataTextField: "Text", selectedValue: ((int)defaultOrder).ToString());
         }
     }
 }

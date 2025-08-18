@@ -26,13 +26,13 @@
                 }
                 <div class="row mt-2 mb-4 d-flex justify-content-center mx-auto">
                     <div class="col d-inline">
-                        <div onclick="identitySubmit(this)" class="site-option option-button submit-form material-symbols-outlined align-items-center justify-content-center box-shadow">keyboard_double_arrow_right</div>
+                        <div role="button" tabindex="0" onclick="identitySubmit(this)" class="site-option option-button submit-form material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log in">keyboard_double_arrow_right</div>
                         <br />
                         <span class="option-tip">Log in</span>
                     </div>
                     <div class="col d-inline">
                         <a asp-page="ForgotPassword">
-                            <div onclick="identitySubmit(this)" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow">contact_support</div>
+                            <div role="button" tabindex="0" onclick="identitySubmit(this)" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Forgotten password">contact_support</div>
                         </a>
                         <br />
                         <span class="option-tip">Forgotten password?</span>

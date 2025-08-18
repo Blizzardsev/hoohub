@@ -3,9 +3,7 @@ using hoohub.Enums;
 using hoohub.Requests.Data;
 using hoohub.Requests.Results;
 using hoohub.Services;
-using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -21,7 +19,7 @@ namespace hoohub.Pages.Manage
     {
         private readonly HooHubContext _hooContext;
         private readonly UserManager<HooHubUser> _userManager;
-        private readonly string[] _comicUploadFileExtensions = ["png", "jpg", "jpeg"];
+        private readonly string[] _comicUploadFileExtensions = ["png", "jpg", "jpeg", "gif"];
 
         [BindProperty]
         public ManageInput ManageInputModel { get; set; } = new ManageInput();
@@ -48,7 +46,7 @@ namespace hoohub.Pages.Manage
                 [DataType(DataType.Text)]
                 [MinLength(3)]
                 [MaxLength(3)]
-                [RegularExpression("^((00[0-9])|(0[0-9][0-9])|([0-9][0-9][0-9]))$", ErrorMessage = "Comic number must be in the correct format (E.G 001)")]
+                [RegularExpression("^(((00[0-9])|(0[0-9][0-9])|([0-9][0-9][0-9]))(.[0-9])?)$", ErrorMessage = "Comic number must be in the correct format (E.G 001)")]
                 public string ComicNumber { get; set; } = string.Empty;
 
                 [Display(Name = "Comic title", Prompt = "hate everything")]
@@ -72,6 +70,10 @@ namespace hoohub.Pages.Manage
                 [Display(Name = "Hidden")]
                 [Required]
                 public bool IsHidden { get; set; } = false;
+
+                [Display(Name = "Scheduled post")]
+                [Required]
+                public bool IsScheduled { get; set; } = false;
 
                 [Display(Name = "Schedule for")]
                 [DataType(DataType.DateTime)]
@@ -107,7 +109,7 @@ namespace hoohub.Pages.Manage
                 [DataType(DataType.Text)]
                 [MinLength(3)]
                 [MaxLength(3)]
-                [RegularExpression("^((00[0-9])|(0[0-9][0-9])|([0-9][0-9][0-9]))$", ErrorMessage = "Comic number must be in the correct format (E.G 001)")]
+                [RegularExpression("^(((00[0-9])|(0[0-9][0-9])|([0-9][0-9][0-9]))(.[0-9])?)$", ErrorMessage = "Comic number must be in the correct format (E.G 001)")]
                 public string ComicNumber { get; set; } = string.Empty;
 
                 [Display(Name = "Comic title", Prompt = "hate everything")]
@@ -131,11 +133,14 @@ namespace hoohub.Pages.Manage
                 [Display(Name = "Hidden")]
                 [Required]
                 public bool IsHidden { get; set; } = false;
-            }
 
-            public class ManageSite()
-            {
+                [Display(Name = "Scheduled post")]
+                [Required]
+                public bool IsScheduled { get; set; } = false;
 
+                [Display(Name = "Schedule for")]
+                [DataType(DataType.DateTime)]
+                public DateTime ScheduleFor { get; set; } = DateTime.UtcNow;
             }
 
             public class ManageMe()
@@ -155,14 +160,12 @@ namespace hoohub.Pages.Manage
 
             public NewComic NewComicInput;
             public ManageComic ManageComicInput;
-            public ManageSite ManageSiteInput;
             public ManageMe ManageMeInput;
 
             public ManageInput()
             {
                 NewComicInput = new NewComic();
                 ManageComicInput = new ManageComic();
-                ManageSiteInput = new ManageSite();
                 ManageMeInput = new ManageMe();
             }
         }
@@ -192,6 +195,8 @@ namespace hoohub.Pages.Manage
         /// <param name="imageData"></param>
         /// <param name="tags"></param>
         /// <param name="isHidden"></param>
+        /// <param name="isScheduled"></param>
+        /// <param name="scheduleFor"></param>
         /// <returns></returns>
         public async Task<JsonResult> OnPostComicAsync(
             string comicNumber,
@@ -226,11 +231,11 @@ namespace hoohub.Pages.Manage
                         message: $"Comics must be uploaded in jpg or png format"));
                 }
 
-                if (isScheduled && scheduleFor.HasValue && DateTime.UtcNow > scheduleFor)
+                if (isScheduled && scheduleFor.HasValue && DateTime.UtcNow > scheduleFor.Value.ToUniversalTime())
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
-                        message: "Cannot schedule a post for a date in the past"));
+                        message: $"Cannot schedule for a date in the past: current time is {FormattingService.GetDateTimeAsString(DateTime.UtcNow)}"));
                 }
 
                 var newComic = new Comic(
@@ -239,8 +244,9 @@ namespace hoohub.Pages.Manage
                     comicDescription: string.IsNullOrWhiteSpace(comicDescription) ? string.Empty : comicDescription,
                     imageData: FormattingService.GetIFormFileAsBytes(imageData),
                     tags: string.IsNullOrWhiteSpace(tags) ? string.Empty : tags,
-                    isHidden: isHidden,
+                    isHidden: isScheduled ? true : isHidden,
                     scheduledDate: scheduleFor != null && isScheduled ? scheduleFor.Value.ToUniversalTime() : null);
+
                 await _hooContext.Comics.AddAsync(newComic);
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.ComicCreated,
@@ -275,7 +281,7 @@ namespace hoohub.Pages.Manage
                     success: true,
                     manageComicListData: _hooContext.Comics
                         .OrderByDescending(comic => comic.ComicNumber)
-                        .Select(comic => new Requests.Data.ManageComicListData(comic))
+                        .Select(comic => new ManageComicListData(comic))
                         .ToList()));
             }
             catch (Exception exception) 
@@ -380,7 +386,7 @@ namespace hoohub.Pages.Manage
 
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.ComicUpdated,
-                    details: $"Comic GUID {comic.Id} was updated by ${_userManager.GetUserAsync(User).Result.GetEventLogString()}"));
+                    details: $"Comic GUID {comic.Id} was updated by {_userManager.GetUserAsync(User).Result.GetEventLogString()}"));
                 await _hooContext.SaveChangesAsync();
 
                 return new JsonResult(new BaseResult(success: true));
@@ -455,41 +461,16 @@ namespace hoohub.Pages.Manage
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="eventType"></param>
-        /// <param name="eventDetails"></param>
-        /// <param name="orderBy"></param>
         /// <returns></returns>
-        public async Task<JsonResult> OnGetLogsAsync(
-            string eventType = "any",
-            string eventDetails = "",
-            OrderByTypes orderBy = OrderByTypes.Descending)
+        public async Task<JsonResult> OnGetEventsAsync()
         {
             try
             {
-                eventType = string.IsNullOrWhiteSpace(eventType) ? "any" : eventType.ToLower().Replace(" ", "");
                 var events = _hooContext.Events
                     .AsNoTracking()
                     .OrderByDescending(eventItem => eventItem.CreatedDate)
                     .Take(10000)
                     .AsEnumerable();
-
-                if (events.Any() && Enum.TryParse(value: eventType.Replace(" ", ""), ignoreCase: true, result: out EventTypes filterEventType))
-                {
-                    events = events.Where(eventLine => eventLine.EventType == filterEventType);
-                }
-                else if (events.Any() && !string.IsNullOrWhiteSpace(eventType) && eventType != "any")
-                {
-                    events = events.Where(eventLine => FormattingService.GetEnumDescription(eventLine.EventType).Contains(eventType, StringComparison.OrdinalIgnoreCase));
-                }
-
-                if (events.Any() && !string.IsNullOrWhiteSpace(eventDetails))
-                {
-                    events = events.Where(eventLine => eventLine.Details.Contains(eventDetails, StringComparison.OrdinalIgnoreCase));
-                }
-
-                events = orderBy == OrderByTypes.Ascending
-                    ? events.OrderBy(eventLine => eventLine.CreatedDate)
-                    : events.OrderByDescending(eventLine => eventLine.CreatedDate);
 
                 return new JsonResult(new EventsResult(
                     success: true, 

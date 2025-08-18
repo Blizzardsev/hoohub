@@ -133,10 +133,6 @@ using (var _scope = app.Services.CreateScope())
     using var emailStore = (IUserEmailStore<HooHubUser>)userStore;
     using var userManager = _scope.ServiceProvider.GetService<UserManager<HooHubUser>>();
 
-    await _hooContext.Events.AddAsync(new Event(
-        eventType: EventTypes.Unknown,
-        details: Convert.ToBase64String(File.ReadAllBytes("C:\\Repository\\hoohub\\wwwroot\\img\\hoo_logo_placeholder.png"))));
-
     if (!_hooContext.Users.Any())
     {
         foreach (var settings in accountSettings)

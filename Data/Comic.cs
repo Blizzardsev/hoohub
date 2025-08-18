@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace hoohub.Data
+﻿namespace hoohub.Data
 {
     public class Comic
     {
@@ -79,7 +77,10 @@ namespace hoohub.Data
             ComicNumber = comicNumber;
             ComicTitle = comicTitle;
             ComicDescription = comicDescription;
-            PublishDate = scheduledDate == null ? DateTime.UtcNow : DateTime.UtcNow.AddYears(99);
+            if (scheduledDate == null)
+            {
+                PublishDate = DateTime.UtcNow;
+            }
             ImageData = imageData;
             Tags = string.Join(",", tags);
             IsHidden = isHidden;

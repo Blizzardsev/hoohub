@@ -28,7 +28,7 @@
 <body>
     <header>
         <a asp-page="/Index">
-            <img id="logo" class="d-inline-block mb-2 mt-2" src="~/img/hoo_logo_alt.png" />
+            <img role="button" tabindex="0" id="logo" class="d-inline-block mb-2 mt-2" src="~/img/hoo_logo_alt.png" />
         </a>
         <span id="site-nav" class="navbar-option interactive material-symbols-outlined align-middle" onclick="toggleMenu(this)">menu</span>
     </header>
@@ -37,7 +37,7 @@
         <div class="container box-shadow">
             <img src="~/img/hoo_logo_no_tagline.png" />
             <a asp-page="/Index">
-                <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow" title="Home">home</div>
+                <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow" title="Home">home</div>
             </a>
             <a asp-page="/Archive">
                 <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Archive">grid_on</div>
@@ -45,16 +45,16 @@
             @if (signedIn)
             {
                 <a asp-page="/Manage/Index">
-                    <div class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Manage">settings</div>
+                    <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Manage">settings</div>
                 </a>
                 <a asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/Account/Logout")">
-                    <div class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log out">logout</div>
+                    <div role="button" tabindex="0" class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log out">logout</div>
                 </a>
             }
             else
             {
                 <a asp-page="/Account/Login" asp-route-returnUrl="@Url.Page("/Account/Login")">
-                    <div class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log in">person</div>
+                    <div role="button" tabindex="0" class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log in">person</div>
                 </a>
             }
         </div>
@@ -73,9 +73,8 @@
 
     <footer class="footer text-muted">
         <div class="container text-center mx-auto">
-            <span class="footer-item"><img class="twitter" src="~/img/twitter.png"/><a href="https://x.com/HooDoodles" target="_blank">Contact</a></span>
-            
-            <span class="footer-item"><a asp-page="/Cookies">Cookies</a></span>
+            <span role="button" tabindex="0" class="footer-item" title="Contact"><img class="twitter" src="~/img/twitter.png" /><a href="https://x.com/HooDoodles" target="_blank">Contact</a></span>
+            <span role="button" tabindex="0" class="footer-item" title="Cookies"><a asp-page="/Cookies">Cookies</a></span>
         </div>
     </footer>
 

@@ -1,13 +1,15 @@
-﻿let validExtensions = ["png", "jpeg", "jpg"]
+﻿let validExtensions = ["png", "jpeg", "jpg", "gif"]
 let profilePicturePreviewSource = null
 
-$(document).ready(function() {
+$(document).ready(function () {
     getManageComicsList()
+    getEvents()
     setFormLockState($("#manage-comic-form"), true)
 })
 
 /**
- * 
+ * On updating the image for a new comic, checks to ensure the uploaded file is of a valid format before updating the preview.
+ * Otherwise, a placeholder is displayed.
  */
 $("#new-comic-image-data").on("change", function () {
     let imageFile = document.getElementById("new-comic-image-data").files[0]
@@ -23,7 +25,8 @@ $("#new-comic-image-data").on("change", function () {
 })
 
 /**
- * 
+ * On updating the image for an existing comic, checks to ensure the uploaded file is of a valid format before updating the preview.
+ * Otherwise, a placeholder is displayed.
  */
 $("#manage-comic-image-data").on("change", function () {
     let imageFile = document.getElementById("manage-comic-image-data").files[0]
@@ -39,7 +42,8 @@ $("#manage-comic-image-data").on("change", function () {
 })
 
 /**
- * 
+ * On updating the image for a profile picture, checks to ensure the uploaded file is of a valid format before updating the preview.
+ * Otherwise, a placeholder is displayed.
  */
 $("#manage-me-image-data").on("change", function () {
     let imageFile = document.getElementById("manage-me-image-data").files[0]
@@ -56,8 +60,8 @@ $("#manage-me-image-data").on("change", function () {
 })
 
 /**
- * 
- * @param {*} tabId 
+ * Handles tab switches, such that clicking a tab option displays the relevant tab content.
+ * @param {*} tabId - The Id of the tab being selected, for which the matching content should be displayed.
  */
 function switchTab(tabId) {
     $(".tab-header").removeClass("selected")
@@ -66,9 +70,9 @@ function switchTab(tabId) {
 }
 
 /**
- * 
- * @param {*} file 
- * @returns 
+ * Returns whether the given file has a valid image file extension of the types defined.
+ * @param {*} file - The file to check
+ * @returns - True if the image extension is one of the types defined, otherwise false.
  */
 function getFileExtensionValid(file) {
     let fileSplit = file.name.split(".")
@@ -76,9 +80,10 @@ function getFileExtensionValid(file) {
 }
 
 /**
- * 
- * @param {*} element 
- * @returns 
+ * Attempts to post a new comic.
+ * If successful, clears the new comic input and resets the form.
+ * Otherwise, notifies of any errors.
+ * @param {*} element - The calling control to be disabled/enabled.
  */
 function postNewComic(element) {
     let newComicForm = $("#new-comic-form")
@@ -133,15 +138,67 @@ function postNewComic(element) {
 }
 
 /**
- * 
- * @param {*} element 
+ * Attempts to fetch the list of events and display them.
+ * @param {any} element - The calling control to be disabled/enabled.
  */
-function getManageComicsList(element) {
-    if ($(element).hasClass("disabled")) {
-        return
+function getEvents(element) {
+    if (element != undefined) {
+        if ($(element).hasClass("disabled")) {
+            return
+        }
+        $(element).addClass("disabled")
     }
-    
-    $(element).addClass("disabled")
+    $("#manage-events-list").css("filter", "brightness(80%)")
+
+    setTimeout(function () {
+        $.ajax({
+            type: "GET",
+            url: "?handler=Events",
+            dataType: "json",
+            data: {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+            },
+            success: function (result) {
+                if (result.success) {
+                    let eventsList = []
+                    result.eventData.forEach(function (event) {
+                        eventsList.push(`
+                            <div class="row manage-events-item w-100 mx-auto">
+                                <div class="col">${event.displayCreatedDate}</div>
+                                <div class="col">${event.displayEventType}</div>
+                                <div class="col">${event.details}</div>
+                            </div>
+                        `)
+                    })
+                    $("#manage-events-list").html(eventsList.join(""))
+                }
+                else {
+                    displayAlert("Failed to load events")
+                }
+            },
+            failure: function () {
+                hideLoading(loaderId)
+                displayAlert("Failed to load events")
+            },
+            complete: function () {
+                $(element).removeClass("disabled")
+                $("#manage-events-list").css("filter", "none")
+            }
+        })
+    }, 500)
+}
+
+/**
+* Attempts to fetch the list of existing comics and display them.
+* @param {any} element - The calling control to be disabled/enabled.
+*/
+function getManageComicsList(element) {
+    if (element != undefined) {
+        if ($(element).hasClass("disabled")) {
+            return
+        }
+        $(element).addClass("disabled")
+    }
     $("#manage-comics-list").css("filter", "brightness(80%)")
 
     setTimeout(function () {
@@ -179,8 +236,9 @@ function getManageComicsList(element) {
 }
 
 /**
- * 
- * @param {*} comicGuid 
+ * Attempts to fetch the details and populate the comic management form for the selected comic.
+ * @param {any} element - The calling control to be disabled/enabled.
+ * @param {*} comicGuid - The GUID of the comic to load.
  */
 function loadManageComic(element, comicGuid) {
     $(".manage-comic-item").removeClass("selected")
@@ -207,6 +265,17 @@ function loadManageComic(element, comicGuid) {
                     $("#manage-comic-comic-title").val(result.comicTitle)
                     $("#manage-comic-comic-description").val(result.comicDescription)
                     $("#manage-comic-comic-tags").val(result.tags)
+
+                    if (result.scheduledFor != null && result.publishDate == null) {
+                        $("#manage-comic-schedule-for").val(result.scheduledFor)
+                        $("#manage-comic-schedule-for").show()
+                        $("#manage-comic-schedule-for").prop("readonly", false)
+                    }
+                    else {
+                        $("#manage-comic-schedule-for").hide()
+                        $("#manage-comic-schedule-for").prop("readonly", true)
+                    }
+                    
                     $("#manage-comic-is-hidden").prop("checked", result.isHidden)
                     $("#manage-comic-update").removeClass("disabled")
                 })
@@ -224,7 +293,7 @@ function loadManageComic(element, comicGuid) {
 }
 
 /**
- * 
+ * On clicking the preview of the manage comic form, prompts a file upload.
  */
 function manageComicPreviewClick() {
     if (!$("#manage-comic-form").hasClass("locked")) {
@@ -233,10 +302,11 @@ function manageComicPreviewClick() {
 }
 
 /**
- * 
- * @param {*} element 
- * @returns 
- */
+* Attempts to update an existing comic.
+* If successful, informs the user.
+* Otherwise, notifies of any errors.
+* @param {*} element - The calling control to be disabled/enabled.
+*/
 function patchComic(element) {
     let manageComicForm = $("#manage-comic-form")
 
@@ -288,10 +358,11 @@ function patchComic(element) {
 }
 
 /**
- * 
- * @param {*} element 
- * @returns 
- */
+* Attempts to update the user's profile.
+* If successful, informs the user.
+* Otherwise, notifies of any errors.
+* @param {*} element - The calling control to be disabled/enabled.
+*/
 function patchProfile(element) {
     let manageMeForm = $("#manage-me-form")
 
