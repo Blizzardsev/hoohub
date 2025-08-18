@@ -25,6 +25,33 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Trocchi&display=swap" rel="stylesheet">
     @RenderSection("Styles", required: false)
+
+    <!--Theme styles based on night/day-->
+    <style>
+        :root {
+            --main-foreground-colour: @(isNightMode ? "#fff" : "#280501");
+            --main-background-colour: @(isNightMode ? "#0b0128" : "#fff");
+
+            --site-nav-foreground-colour: @(isNightMode ? "#fff" : "#0b0128");
+
+            --site-menu-background-colour: @(isNightMode ? "#3C3453" : "#fff");
+
+            --site-option-foreground-colour: @(isNightMode ? "#fff" : "#fff");
+            --site-option-background-colour: @(isNightMode ? "#3C3453" : "#0b0128");
+
+            --site-alert-foreground-colour: @(isNightMode ? "#fff" : "#0b0128");
+            --site-alert-background-colour: @(isNightMode ? "#3C3453" : "#0b0128");
+            /*
+            --tab-header-foreground-colour: @(isNightMode ? "" : "#84706D");
+            --tab-header-background-colour: @(isNightMode ? "" : "#DFDAD9");
+            --tab-header-selected-foreground-colour: @(isNightMode ? "" : "#fff");
+            --tab-header-selected-background-colour: @(isNightMode ? "" : "#280501");
+            --tab-header-selected-border-colour: @(isNightMode ? "" : "#280501");*/
+            
+            --tab-body-border: @(isNightMode ? "2px solid #3C3453" : "2px solid #280501");
+        }
+    </style>
+
 </head>
 <div class="background-stripe"></div>
 <body>
@@ -59,7 +86,7 @@
                     <div role="button" tabindex="0" class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log in">person</div>
                 </a>
             }
-            <a asp-page="/Index">
+            <a asp-page="/Index" asp-page-handler="ToggleNightMode">
                 @{
                     var modeTitle = $"Switch to {(isNightMode ? "day" : "night")} mode";
                     var modeMaterialIcon = isNightMode ? "clear_day" : "mode_night";

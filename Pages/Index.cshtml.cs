@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
 
 namespace hoohub.Pages
 {
@@ -151,8 +152,44 @@ namespace hoohub.Pages
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
-                eventType: Enums.EventTypes.Error,
+                    eventType: Enums.EventTypes.Error,
                     details: $"Failed to load last comic: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return RedirectToPage("./Error");
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IActionResult> OnGetToggleNightModeAsync()
+        {
+            try
+            {
+                string? nightModeSetting = Request.Cookies["nightMode"];
+                if (string.IsNullOrWhiteSpace(nightModeSetting))
+                {
+                    Response.Cookies.Append("nightMode", "true");
+                }
+                else
+                {
+                    Response.Cookies.Append("nightMode", Request.Cookies["nightMode"] == "true" ? "false" : "true");
+                }
+
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: Enums.EventTypes.Unknown,
+                    details: $"Night mode cookie method hit"));
+                await _hooContext.SaveChangesAsync();
+
+                return RedirectToPage();
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: Enums.EventTypes.Error,
+                    details: $"Failed to switch themes: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
                 return RedirectToPage("./Error");

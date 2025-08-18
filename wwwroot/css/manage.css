@@ -33,7 +33,7 @@
 
 .tab-body {
     display: none;
-    border: 2px solid #280501;
+    border: var(--tab-body-border);
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
