@@ -41,7 +41,7 @@
     width: 75vw;
     padding: 20px;
     overflow-y: scroll;
-    scrollbar-color: #280501 #DFDAD9;
+    scrollbar-color: var(--scrollbar-color);
     scrollbar-width: thin;
 }
 
@@ -106,14 +106,14 @@ input {
     min-height: 58vh;
     max-height: 58vh;
     overflow-y: scroll;
-    scrollbar-color: #280501 #DFDAD9;
+    scrollbar-color: var(--scrollbar-color);
     scrollbar-width: thin;
 }
 
 .manage-comic-item,
 .manage-events-item {
-    color: #808080;
-    background-color: #fff;
+    color: var(--list-item-foreground-colour);
+    background-color: var(--list-item-background-colour);
     padding-top: 5px;
     padding-bottom: 5px;
     border-bottom: 1px solid #808080;

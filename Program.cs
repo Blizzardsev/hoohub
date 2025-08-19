@@ -5,7 +5,6 @@ using hoohub.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using System.Drawing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +17,12 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddWebOptimizer(pipeline =>
 {
-    //pipeline.MinifyJsFiles("js/*");
-    pipeline.MinifyCssFiles("css/*");
-    //pipeline.MinifyHtmlFiles("html/*");
+    if (!Debugger.IsAttached)
+    {
+        pipeline.MinifyJsFiles("js/*");
+        pipeline.MinifyCssFiles("css/*");
+        pipeline.MinifyHtmlFiles("html/*");
+    }
 });
 
 // Identity scaffolding
@@ -34,7 +36,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
     options.LogoutPath = "/Account/Logout";
-    options.ExpireTimeSpan = TimeSpan.FromHours(7);
+    options.ExpireTimeSpan = TimeSpan.FromDays(365);
     options.SlidingExpiration = true;
 });
 

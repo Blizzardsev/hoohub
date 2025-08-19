@@ -31,6 +31,11 @@ namespace hoohub.Pages
         /// <summary>
         /// 
         /// </summary>
+        public bool IsNightMode { get; private set; } = false;
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="hooContext"></param>
         public IndexModel(HooHubContext hooContext)
         {
@@ -46,6 +51,17 @@ namespace hoohub.Pages
         {
             try
             {
+                string? nightModeSetting = Request.Cookies["nightMode"];
+                if (string.IsNullOrWhiteSpace(nightModeSetting))
+                {
+                    Response.Cookies.Append("nightMode", "false");
+                    IsNightMode = false;
+                }
+                else
+                {
+                    IsNightMode = Request.Cookies["nightMode"] == "true";
+                }
+
                 Comic? comicToDisplay = null;
                 if (!string.IsNullOrEmpty(comic))
                 {
@@ -177,11 +193,6 @@ namespace hoohub.Pages
                 {
                     Response.Cookies.Append("nightMode", Request.Cookies["nightMode"] == "true" ? "false" : "true");
                 }
-
-                await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.Unknown,
-                    details: $"Night mode cookie method hit"));
-                await _hooContext.SaveChangesAsync();
 
                 return RedirectToPage();
             }

@@ -20,7 +20,7 @@
 }
 
 .archive-comic-view-container {
-	background: rgba(40,5,1,90%);
+	background: var(--archive-comic-view-container-background);
 	height: 100vh;
 	width: 100vw;
 	top: 0;

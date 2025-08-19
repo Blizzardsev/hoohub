@@ -7,6 +7,7 @@
     var displayPicture = user != null ? $@"data:image/jpg;base64,{Convert.ToBase64String(user.DisplayPicture)}" : "~/img/notfound.png";
 
     var isNightMode = Context.Request.Cookies["nightMode"] == "true";
+    var logoPath = isNightMode ? "hoo_logo_alt_night.png" : "hoo_logo_alt.png";
 }
 
 <!DOCTYPE html>
@@ -31,43 +32,50 @@
         :root {
             --main-foreground-colour: @(isNightMode ? "#fff" : "#280501");
             --main-background-colour: @(isNightMode ? "#0b0128" : "#fff");
+            --scrollbar-color: @(isNightMode ? "#fff #4f456e" : "#280501 #DFDAD9");
 
             --site-nav-foreground-colour: @(isNightMode ? "#fff" : "#0b0128");
-
-            --site-menu-background-colour: @(isNightMode ? "#3C3453" : "#fff");
-
+            --site-menu-background-colour: @(isNightMode ? "#4f456e" : "#fff");
             --site-option-foreground-colour: @(isNightMode ? "#fff" : "#fff");
-            --site-option-background-colour: @(isNightMode ? "#3C3453" : "#0b0128");
+            --site-option-background-colour: @(isNightMode ? "#4f456e" : "#0b0128");
+            --slider-selected-colour: @(isNightMode ? "#4f456e" : "#280501");
 
             --input-foreground-colour: @(isNightMode ? "#fff" : "#280501");
-            --input-background-colour: @(isNightMode ? "#3C3453" : "#ddd7d6");
+            --input-background-colour: @(isNightMode ? "#4f456e" : "#ddd7d6");
 
             --footer-item-foreground-colour: @(isNightMode ? "#fff" : "#fff");
-            --footer-item-background-colour: @(isNightMode ? "#3C3453" : "#1e1e1e");
+            --footer-item-background-colour: @(isNightMode ? "#4f456e" : "#1e1e1e");
 
-            --site-alert-foreground-colour: @(isNightMode ? "#fff" : "#0b0128");
-            --site-alert-background-colour: @(isNightMode ? "#3C3453" : "#0b0128");
+            --site-alert-foreground-colour: @(isNightMode ? "#fff" : "#fff");
+            --site-alert-background-colour: @(isNightMode ? "rgba(60,52,83,90%)" : "rgba(40,5,1,90%)");
 
             --athena-filter: @(isNightMode ? "grayscale(100) brightness(100)" : "none");
-            /*
+            
+            --loading-container-background: @(isNightMode ? "rgba(60,52,83,90%)" : "rgba(40,5,1,90%)");
+            
+            --archive-comic-view-container-background: @(isNightMode ? "rgba(60,52,83,90%)" : "rgba(40,5,1,90%)");
+            
+            --list-item-foreground-colour: @(isNightMode ? "#fff" : "#808080");
+            --list-item-background-colour: @(isNightMode ? "transparent" : "#fff");
+            
+            
             --tab-header-foreground-colour: @(isNightMode ? "" : "#84706D");
             --tab-header-background-colour: @(isNightMode ? "" : "#DFDAD9");
             --tab-header-selected-foreground-colour: @(isNightMode ? "" : "#fff");
             --tab-header-selected-background-colour: @(isNightMode ? "" : "#280501");
-            --tab-header-selected-border-colour: @(isNightMode ? "" : "#280501");*/
+            --tab-header-selected-border-colour: @(isNightMode ? "" : "#280501");
             
-            --tab-body-border: @(isNightMode ? "2px solid #3C3453" : "2px solid #280501");
+            --tab-body-border: @(isNightMode ? "2px solid #4f456e" : "2px solid #280501");
         }
     </style>
-
 </head>
 <div class="background-stripe"></div>
 <body>
     <header>
         <a asp-page="/Index">
-            <img role="button" tabindex="0" id="logo" class="d-inline-block mb-2 mt-2" src="~/img/hoo_logo_alt.png" />
+            <img role="button" tabindex="0" id="logo" class="d-inline-block mb-2 mt-2" src="~/img/@(logoPath)" />
         </a>
-        <span id="site-nav" class="navbar-option interactive material-symbols-outlined align-middle" onclick="toggleMenu(this)">menu</span>
+        <span id="site-nav" class="navbar-option interactive material-symbols-outlined align-middle mb-2 mt-2" onclick="toggleMenu(this)">menu</span>
     </header>
 
     <div id="site-menu">

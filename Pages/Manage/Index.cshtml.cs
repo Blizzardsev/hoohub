@@ -28,6 +28,11 @@ namespace hoohub.Pages.Manage
 
         public string DisplayPictureOnLoad { get; set; } = string.Empty;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsNightMode { get; private set; } = false;
+
         public IndexModel(HooHubContext hooContext, UserManager<HooHubUser> userManager)
         {
             _hooContext = hooContext;
@@ -177,15 +182,38 @@ namespace hoohub.Pages.Manage
         /// </summary>
         public async Task<IActionResult> OnGet()
         {
-            var currentUser = _userManager.GetUserAsync(User).Result;
-            if (currentUser == null)
+            try
             {
-                return RedirectToPage("/Index");
-            }
+                string? nightModeSetting = Request.Cookies["nightMode"];
+                if (string.IsNullOrWhiteSpace(nightModeSetting))
+                {
+                    Response.Cookies.Append("nightMode", "false");
+                    IsNightMode = false;
+                }
+                else
+                {
+                    IsNightMode = Request.Cookies["nightMode"] == "true";
+                }
 
-            DisplayPictureOnLoad = Convert.ToBase64String(currentUser.DisplayPicture);
-            ManageInputModel.ManageMeInput.Handle = currentUser.Handle;
-            return Page();
+                var currentUser = _userManager.GetUserAsync(User).Result;
+                if (currentUser == null)
+                {
+                    return RedirectToPage("/Index");
+                }
+
+                DisplayPictureOnLoad = Convert.ToBase64String(currentUser.DisplayPicture);
+                ManageInputModel.ManageMeInput.Handle = currentUser.Handle;
+                return Page();
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                eventType: Enums.EventTypes.Error,
+                    details: $"Failed to load comic archive: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return RedirectToPage("./Error");
+            }
         }
 
         /// <summary>

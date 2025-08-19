@@ -1,7 +1,9 @@
 ﻿@page
 @model IndexModel
+
 @{
     ViewData["Title"] = "Hoo.";
+    var bannerPath = Model.IsNightMode ? "hoo_banner_night.png" : "hoo_banner.png";
 }
 
 @section Styles {
@@ -55,7 +57,7 @@
 </div>
 
 <div class="container content-panel text-center">
-    <img id="banner" class="mb-md-2 d-block m-auto animate__animated animate__fadeIn animate__fast" src="~/img/hoo_banner.png" />
+    <img id="banner" class="mb-md-2 d-block m-auto animate__animated animate__fadeIn animate__fast" src="~/img/@(bannerPath)" />
     @if (Model.Comic != null)
     {
         string imageSource = Model.Comic != null ? $@"data:image/jpg;base64, {Model.Comic.GetImageAsBase64String()}" : "~/img/notfound.png";

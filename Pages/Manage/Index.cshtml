@@ -4,6 +4,7 @@
 @model hoohub.Pages.Manage.IndexModel
 @{
     ViewData["Title"] = "Manage";
+    var placeholderPath = Model.IsNightMode ? "hoo_logo_placeholder_night.png" : "hoo_logo_placeholder.png";
 }
 
 @section Styles {
@@ -32,7 +33,12 @@
             <div class="row">
                 <div class="col">
                     <h5 class="text-center mb-2">Preview</h5>
-                    <img id="new-comic-preview" title="Upload a comic..." class="animate__animated animate__fadeIn" src="~/img/hoo_logo_placeholder.png" data-placeholder="@($@"data:image/jpg;base64, {Properties.Resources.UploadPlaceholderBase64}")" onclick="$('#new-comic-image-data').click()" />
+                    <img 
+                        id="new-comic-preview" 
+                        title="Upload a comic..." 
+                        class="animate__animated animate__fadeIn" 
+                        src="~/img/@(placeholderPath)"
+                         data-placeholder="@($@"data:image/jpg;base64, {(Model.IsNightMode ? Properties.Resources.UploadPlaceholderBase64 : Properties.Resources.UploadPlaceholderNightBase64)}")" onclick="$('#new-comic-image-data').click()" />
                     <br />
                     <span asp-validation-for="ManageInputModel.NewComicInput.ImageData" class="text-warning"></span>
                 </div>
@@ -118,7 +124,13 @@
                 <div class="col mx-auto overflow-auto">
                     <div class="row">
                         <div class="col-auto mx-auto">
-                            <img id="manage-comic-preview" title="Upload a comic..." class="animate__animated animate__fadeIn" src="~/img/hoo_logo_placeholder.png" data-placeholder="@($@"data:image/jpg;base64, {Properties.Resources.UploadPlaceholderBase64}")" onclick="manageComicPreviewClick()" />
+                            <img 
+                                id="manage-comic-preview" 
+                                title="Upload a comic..." 
+                                class="animate__animated animate__fadeIn" 
+                                src="~/img/@(placeholderPath)"
+                                 data-placeholder="@($@"data:image/jpg;base64, {(Model.IsNightMode ? Properties.Resources.UploadPlaceholderNightBase64 : Properties.Resources.UploadPlaceholderBase64)}")"
+                                 onclick="manageComicPreviewClick()" />
                             <br />
                             <span asp-validation-for="ManageInputModel.ManageComicInput.ImageData" class="text-warning"></span>
                         </div>

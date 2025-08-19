@@ -21,7 +21,7 @@ html {
 
 html {
     position: relative;
-    scrollbar-color: #280501 #DDD7D6;
+    scrollbar-color: var(--scrollbar-color);
     scrollbar-width: thin;
 }
 
@@ -36,7 +36,10 @@ body {
 header {
     background-color: var(--main-background-colour);
     z-index: 100;
-    position: relative;
+    position: sticky;
+    top: 0;
+    box-shadow: 0 5px 5px 0 rgba(0,0,0,.15);
+    display: flex;
 }
 
 footer {
@@ -163,11 +166,11 @@ h4, h5 {
 
 #site-nav {
     font-size: 2.5em;
-    float: right;
-    transition: all .5s;
+    transition: .5s;
     cursor: pointer;
     margin-right: 2vw;
-    margin-top: 2vh;
+    display: inline-block;
+    margin-left: auto;
 }
 
     #site-nav:hover {
@@ -298,8 +301,8 @@ h4, h5 {
     text-align: center;
     font-size: 1.5em;
     z-index: 250;
-    background: rgba(40,5,1,90%);
-    color: #fff;
+    background: var(--site-alert-background-colour);
+    color: var(--site-alert-foreground-colour);
     width: 35%;
     margin: auto;
     border-radius: 50px;
@@ -311,12 +314,12 @@ h4, h5 {
 }
 
 .loading-container {
-	background: rgba(40,5,1,90%);
-	height: 100vh;
-	width: 100vw;
-	top: 0;
-	position: fixed;
-	z-index: 200;
+    background: var(--loading-container-background);
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    position: fixed;
+    z-index: 200;
 }
 
 	.loading-container .loader {
@@ -334,7 +337,7 @@ select,
     background-color: var(--input-background-colour);
     border: 2px solid transparent !important;
     transition: all .2s;
-    scrollbar-color: #280501 #DDD7D6;
+    scrollbar-color: var(--scrollbar-color);
     scrollbar-width: thin;
     box-shadow: none;
     margin-bottom: 10px;
@@ -399,7 +402,6 @@ select,
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #16191d;
     -webkit-transition: .4s;
     transition: .4s;
     border-radius: 34px;
@@ -425,8 +427,8 @@ input:not(checked) + .slider {
 }
 
 input:checked + .slider {
-    background-color: #280501;
-    border: 1px solid #280501;
+    background-color: var(--slider-selected-colour);
+    border: 1px solid var(--slider-selected-colour);
 }
 
     input:checked + .slider:before {
@@ -449,13 +451,13 @@ input:disabled + .slider {
     background-image:  linear-gradient(#280501 2px, transparent 2px), linear-gradient(90deg, #280501 2px, transparent 2px), linear-gradient(#280501 1px, transparent 1px), linear-gradient(90deg, #280501 1px, #fff 1px);
     background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
     background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
-    height: 100vh;
     width: 10vw;
-    position: absolute;
+    position: fixed;
     float: left;
     margin-left: 0vw;
     margin-top: 0%;
     top: 0;
+    bottom: 0;
     left: 0;
     box-shadow: 20px 0 10px -10px rgba(0,0,0,.25);
     -webkit-transition: background-image 0.2s ease-in-out;
