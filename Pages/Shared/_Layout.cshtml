@@ -42,6 +42,7 @@
 
             --input-foreground-colour: @(isNightMode ? "#fff" : "#280501");
             --input-background-colour: @(isNightMode ? "#4f456e" : "#ddd7d6");
+            --input-read-only-background-color: @(isNightMode ? "#2d273f !important" : "#84706D !important");
 
             --footer-item-foreground-colour: @(isNightMode ? "#fff" : "#fff");
             --footer-item-background-colour: @(isNightMode ? "#4f456e" : "#1e1e1e");
@@ -58,12 +59,12 @@
             --list-item-foreground-colour: @(isNightMode ? "#fff" : "#808080");
             --list-item-background-colour: @(isNightMode ? "transparent" : "#fff");
             
-            
-            --tab-header-foreground-colour: @(isNightMode ? "" : "#84706D");
-            --tab-header-background-colour: @(isNightMode ? "" : "#DFDAD9");
-            --tab-header-selected-foreground-colour: @(isNightMode ? "" : "#fff");
-            --tab-header-selected-background-colour: @(isNightMode ? "" : "#280501");
-            --tab-header-selected-border-colour: @(isNightMode ? "" : "#280501");
+            --tab-header-foreground-colour: @(isNightMode ? "#8c82b0" : "#84706D");
+            --tab-header-background-colour: @(isNightMode ? "#2d273f" : "#DFDAD9");
+            --tab-header-border: @(isNightMode ? "2px solid #2d273f" : "2px solid #DFDAD9");
+            --tab-header-selected-foreground-colour: @(isNightMode ? "#fff" : "#fff");
+            --tab-header-selected-background-colour: @(isNightMode ? "#4f456e" : "#280501");
+            --tab-header-selected-border-colour: @(isNightMode ? "#4f456e" : "#280501");
             
             --tab-body-border: @(isNightMode ? "2px solid #4f456e" : "2px solid #280501");
         }

@@ -14,7 +14,8 @@
     <div class="container">
         @if(Model.Comic != null)
         {
-            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mb-4" title="Get link" onclick="copyToClipboard('@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id})')">link</div>
+            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow" title="Get link" onclick="copyToClipboard('@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id})')">link</div>
+            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2 mb-4" onclick="showModal('comicInfo')">info</div>
         }
         else
         {

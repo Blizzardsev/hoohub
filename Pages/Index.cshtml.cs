@@ -16,7 +16,7 @@ namespace hoohub.Pages
         /// <summary>
         /// 
         /// </summary>
-        public Comic? Comic { get; set; }
+        public Comic? Comic { get; private set; }
 
         /// <summary>
         /// 
@@ -32,6 +32,11 @@ namespace hoohub.Pages
         /// 
         /// </summary>
         public bool IsNightMode { get; private set; } = false;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public HooHubUser ComicUploader { get; private set; }
 
         /// <summary>
         /// 
@@ -81,6 +86,7 @@ namespace hoohub.Pages
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = comicToDisplay;
+
                 return Page();
             }
             catch (Exception exception)
@@ -124,6 +130,10 @@ namespace hoohub.Pages
             }
 		}
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> OnGetFirstComicAsync()
         {
             try
@@ -150,6 +160,10 @@ namespace hoohub.Pages
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> OnGetLastComicAsync()
         {
             try

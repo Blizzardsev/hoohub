@@ -1,7 +1,7 @@
 ﻿.tab-header {
-    color: #84706D;
-    background-color: #DFDAD9;
-    border: 2px solid #DFDAD9;
+    color: var(--tab-header-foreground-colour);
+    background-color: var(--tab-header-background-colour);
+    border: var(--tab-header-border);
     border-bottom: none;
     border-radius: 5px;
     border-bottom-right-radius: 0px;
@@ -17,9 +17,9 @@
 }
 
     .tab-header.selected {
-        color: #fff;
-        background-color: #280501;
-        border-color: #280501;
+        color: var(--tab-header-selected-foreground-colour);
+        background-color: var(--tab-header-selected-background-colour);
+        border-color: var(--tab-header-selected-border-colour);
     }
 
     .tab-header:not(.selected):hover {
