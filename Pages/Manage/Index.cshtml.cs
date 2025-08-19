@@ -296,7 +296,7 @@ namespace hoohub.Pages.Manage
                     imageData: FormattingService.GetIFormFileAsBytes(imageData),
                     tags: string.IsNullOrWhiteSpace(tags) ? string.Empty : tags,
                     isHidden: isScheduled ? true : isHidden,
-                    uploadedById: currentUser.Id,
+                    uploadedBy: currentUser,
                     scheduledDate: scheduleFor != null && isScheduled ? scheduleFor.Value.ToUniversalTime() : null);
 
                 await _hooContext.Comics.AddAsync(newComic);
@@ -475,7 +475,7 @@ namespace hoohub.Pages.Manage
                 }
                 comic.Tags = tags;
                 comic.IsHidden = isHidden;
-                comic.LastEditedById = currentUser.Id;
+                comic.LastEditedBy = currentUser;
 
                 if (!isScheduled && comic.ScheduledDate.HasValue)
                 {

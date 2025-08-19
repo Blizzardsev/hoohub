@@ -159,3 +159,11 @@ function clearForm(form) {
     $(form).find("select").prop("selectedIndex", 0)
     $(form).find(":checkbox").prop("checked", false)
 }
+
+function showModal(modalId) {
+    $(`#${modalId}`).fadeIn(200)
+}
+
+function hideModal(modalId) {
+    $(`#${modalId}`).fadeOut(200)
+}

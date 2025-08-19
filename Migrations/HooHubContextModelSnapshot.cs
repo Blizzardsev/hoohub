@@ -170,7 +170,6 @@ namespace hoohub.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("LastEditedById")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("PublishDate")
@@ -184,10 +183,13 @@ namespace hoohub.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UploadedById")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LastEditedById");
+
+                    b.HasIndex("UploadedById");
 
                     b.ToTable("Comics", (string)null);
                 });
@@ -350,6 +352,21 @@ namespace hoohub.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("hoohub.Data.Comic", b =>
+                {
+                    b.HasOne("hoohub.Data.HooHubUser", "LastEditedBy")
+                        .WithMany()
+                        .HasForeignKey("LastEditedById");
+
+                    b.HasOne("hoohub.Data.HooHubUser", "UploadedBy")
+                        .WithMany()
+                        .HasForeignKey("UploadedById");
+
+                    b.Navigation("LastEditedBy");
+
+                    b.Navigation("UploadedBy");
                 });
 #pragma warning restore 612, 618
         }

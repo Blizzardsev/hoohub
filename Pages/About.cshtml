@@ -1,0 +1,72 @@
+﻿@page
+@model hoohub.Pages.AboutModel
+@{
+    ViewData["Title"] = "About us";
+    var artistDisplayPicture = Model.ArtistCreditUser != null && Model.ArtistCreditUser.DisplayPicture != null
+        ? $@"data:image/jpg;base64,{Convert.ToBase64String(Model.ArtistCreditUser.DisplayPicture)}"
+        : "~/img/notfound.png";
+    var writerDisplayPicture = Model.WriterCreditUser != null && Model.WriterCreditUser.DisplayPicture != null
+        ? $@"data:image/jpg;base64,{Convert.ToBase64String(Model.WriterCreditUser.DisplayPicture)}"
+        : "~/img/notfound.png";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/about.css" />
+}
+
+<div class="container animate__animated animate__fadeIn">
+    <div class="row w-75 mx-auto mb-4">
+        <div class="col">
+            <h1 class="mt-2">About us</h1>
+            <br />
+            <h3 class="mb-4">Hi!</h3>
+            <p>
+                Hoo is a little webcomic about Athena: the life of our little owl who (understandably) hates just about everything!
+                <br /><br />
+                We started Hoo as a way of sharing our grievances, pet hates and general frustations in an adorably convenient owl-based format for others to enjoy.
+                <br/></br/>
+                We sincerely hope you enjoy our comics as much as we enjoy creating them! ♥
+            </p>
+            <hr />
+            <h3 class="mb-4">Hoo's involved?</h3>
+            <div class="row">
+                <div class="col align-middle text-center">
+                    <img class="contributor-pfp" src="@(artistDisplayPicture)" />
+                    <h5 class="mt-2">@(Model.ArtistCreditUser.Handle) | Artist</h5>
+                    <div class="row mt-2 d-flex justify-content-center mx-auto">
+                        <div class="col-auto mx-auto text-center scale-75">
+                            <a href="">
+                                <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Find me on X...">share</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col align-middle text-center">
+                    <img class="contributor-pfp" src="@(writerDisplayPicture)" />
+                    <h5 class="mt-2">@(Model.WriterCreditUser.Handle) | Writer</h5>
+                    <div class="row mt-2 d-flex justify-content-center mx-auto">
+                        <div class="col-auto mx-auto text-center scale-75">
+                            <a href="">
+                                <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Find me on X...">share</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col d-flex align-items-center">
+            <img class="comic-display mx-auto athena" style="max-width: 45vh" src="~/img/flower.png" />
+        </div>
+    </div>
+    <div class="row mt-4 d-flex justify-content-center mx-auto">
+        <div class="col-auto mx-auto text-center" style="margin-top: 5%">
+            <a asp-page="/Index">
+                <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Home">keyboard_double_arrow_right</div>
+            </a>
+            <br />
+            <span class="option-tip">Thank you!</span>
+        </div>
+    </div>
+</div>
+
+

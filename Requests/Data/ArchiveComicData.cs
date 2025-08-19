@@ -46,13 +46,9 @@ namespace hoohub.Requests.Data
         {
             Guid = comic.Id;
             DisplayName = HttpUtility.HtmlEncode(comic.GetComicDisplayName());
-            DisplayPublishDate = comic.PublishDate.HasValue ? comic.PublishDate.Value.ToLocalTime().ToString("dddd, dd | MM | yyyy") : "(Not yet published)";
-            DisplayTags = string.IsNullOrWhiteSpace(comic.Tags)
-                ? "(No tags)"
-                : HttpUtility.HtmlEncode(comic.Tags.Replace(",", ", "));
-            Description = string.IsNullOrWhiteSpace(comic.ComicDescription)
-                ? "(No description)"
-                : HttpUtility.HtmlEncode(comic.ComicDescription);
+            DisplayPublishDate = comic.GetComicDisplayPublishDate();
+            DisplayTags = comic.GetComicDisplayTags();
+            Description = comic.GetComicDisplayDescription();
             ImageData = comic.ImageData;
         }
     }

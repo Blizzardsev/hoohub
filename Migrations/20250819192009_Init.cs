@@ -26,24 +26,6 @@ namespace hoohub.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Comics",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    ComicNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    ComicTitle = table.Column<string>(type: "TEXT", nullable: false),
-                    ComicDescription = table.Column<string>(type: "TEXT", nullable: false),
-                    PublishDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ImageData = table.Column<byte[]>(type: "BLOB", nullable: false),
-                    Tags = table.Column<string>(type: "TEXT", nullable: false),
-                    IsHidden = table.Column<bool>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Comics", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Events",
                 columns: table => new
                 {
@@ -195,6 +177,37 @@ namespace hoohub.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Comics",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    ComicNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    ComicTitle = table.Column<string>(type: "TEXT", nullable: false),
+                    ComicDescription = table.Column<string>(type: "TEXT", nullable: false),
+                    PublishDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ImageData = table.Column<byte[]>(type: "BLOB", nullable: false),
+                    Tags = table.Column<string>(type: "TEXT", nullable: false),
+                    IsHidden = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ScheduledDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    UploadedById = table.Column<string>(type: "TEXT", nullable: true),
+                    LastEditedById = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comics", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Comics_Users_LastEditedById",
+                        column: x => x.LastEditedById,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Comics_Users_UploadedById",
+                        column: x => x.UploadedById,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -220,6 +233,16 @@ namespace hoohub.Migrations
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comics_LastEditedById",
+                table: "Comics",
+                column: "LastEditedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comics_UploadedById",
+                table: "Comics",
+                column: "UploadedById");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",

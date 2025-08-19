@@ -10,12 +10,37 @@
     <link rel="stylesheet" href="~/css/comics.css" />
 }
 
+@if (Model.Comic != null)
+{
+    var uploaderDisplayPicture = Model.Comic.UploadedBy != null && Model.Comic.UploadedBy.DisplayPicture != null
+        ? $@"data:image/jpg;base64,{Convert.ToBase64String(Model.Comic.UploadedBy.DisplayPicture)}" 
+        : "~/img/notfound.png";
+
+    <div id="about-comic" class="about-comic-view-container animate__animated animate__fadeIn animate__faster" onclick="hideModal('about-comic')" style="display: none">
+        <div class="about-comic-view-content">
+            <h2>@Model.Comic.GetComicDisplayName()</h2>
+            <h5 class="fst-italic mb-4">First published @Model.Comic.GetComicDisplayPublishDate()</h5>
+
+            @if (Model.Comic.UploadedBy != null)
+            {
+                <img class="mb-4" src="@(uploaderDisplayPicture)">
+                <h5 class="fst-italic mb-2">Uploaded by @(Model.Comic.UploadedBy.Handle)</h5>
+            }
+
+            <h5 class="fst-italic mt-4">@Model.Comic.GetComicDisplayDescription()</h5>
+            <h5 class="fst-italic">Tags | @Model.Comic.GetComicDisplayTags()</h5>
+
+            <h5 class="fst-italic mt-5" style="filter: opacity(0.5)">Click anywhere to dismiss</h5>
+        </div>
+    </div>
+}
+
 <div id="comic-menu">
     <div class="container">
         @if(Model.Comic != null)
         {
-            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow" title="Get link" onclick="copyToClipboard('@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id})')">link</div>
-            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2 mb-4" onclick="showModal('comicInfo')">info</div>
+            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow" title="Get link" onclick="copyToClipboard('@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id })')">link</div>
+            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2 mb-4" onclick="showModal('about-comic')">info</div>
         }
         else
         {
@@ -58,7 +83,7 @@
 </div>
 
 <div class="container content-panel text-center">
-    <img id="banner" class="mb-md-2 d-block m-auto animate__animated animate__fadeIn animate__fast" src="~/img/@(bannerPath)" />
+    <img id="banner" class="mt-2 mb-2 d-block m-auto animate__animated animate__fadeIn animate__fast" src="~/img/@(bannerPath)" />
     @if (Model.Comic != null)
     {
         string imageSource = Model.Comic != null ? $@"data:image/jpg;base64, {Model.Comic.GetImageAsBase64String()}" : "~/img/notfound.png";

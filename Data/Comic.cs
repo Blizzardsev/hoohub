@@ -1,4 +1,7 @@
-﻿namespace hoohub.Data
+﻿using Org.BouncyCastle.Crypto.Macs;
+using System.Web;
+
+namespace hoohub.Data
 {
     /// <summary>
     /// Represents a user-viewable comic; the main content of the site.
@@ -54,12 +57,12 @@
         /// <summary>
         /// The ID of the user who originally uploaded this comic.
         /// </summary>
-        public string UploadedById { get; set; } = string.Empty;
+        public HooHubUser? UploadedBy { get; set; }
 
         /// <summary>
         /// The ID of the user who most recently updated this comic.
         /// </summary>
-        public string LastEditedById { get; set; } = string.Empty;    
+        public HooHubUser? LastEditedBy { get; set; }    
 
         /// <summary>
         /// Default constructor.
@@ -77,7 +80,7 @@
         /// <param name="imageData">The comic image data to set.</param>
         /// <param name="tags">The comic tags to set.</param>
         /// <param name="isHidden">The hidden state to set.</param>
-        /// <param name="uploadedById">The uploaded by user ID to set.</param>
+        /// <param name="uploadedBy">The uploaded by user to set.</param>
         /// <param name="scheduledDate">The optional scheduled date to set.</param>
         public Comic(
             string comicTitle, 
@@ -86,7 +89,7 @@
             byte[] imageData, 
             string tags,
             bool isHidden,
-            string uploadedById,
+            HooHubUser uploadedBy = null,
             DateTime? scheduledDate = null)
         {
             ComicNumber = comicNumber;
@@ -101,7 +104,7 @@
             ImageData = imageData;
             Tags = string.Join(",", tags);
             IsHidden = isHidden;
-            UploadedById = uploadedById;
+            UploadedBy = uploadedBy;
 
             if (scheduledDate.HasValue)
             {
@@ -114,6 +117,28 @@
         /// </summary>
         /// <returns>The formatted name to use when presenting the comic.</returns>
         public string GetComicDisplayName() => $"{ComicNumber} | {ComicTitle}";
+
+        /// <summary>
+        /// Returns the published date of the comic to use when presenting it to the user, or a placeholder if no date is defined.
+        /// </summary>
+        /// <returns>The published date of the comic to use when presenting it to the user, or a placeholder if no date is defined.</returns>
+        public string GetComicDisplayPublishDate() => PublishDate.HasValue ? PublishDate.Value.ToLocalTime().ToString("dddd, dd | MM | yyyy") : "(Not yet published)";
+
+        /// <summary>
+        /// Returns the tags of the comic in a comma-separated and spaced format to use when presenting it to the user, or a placeholder if no tags are defined.
+        /// </summary>
+        /// <returns>The tags of the comic in a comma-separated and spaced format to use when presenting it to the user, or a placeholder if no tags are defined.</returns>
+        public string GetComicDisplayTags() => string.IsNullOrWhiteSpace(Tags)
+            ? "(No tags)"
+            : HttpUtility.HtmlEncode(Tags.Replace(",", ", "));
+
+        /// <summary>
+        /// Returns the description of the comic if it exists, or a placeholder if not.
+        /// </summary>
+        /// <returns>The description of the comic if it exists, or a placeholder if not.</returns>
+        public string GetComicDisplayDescription() => string.IsNullOrWhiteSpace(ComicDescription)
+            ? "(No description)"
+            : HttpUtility.HtmlEncode(ComicDescription);
 
         /// <summary>
         /// Returns the <see cref="ImageData"/> of the comic as a Base64 string for presentation in image elements or for downloads.

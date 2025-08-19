@@ -11,8 +11,8 @@ using hoohub.Data;
 namespace hoohub.Migrations
 {
     [DbContext(typeof(HooHubContext))]
-    [Migration("20250818161950_CreatedByLastEditedByComicAttributes")]
-    partial class CreatedByLastEditedByComicAttributes
+    [Migration("20250819192009_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -173,7 +173,6 @@ namespace hoohub.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("LastEditedById")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("PublishDate")
@@ -187,10 +186,13 @@ namespace hoohub.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UploadedById")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LastEditedById");
+
+                    b.HasIndex("UploadedById");
 
                     b.ToTable("Comics", (string)null);
                 });
@@ -353,6 +355,21 @@ namespace hoohub.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("hoohub.Data.Comic", b =>
+                {
+                    b.HasOne("hoohub.Data.HooHubUser", "LastEditedBy")
+                        .WithMany()
+                        .HasForeignKey("LastEditedById");
+
+                    b.HasOne("hoohub.Data.HooHubUser", "UploadedBy")
+                        .WithMany()
+                        .HasForeignKey("UploadedById");
+
+                    b.Navigation("LastEditedBy");
+
+                    b.Navigation("UploadedBy");
                 });
 #pragma warning restore 612, 618
         }

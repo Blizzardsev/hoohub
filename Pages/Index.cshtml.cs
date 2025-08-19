@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System;
 
 namespace hoohub.Pages
 {
@@ -70,12 +69,15 @@ namespace hoohub.Pages
                 Comic? comicToDisplay = null;
                 if (!string.IsNullOrEmpty(comic))
                 {
-                    comicToDisplay = await _hooContext.Comics.SingleOrDefaultAsync(comicItem => comicItem.Id == comic && !comicItem.IsHidden);
+                    comicToDisplay = await _hooContext.Comics
+                        .Include(comicItem => comicItem.UploadedBy)
+                        .SingleOrDefaultAsync(comicItem => comicItem.Id == comic && !comicItem.IsHidden);
                 }
 
                 if (comicToDisplay == null)
                 {
                     comicToDisplay = await _hooContext.Comics
+                        .Include(comic => comic.UploadedBy)
                         .Where(comic => !comic.IsHidden)
                         .OrderByDescending(comic => comic.ComicNumber).FirstOrDefaultAsync();
                 }
@@ -83,6 +85,7 @@ namespace hoohub.Pages
                 var nextPreviousComicIds = GetNextPreviousComicIds(comicToDisplay, _hooContext.Comics
                     .OrderByDescending(comic => comic.ComicNumber)
                     .Where(comic => !comic.IsHidden).ToList());
+
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = comicToDisplay;
@@ -109,6 +112,7 @@ namespace hoohub.Pages
 			try
 			{
                 var allComics = await _hooContext.Comics
+                    .Include(comic => comic.UploadedBy)
                     .Where(comic => !comic.IsHidden && comic.Id != currentComic)
                     .OrderByDescending(comic => comic.ComicNumber)
                     .ToListAsync();
@@ -139,6 +143,7 @@ namespace hoohub.Pages
             try
             {
                 var allComics = await _hooContext.Comics
+                    .Include(comic => comic.UploadedBy)
                     .Where(comic => !comic.IsHidden)
                     .OrderByDescending(comic => comic.ComicNumber)
                     .ToListAsync();
@@ -169,6 +174,7 @@ namespace hoohub.Pages
             try
             {
                 var allComics = await _hooContext.Comics
+                    .Include(comic => comic.UploadedBy)
                     .Where(comic => !comic.IsHidden)
                     .OrderByDescending(comic => comic.ComicNumber)
                     .ToListAsync();
