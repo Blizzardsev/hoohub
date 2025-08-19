@@ -273,6 +273,9 @@ function loadManageComic(element, comicGuid) {
                     $("#manage-comic-comic-description").val(result.comicDescription)
                     $("#manage-comic-comic-tags").val(result.tags)
 
+                    $("#manage-comic-published-info").text(result.displayPublished)
+                    $("#manage-comic-modified-info").text(result.displayLastModified)
+
                     if (result.scheduledDate != null && result.publishDate == null) {
                         loadedComicToManageWasScheduled = true
                         $("#manage-comic-schedule-details").show()
@@ -408,6 +411,7 @@ function patchProfile(element) {
     let formData = new FormData()
     formData.append("__RequestVerificationToken", $('input[name="__RequestVerificationToken"]').val())
     formData.append("handle", $("#manage-me-handle").val())
+    formData.append("socialLink", $("#manage-me-social").val())
     formData.append("imageData", $("#manage-me-image-data").prop("files")[0])
 
     setFormLockState(manageMeForm, true)

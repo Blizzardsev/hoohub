@@ -71,6 +71,7 @@ namespace hoohub.Pages
                 {
                     comicToDisplay = await _hooContext.Comics
                         .Include(comicItem => comicItem.UploadedBy)
+                        .AsSplitQuery()
                         .SingleOrDefaultAsync(comicItem => comicItem.Id == comic && !comicItem.IsHidden);
                 }
 
@@ -78,6 +79,7 @@ namespace hoohub.Pages
                 {
                     comicToDisplay = await _hooContext.Comics
                         .Include(comic => comic.UploadedBy)
+                        .AsSplitQuery()
                         .Where(comic => !comic.IsHidden)
                         .OrderByDescending(comic => comic.ComicNumber).FirstOrDefaultAsync();
                 }
@@ -113,6 +115,7 @@ namespace hoohub.Pages
 			{
                 var allComics = await _hooContext.Comics
                     .Include(comic => comic.UploadedBy)
+                    .AsSplitQuery()
                     .Where(comic => !comic.IsHidden && comic.Id != currentComic)
                     .OrderByDescending(comic => comic.ComicNumber)
                     .ToListAsync();
@@ -144,6 +147,7 @@ namespace hoohub.Pages
             {
                 var allComics = await _hooContext.Comics
                     .Include(comic => comic.UploadedBy)
+                    .AsSplitQuery()
                     .Where(comic => !comic.IsHidden)
                     .OrderByDescending(comic => comic.ComicNumber)
                     .ToListAsync();
@@ -175,6 +179,7 @@ namespace hoohub.Pages
             {
                 var allComics = await _hooContext.Comics
                     .Include(comic => comic.UploadedBy)
+                    .AsSplitQuery()
                     .Where(comic => !comic.IsHidden)
                     .OrderByDescending(comic => comic.ComicNumber)
                     .ToListAsync();

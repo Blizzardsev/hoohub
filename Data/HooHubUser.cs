@@ -39,6 +39,11 @@ namespace hoohub.Data
         public byte[] DisplayPicture { get; set; } = (byte[])new ImageConverter().ConvertTo(Properties.Resources.hoo_pfp, typeof(byte[]));
 
         /// <summary>
+        /// The preferred social media link of the user.
+        /// </summary>
+        public string SocialLink { get; set; } = string.Empty;
+
+        /// <summary>
         /// Default constructor.
         /// Assigns a default profile picture.
         /// </summary>

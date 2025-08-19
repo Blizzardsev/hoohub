@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using hoohub.Data;
 
@@ -10,9 +11,11 @@ using hoohub.Data;
 namespace hoohub.Migrations
 {
     [DbContext(typeof(HooHubContext))]
-    partial class HooHubContextModelSnapshot : ModelSnapshot
+    [Migration("20250819222359_UserSocialLink")]
+    partial class UserSocialLink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.7");
@@ -170,9 +173,6 @@ namespace hoohub.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("LastEditedById")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("PublishDate")

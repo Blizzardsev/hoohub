@@ -147,6 +147,7 @@ using (var _scope = app.Services.CreateScope())
                 user.TwoFactorEnabled = false;
                 user.IsDisabled = false;
                 user.TwoFactorEnabled = true;
+                user.SocialLink = settings.SocialLink;
 
                 if (userStore == null || emailStore == null || userManager == null)
                 {

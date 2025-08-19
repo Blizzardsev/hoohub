@@ -1,4 +1,5 @@
 ﻿using hoohub.Data;
+using hoohub.Services;
 
 namespace hoohub.Requests.Results
 {
@@ -53,6 +54,16 @@ namespace hoohub.Requests.Results
         public DateTime? PublishDate { get; init; }
 
         /// <summary>
+        /// The date the comic was published, if it exists.
+        /// </summary>
+        public string DisplayPublished { get; init; }
+
+        /// <summary>
+        /// The date the comic was last modified, and who by.
+        /// </summary>
+        public string DisplayLastModified { get; init; }
+
+        /// <summary>
         /// Initialises a new instance of the <see cref="ManageComicDetailsResult"/> class.
         /// </summary>
         /// <param name="success">The success state to set.</param>
@@ -70,6 +81,8 @@ namespace hoohub.Requests.Results
             IsHidden = comic.IsHidden;
             ScheduledDate = comic.ScheduledDate;
             PublishDate = comic.PublishDate;
+            DisplayPublished = comic.PublishDate.HasValue ? FormattingService.GetDateTimeAsString(PublishDate.Value) : "N/A";
+            DisplayLastModified = $"{FormattingService.GetDateTimeAsString(comic.LastModifiedDate)}\nby {(comic.LastEditedBy == null ? "Unknown" : comic.LastEditedBy.Handle)}";
             Message = message;
         }
     }

@@ -71,6 +71,10 @@
         position: relative;
     }
 
+    #manage-comic-preview {
+        position: initial;
+    }
+
     #manage-me-preview {
         width: 300px;
         height: 300px;

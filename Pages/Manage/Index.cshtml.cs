@@ -4,7 +4,6 @@ using hoohub.Requests.Data;
 using hoohub.Requests.Results;
 using hoohub.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,7 +11,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
 
 namespace hoohub.Pages.Manage
 {
@@ -155,9 +153,14 @@ namespace hoohub.Pages.Manage
                 [Display(Name = "Handle", Prompt = "hoo")]
                 [Required(AllowEmptyStrings = false, ErrorMessage = "Handle must be provided")]
                 [MinLength(1)]
-                [MaxLength(10)]
+                [MaxLength(30)]
                 [RegularExpression("^[A-Za-z]+$", ErrorMessage = "Handle cannot contain numbers, symbols or whitespace")]
                 public string Handle { get; set; }
+
+                [Display(Name = "Social media URL", Prompt = "https://twitter.com")]
+                [MaxLength(255)]
+                [RegularExpression("^(https?:\\/\\/)?([\\w\\-]+\\.)+[\\w\\-]+(\\/[\\w\\-.,@?^=%&:/~+#]*)?$", ErrorMessage = "Handle must be a valid URL")]
+                public string SocialLink { get; set; }
 
                 [Required(ErrorMessage = "Profile must have a picture")]
                 [MinLength(1)]
@@ -203,6 +206,7 @@ namespace hoohub.Pages.Manage
 
                 DisplayPictureOnLoad = Convert.ToBase64String(currentUser.DisplayPicture);
                 ManageInputModel.ManageMeInput.Handle = currentUser.Handle;
+                ManageInputModel.ManageMeInput.SocialLink = currentUser.SocialLink;
                 return Page();
             }
             catch (Exception exception)
@@ -297,7 +301,8 @@ namespace hoohub.Pages.Manage
                     tags: string.IsNullOrWhiteSpace(tags) ? string.Empty : tags,
                     isHidden: isScheduled ? true : isHidden,
                     uploadedBy: currentUser,
-                    scheduledDate: scheduleFor != null && isScheduled ? scheduleFor.Value.ToUniversalTime() : null);
+                    scheduledDate: scheduleFor != null && isScheduled ? scheduleFor.Value.ToUniversalTime() : null,
+                    wasPublished: !isHidden && !isScheduled);
 
                 await _hooContext.Comics.AddAsync(newComic);
                 await _hooContext.Events.AddAsync(new Event(
@@ -357,7 +362,10 @@ namespace hoohub.Pages.Manage
         {
             try
             {
-                var comic = await _hooContext.Comics.SingleOrDefaultAsync(comic => comic.Id == comicGuid);
+                var comic = await _hooContext.Comics
+                    .Include(comic => comic.LastEditedBy)
+                    .AsSplitQuery()
+                    .SingleOrDefaultAsync(comic => comic.Id == comicGuid);
                 if (comic == null)
                 {
                     return new JsonResult(new BaseResult(success: false, message: $"Comic GUID {comicGuid} not found"));
@@ -458,14 +466,18 @@ namespace hoohub.Pages.Manage
                     isHidden = true;
                 }
 
-                var comicNumberChange = $"{comic.ComicNumber} -> {comicNumber}";
-                var comicTitleChange = $"{comic.ComicTitle} -> {comicTitle}";
-                var comicDescriptionChange = $"{comic.ComicDescription} -> {comicDescription}";
-                var comicTagsChange = $"{comic.Tags} -> {tags}";
-                var comicHiddenChange = $"{FormattingService.GetBooleanAsYesNoString(comic.IsHidden)} -> {FormattingService.GetBooleanAsYesNoString(isHidden)}";
-                var comicScheduledChange = $"{(comic.ScheduledDate.HasValue ? FormattingService.GetDateTimeAsString(comic.ScheduledDate.Value) : "N/A")} " +
-                    $"-> {(scheduleFor.HasValue ? FormattingService.GetDateTimeAsString(scheduleFor.Value) : "N/A")}";
+                var comicNumberChange = comic.ComicNumber != comicNumber ? $"{comic.ComicNumber} -> {comicNumber}" : "(Unchanged)";
+                var comicTitleChange = comic.ComicTitle != comicTitle ? $"{comic.ComicTitle} -> {comicTitle}" : "(Unchanged)";
+                var comicDescriptionChange = comic.ComicDescription != comicDescription ? $"{comic.ComicDescription} -> {comicDescription}" : "(Unchanged)";
+                var comicTagsChange = comic.Tags != tags ? $"{comic.Tags} -> {tags}" : "(Unchanged)";
+                var comicHiddenChange = comic.IsHidden != isHidden 
+                    ? $"{FormattingService.GetBooleanAsYesNoString(comic.IsHidden)} -> {FormattingService.GetBooleanAsYesNoString(isHidden)}"
+                    : "(Unchanged)";
+                var comicScheduledChange = comic.ScheduledDate != scheduleFor 
+                    ? $"{(comic.ScheduledDate.HasValue ? FormattingService.GetDateTimeAsString(comic.ScheduledDate.Value) : "N/A")} -> {(scheduleFor.HasValue ? FormattingService.GetDateTimeAsString(scheduleFor.Value) : "N/A")}"
+                    : "(Unchanged)";
 
+                comic.LastModifiedDate = DateTime.UtcNow;
                 comic.ComicNumber = comicNumber;
                 comic.ComicTitle = comicTitle;
                 comic.ComicDescription = comicDescription;
@@ -493,6 +505,7 @@ namespace hoohub.Pages.Manage
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.ComicUpdated,
                     details: $"Comic GUID {comic.Id} was updated by {currentUser.GetEventLogString()}:" +
+                        "\n---" +
                         $"\nComic number: {comicNumberChange}" +
                         $"\nTitle: {comicTitleChange}" +
                         $"\nDescription: {comicDescriptionChange}" +
@@ -518,21 +531,25 @@ namespace hoohub.Pages.Manage
         /// Attempts to update the current user, returning a <see cref="JsonResult"/> representing the result of the request.
         /// </summary>
         /// <param name="handle">The handle of the user to set.</param>
+        /// <param name="socialLink">The preferred social media URL of the user to set.</param>
         /// <param name="imageData">Optional replacement profile picture of the user to set.</param>
         /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
-        public async Task<JsonResult> OnPatchMeAsync(string handle, IFormFile? imageData = null)
+        public async Task<JsonResult> OnPatchMeAsync(
+            string handle, 
+            string socialLink,
+            IFormFile? imageData = null)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var currentUser = await _userManager.GetUserAsync(User);
             try
             {
-                if (user == null)
+                if (currentUser == null)
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
-                        message: "You must be signed in to perform this action"));
+                        message: $"You are not authorised to perform this action"));
                 }
 
-                if ((user.DisplayPicture == null || user.DisplayPicture.Length == 0) && imageData == null)
+                if ((currentUser.DisplayPicture == null || currentUser.DisplayPicture.Length == 0) && imageData == null)
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
@@ -546,20 +563,24 @@ namespace hoohub.Pages.Manage
                         message: $"Profile pictures must be uploaded in jpg, png or gif format"));
                 }
 
-                var handleChange = $"{user.Handle} -> {handle}";
-                var profilePictureChange = "Current -> Current";
+                var handleChange = currentUser.Handle != handle ? $"{currentUser.Handle} -> {handle}" : "(Unchanged)";
+                var socialChange = currentUser.SocialLink != socialLink ? $"{currentUser.SocialLink} -> {socialLink}" : "(Unchanged)";
+                var profilePictureChange = "(Unchanged)";
 
-                user.Handle = handle;
+                currentUser.Handle = handle;
+                currentUser.SocialLink = socialLink;
                 if (imageData != null)
                 {
                     profilePictureChange = $"Current -> {imageData.FileName}";
-                    user.DisplayPicture = FormattingService.GetIFormFileAsBytes(imageData);
+                    currentUser.DisplayPicture = FormattingService.GetIFormFileAsBytes(imageData);
                 }
 
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.UserUpdated,
-                    details: $"{user.GetEventLogString()} updated their profile:" +
+                    details: $"{currentUser.GetEventLogString()} updated their profile:" +
+                        "\n---" +
                         $"\nHandle: {handleChange}" +
+                        $"\nSocial media URL: {socialChange}" +
                         $"\nProfile picture: {profilePictureChange}"));
                 await _hooContext.SaveChangesAsync();
 
@@ -569,7 +590,7 @@ namespace hoohub.Pages.Manage
             {
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: Enums.EventTypes.Error,
-                    details: $"Failed to update profile for {user.GetEventLogString()}: {exception.Message}",
+                    details: $"Failed to update profile for {currentUser.GetEventLogString()}: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: false));

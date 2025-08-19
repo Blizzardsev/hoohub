@@ -56,7 +56,7 @@ namespace hoohub.Services
                     comicsToPublish.ForEach(async comic =>
                     {
                         comic.IsHidden = false;
-                        comic.PublishDate = DateTime.Now;
+                        comic.PublishDate = DateTime.UtcNow;
                         comic.ScheduledDate = null;
                         await _hooContext.Events.AddAsync(new Event(
                             eventType: EventTypes.ComicReleased,

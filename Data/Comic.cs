@@ -65,6 +65,11 @@ namespace hoohub.Data
         public HooHubUser? LastEditedBy { get; set; }    
 
         /// <summary>
+        /// The date/time the comic was last updated.
+        /// </summary>
+        public DateTime LastModifiedDate { get; set; }
+
+        /// <summary>
         /// Default constructor.
         /// </summary>
         public Comic()
@@ -90,8 +95,10 @@ namespace hoohub.Data
             string tags,
             bool isHidden,
             HooHubUser uploadedBy = null,
-            DateTime? scheduledDate = null)
+            DateTime? scheduledDate = null,
+            bool wasPublished = false)
         {
+            LastModifiedDate = DateTime.UtcNow;
             ComicNumber = comicNumber;
             ComicTitle = comicTitle;
             ComicDescription = comicDescription;
@@ -105,6 +112,7 @@ namespace hoohub.Data
             Tags = string.Join(",", tags);
             IsHidden = isHidden;
             UploadedBy = uploadedBy;
+            LastEditedBy = uploadedBy;
 
             if (scheduledDate.HasValue)
             {
