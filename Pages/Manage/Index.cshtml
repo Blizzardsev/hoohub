@@ -24,7 +24,7 @@
         <div role="button" tabindex="0" data-tab-id="3" class="col-auto tab-header" onclick="switchTab(3)">
             <span>Me</span>
         </div>
-        <div role="button" tabindex="0" data-tab-id="4" class="col-auto tab-header" onclick="switchTab(4)">
+        <div role="button" tabindex="0" data-tab-id="4" class="col-auto tab-header" onclick="switchTab(4);getEvents($('#logs-update'))">
             <span>Events</span>
         </div>
     </div>
@@ -111,6 +111,7 @@
         <div data-tab-id="1" class="container tab-body">
             <div class="row overflow-hidden">
                 <div class="col overflow-hidden">
+                    <h5 id="manage-comics-count" class="mb-1 box-">Displaying X comics</h5>
                     <div id="manage-comics-list">
                     </div>
                     <div class="row mt-4 d-flex justify-content-center mx-auto">
@@ -233,6 +234,7 @@
         </div>
         <div data-tab-id="4" class="container tab-body">
             <div class="row overflow-hidden">
+                <h5 id="manage-events-count" class="mb-1 box-">Displaying X events</h5>
                 <div id="manage-events-list">
                 </div>
                 <div class="row mt-4 d-flex justify-content-center mx-auto">

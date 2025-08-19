@@ -558,7 +558,7 @@ namespace hoohub.Pages.Manage
 
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.UserUpdated,
-                    details: $"{user.Handle} updated their profile:" +
+                    details: $"{user.GetEventLogString()} updated their profile:" +
                         $"\nHandle: {handleChange}" +
                         $"\nProfile picture: {profilePictureChange}"));
                 await _hooContext.SaveChangesAsync();

@@ -150,6 +150,7 @@ function getEvents(element) {
         $(element).addClass("disabled")
     }
     $("#manage-events-list").css("filter", "brightness(80%)")
+    $("#manage-events-count").text("Fetching...")
 
     setTimeout(function () {
         $.ajax({
@@ -161,6 +162,7 @@ function getEvents(element) {
             },
             success: function (result) {
                 if (result.success) {
+                    $("#manage-events-count").text(`Displaying ${result.eventData.length} events`)
                     let eventsList = []
                     result.eventData.forEach(function (event) {
                         eventsList.push(`
@@ -178,6 +180,7 @@ function getEvents(element) {
                 }
             },
             failure: function () {
+                $("#manage-events-count").text("Failed to load events")
                 hideLoading(loaderId)
                 displayAlert("Failed to load events")
             },
@@ -201,6 +204,7 @@ function getManageComicsList(element) {
         $(element).addClass("disabled")
     }
     $("#manage-comics-list").css("filter", "brightness(80%)")
+    $("#manage-comics-count").text("Fetching...")
 
     setTimeout(function () {
         $.ajax({
@@ -212,6 +216,7 @@ function getManageComicsList(element) {
             },
             success: function (result) {
                 if (result.success) {
+                    $("#manage-comics-count").text(`Displaying ${result.manageComicListData.length} comics`)
                     let manageComicsList = []
                     result.manageComicListData.forEach(function(comic) {
                         manageComicsList.push(`
@@ -225,6 +230,7 @@ function getManageComicsList(element) {
                 }
             },
             failure: function () {
+                $("#manage-comics-count").text("Failed to load comics")
                 hideLoading(loaderId)
                 displayAlert("Failed to load comics")
             },

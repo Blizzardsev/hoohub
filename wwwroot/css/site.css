@@ -104,10 +104,6 @@ h1 {
     font-size: 2.5em;
 }
 
-h4, h5 {
-    color: #DDD7D6;
-}
-
 .top-5 {
     top: 5%;
 }
@@ -523,3 +519,7 @@ input:disabled + .slider {
         border-radius: 100%;
         box-shadow: 0 5px 5px 0 rgba(0,0,0,.15);
     }
+
+.box-shadow {
+    box-shadow: 0 5px 5px 0 rgba(0,0,0,.15);
+}
