@@ -123,8 +123,8 @@
                     </div>
                 </div>
                 <div class="col mx-auto overflow-auto">
-                    <div class="row">
-                        <div class="col-auto mx-auto">
+                    <div class="row w-100">
+                        <div class="col mx-auto">
                             <img 
                                 id="manage-comic-preview" 
                                 title="Upload a comic..." 
@@ -221,7 +221,7 @@
         </div>
         <div data-tab-id="3" class="container tab-body">
             <div class="container mx-auto my-auto">
-                <form id="manage-me-form" class="w-50 mx-auto" enctype="multipart/form-data">
+                <form id="manage-me-form" class="w-75 mx-auto" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                     <img id="manage-me-preview" title="Upload a display picture..." class="animate__animated animate__fadeIn" src="@($@"data:image/jpg;base64, {Model.DisplayPictureOnLoad}")" data-placeholder="@($@"data:image/jpg;base64, {Model.DisplayPictureOnLoad}")" onclick="$('#manage-me-image-data').click()" />
                     <br />

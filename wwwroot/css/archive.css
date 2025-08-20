@@ -1,7 +1,6 @@
 ﻿.archive-comic {
 	padding: 2%;
-	width: 15vw;
-	height: 15vw;
+	width: 25vw;
 	cursor: pointer;
 	transition: .5s;
 	object-fit: cover;
@@ -9,6 +8,12 @@
 
 	.archive-comic:hover {
 		filter: brightness(80%);
+	}
+
+	@media (min-width: 1200px) {
+		.archive-comic {
+			width: 15vw;
+		}
 	}
 
 #hootbye {

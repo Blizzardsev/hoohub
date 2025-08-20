@@ -8,7 +8,7 @@
 	margin-top: 4vh;
 	top: 50%;
 	transform: translateY(-50%);
-	left: 26vw;
+	left: 3%;
 	margin: auto;
 }
 
@@ -20,21 +20,39 @@
 		display: inline-grid;
 	}
 
-@media (max-width: 1000px) {
+@media (max-width: 500px) {
 	#comic-menu {
-		left: 2%;
+		left: 10%;
 	}
 }
 
-@media (max-width: 1250px) {
+@media (min-width: 760px) {
 	#comic-menu {
-		left: 20vw;
+		left: 10%;
+	}
+}
+
+@media (min-width: 1200px) {
+	#comic-menu {
+		left: 15%;
 	}
 }
 
 @media (min-width: 1400px) {
 	#comic-menu {
-		left: 26vw;
+		left: 17.5%;
+	}
+}
+
+@media (min-width: 1600px) {
+	#comic-menu {
+		left: 25%;
+	}
+}
+
+@media (min-height: 550px) {
+	#comic-menu {
+		margin-top: 5vh;
 	}
 }
 

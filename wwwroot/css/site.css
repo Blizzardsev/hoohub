@@ -49,6 +49,7 @@ footer {
     width: 100%;
     white-space: nowrap;
     line-height: 40px !important;
+    backdrop-filter: blur(0.75px) !important;
 }
 
 .warning-tag, .text-danger, .text-warning {
@@ -158,6 +159,7 @@ h1 {
   }
 
 .athena {
+    max-width: 90% !important;
     filter: var(--athena-filter) !important;
 }
 
