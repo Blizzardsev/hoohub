@@ -37,6 +37,9 @@ namespace hoohub.Areas.Identity.Pages.Account
         [TempData]
         public string ErrorMessage { get; set; }
 
+        /// <summary>
+        /// Input validation model.
+        /// </summary>
         public class InputModel
         {
             [Required(AllowEmptyStrings = false)]
@@ -53,7 +56,7 @@ namespace hoohub.Areas.Identity.Pages.Account
         /// Returns the Login page.
         /// </summary>
         /// <param name="returnUrl">The page to return the user to after logging in, or attempting to log in.</param>
-        /// <returns></returns>
+        /// <returns>The login page.</returns>
         public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
             if (_signInManager.IsSignedIn(User))
@@ -83,8 +86,8 @@ namespace hoohub.Areas.Identity.Pages.Account
         }
 
         /// <summary>
-        /// Attempts to log in the user, and direct them to the home page.
-        /// If two-factor is required, then the user is directed to the challenge page instead.
+        /// Attempts to log in the user, and direct them to the home page.<br/>
+        /// If two-factor is required, then the user is directed to the challenge page instead.<br/>
         /// Excess login attempts prompt a user lockout - this can be undone by an Admin.
         /// </summary>
         /// <param name="returnUrl">The page to return the user to after logging in, or attempting to log in.</param>

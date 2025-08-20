@@ -20,6 +20,13 @@ namespace hoohub.Areas.Identity.Pages.Account
         private readonly UserManager<HooHubUser> _userManager;
         private readonly SmtpService _smtpService;
 
+        /// <summary>
+        /// Initialises the <see cref="LoginWith2faModel"/> class.
+        /// </summary>
+        /// <param name="context">Injected app context.</param>
+        /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/> service.</param>
+        /// <param name="userManager">Injected <see cref="UserManager{TUser}"/> service.</param>
+        /// <param name="smtpService">Injected <see cref="SmtpService"/> service.</param>
         public LoginWith2faModel(
             HooHubContext context,
             SignInManager<HooHubUser> signInManager,
@@ -37,6 +44,9 @@ namespace hoohub.Areas.Identity.Pages.Account
 
         public string ReturnUrl { get; set; }
 
+        /// <summary>
+        /// Input validation model.
+        /// </summary>
         public class InputModel
         {
             /// <summary>
@@ -49,6 +59,11 @@ namespace hoohub.Areas.Identity.Pages.Account
             public string TwoFactorCode { get; set; }
         }
 
+        /// <summary>
+        /// Returns the two-factor request page.
+        /// </summary>
+        /// <param name="returnUrl">URL for redirection, from the page the user was originally attempting to access if they were logged out.</param>
+        /// <returns>The two-factor request page.</returns>
         public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
             HooHubUser user = null;
@@ -93,6 +108,13 @@ namespace hoohub.Areas.Identity.Pages.Account
             }
         }
 
+        /// <summary>
+        /// Attempts to validate the given two-factor code.<br/>
+        /// If correct, proceeds and redirects the user onwards to the originally requested page, or the home page otherwise.
+        /// If incorrect, returns to the previous page to allow a retry.
+        /// </summary>
+        /// <param name="returnUrl">URL for redirection, from the page the user was originally attempting to access if they were logged out.</param>
+        /// <returns>The originally requested page or home page if successful; otherwise the two-factor request page.</returns>
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             try

@@ -12,18 +12,24 @@ namespace hoohub.Areas.Identity.Pages.Account
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<HooHubUser> _signInManager;
-        private readonly ILogger<LogoutModel> _logger;
 
-        public LogoutModel(SignInManager<HooHubUser> signInManager, ILogger<LogoutModel> logger)
+        /// <summary>
+        /// Initialises a new instance of the <see cref="LoginModel"/> class.
+        /// </summary>
+        /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/> service.</param>
+        public LogoutModel(SignInManager<HooHubUser> signInManager)
         {
             _signInManager = signInManager;
-            _logger = logger;
         }
 
+        /// <summary>
+        /// Initiates the logout process, redirecting the user.
+        /// </summary>
+        /// <param name="returnUrl">Optional URL for redirection.</param>
+        /// <returns>The page defined by the return URL if given, otherwise this page.</returns>
         public async Task<IActionResult> OnPost(string returnUrl = null)
         {
             await _signInManager.SignOutAsync();
-            _logger.LogInformation("User logged out.");
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);

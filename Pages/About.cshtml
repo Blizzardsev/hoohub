@@ -33,24 +33,30 @@
                 <div class="col align-middle text-center">
                     <img class="contributor-pfp" src="@(artistDisplayPicture)" />
                     <h5 class="mt-2">@(Model.ArtistCreditUser.Handle) | Artist</h5>
-                    <div class="row mt-2 d-flex justify-content-center mx-auto">
-                        <div class="col-auto mx-auto text-center scale-75">
-                            <a href="@(Model.ArtistCreditUser.SocialLink)" target="_blank">
-                                <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Find me on X...">share</div>
-                            </a>
+                    @if (!string.IsNullOrWhiteSpace(Model.ArtistCreditUser.SocialLink))
+                    {
+                        <div class="row mt-2 d-flex justify-content-center mx-auto">
+                            <div class="col-auto mx-auto text-center scale-75">
+                                <a href="@(Model.ArtistCreditUser.SocialLink)" target="_blank">
+                                    <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Find me on X...">share</div>
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
                 <div class="col align-middle text-center">
                     <img class="contributor-pfp" src="@(writerDisplayPicture)" />
                     <h5 class="mt-2">@(Model.WriterCreditUser.Handle) | Writer</h5>
-                    <div class="row mt-2 d-flex justify-content-center mx-auto">
-                        <div class="col-auto mx-auto text-center scale-75">
-                            <a href="@(Model.WriterCreditUser.SocialLink)" target="_blank">
-                                <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Find me on X...">share</div>
-                            </a>
+                    @if (!string.IsNullOrWhiteSpace(Model.ArtistCreditUser.SocialLink))
+                    {
+                        <div class="row mt-2 d-flex justify-content-center mx-auto">
+                            <div class="col-auto mx-auto text-center scale-75">
+                                <a href="@(Model.WriterCreditUser.SocialLink)" target="_blank">
+                                    <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Find me on X...">share</div>
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>

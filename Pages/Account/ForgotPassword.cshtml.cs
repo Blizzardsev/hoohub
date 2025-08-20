@@ -20,6 +20,12 @@ namespace hoohub.Areas.Identity.Pages.Account
         private readonly UserManager<HooHubUser> _userManager;
         private readonly SmtpService _smtpService;
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="ForgotPasswordModel"/>.
+        /// </summary>
+        /// <param name="context">Injected app context.</param>
+        /// <param name="userManager">Injected <see cref="UserManager{TUser}"/> instance.</param>
+        /// <param name="smtpService">Injected <see cref="SmtpService"/> instance.</param>
         public ForgotPasswordModel(HooHubContext context, UserManager<HooHubUser> userManager, SmtpService smtpService)
         {
             _context = context;
@@ -32,6 +38,9 @@ namespace hoohub.Areas.Identity.Pages.Account
 
         public bool IsFirstTimeLogin { get; set; }
 
+        /// <summary>
+        /// Input validation models.
+        /// </summary>
         public class InputModel
         {
             [Required(ErrorMessage = "Email address must be provided", AllowEmptyStrings = false)]
@@ -39,6 +48,11 @@ namespace hoohub.Areas.Identity.Pages.Account
             public string Login { get; set; }
         }
 
+        /// <summary>
+        /// Returns the forgotten password reset request page.
+        /// </summary>
+        /// <param name="email">The email address to prepopulate the <see cref="InputModel.Login"/> for.</param>
+        /// <returns>The forgotten password reset request page.</returns>
         public async Task<IActionResult> OnGetAsync(string? email = null)
         {
             Input = new InputModel
@@ -54,6 +68,10 @@ namespace hoohub.Areas.Identity.Pages.Account
             return Page();
         }
 
+        /// <summary>
+        /// Attempts to initiate the password reset process for the given <see cref="InputModel.Login"/>, if a corresponding <see cref="HooHubUser"/> exists.
+        /// </summary>
+        /// <returns>The password reset confirmation page if the process was initiated successfully, or returns this page if the account does not exist.</returns>
         public async Task<IActionResult> OnPostAsync()
         {
             if (ModelState.IsValid)

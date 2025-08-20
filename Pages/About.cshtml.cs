@@ -1,31 +1,33 @@
 using hoohub.Configuration;
 using hoohub.Data;
-using hoohub.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 
 namespace hoohub.Pages
 {
+    [AllowAnonymous]
     public class AboutModel : PageModel
     {
         private readonly HooHubContext _hooContext;
         private readonly AppSettings _appSettings;
 
         /// <summary>
-        /// 
+        /// The <see cref="HooHubUser"/> corresponding to the artist to credit and link on the page.
         /// </summary>
         public HooHubUser ArtistCreditUser { get; private set; }
 
         /// <summary>
-        /// 
+        /// The <see cref="HooHubUser"/> corresponding to the writer to credit and link on the page.
         /// </summary>
         public HooHubUser WriterCreditUser { get; private set; }
 
         /// <summary>
-        /// 
+        /// Initialises a new instance of the <see cref="AboutModel"/> class.
         /// </summary>
-        /// <param name="hooContext"></param>
+        /// <param name="hooContext">Injected app context.</param>
+        /// <param name="appSettings">Injected app settings.</param>
         public AboutModel(HooHubContext hooContext, AppSettings appSettings)
         {
             _hooContext = hooContext;
@@ -33,7 +35,7 @@ namespace hoohub.Pages
         }
 
         /// <summary>
-        /// 
+        /// Returns the about us page.
         /// </summary>
         public async Task<IActionResult> OnGetAsync()
         {

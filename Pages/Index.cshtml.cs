@@ -13,44 +13,43 @@ namespace hoohub.Pages
         private readonly HooHubContext _hooContext;
 
         /// <summary>
-        /// 
+        /// The comic to render on the page.<br/>
+        /// By default this is today's comic, but depending on request could be a specific comic or a comic based on an index.
         /// </summary>
         public Comic? Comic { get; private set; }
 
         /// <summary>
-        /// 
+        /// The ID of the next comic chronologically relative to the one currently being displayed.
         /// </summary>
         public string? NextComicId { get; private set; }
 
         /// <summary>
-        /// 
+        /// The ID of the previous comic chronologically relative to the one currently being displayed.
         /// </summary>
         public string? PreviousComicId { get; private set; }
 
         /// <summary>
-        /// 
+        /// Whether or not the app is considered to be in Night Mode.<br/>
+        /// Some assets may need replacement based on this.
         /// </summary>
         public bool IsNightMode { get; private set; } = false;
 
         /// <summary>
-        /// 
+        /// Initialises a new instance of the <see cref="IndexModel"/> class.
         /// </summary>
-        public HooHubUser ComicUploader { get; private set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="hooContext"></param>
+        /// <param name="hooContext">Injected app context.</param>
         public IndexModel(HooHubContext hooContext)
         {
             _hooContext = hooContext;
         }
 
         /// <summary>
-        /// 
+        /// Returns the main page.</br>
+        /// If a comic ID is specified in the request (E.G if going forward/backward), load the associated comic if possible for rendering.<br/>
+        /// Otherwise, default to today's comic.
         /// </summary>
-        /// <param name="comic"></param>
-        /// <returns></returns>
+        /// <param name="comic">Optional comic GUID to render.</param>
+        /// <returns>The main page.</returns>
         public async Task<IActionResult> OnGetAsync(string comic = "")
         {
             try
@@ -106,9 +105,9 @@ namespace hoohub.Pages
         }
 
         /// <summary>
-        /// 
+        /// Returns the main page, selecting a random comic to render in the process.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The main page.</returns>
         public async Task<IActionResult> OnGetRandomComicAsync(string currentComic = "")
         {
 			try
@@ -138,9 +137,9 @@ namespace hoohub.Pages
 		}
 
         /// <summary>
-        /// 
+        /// Returns the main page, selecting the first (earliest) comic (based on comic number) to render in the process.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The main page.</returns>
         public async Task<IActionResult> OnGetFirstComicAsync()
         {
             try
@@ -170,9 +169,9 @@ namespace hoohub.Pages
         }
 
         /// <summary>
-        /// 
+        /// Returns the main page, selecting the last (latest) comic (based on comic number) to render in the process.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The main page.</returns>
         public async Task<IActionResult> OnGetLastComicAsync()
         {
             try
@@ -202,7 +201,8 @@ namespace hoohub.Pages
         }
 
         /// <summary>
-        /// 
+        /// Toggles the Night Mode function of the app.<br/>
+        /// Night mode features a softer theme ideal for night browsing.
         /// </summary>
         /// <returns></returns>
         public async Task<IActionResult> OnGetToggleNightModeAsync()
@@ -233,12 +233,13 @@ namespace hoohub.Pages
         }
 
         /// <summary>
-        /// 
+        /// Fetches the IDs of the comics preceding and following the current comic, given a list of comics, if they exist.<br/>
+        /// Non-existent IDs for the next/previous comics (if the current comic is already the first or last) are instead empty strings.
         /// </summary>
-        /// <param name="currentComic"></param>
-        /// <param name="comics"></param>
-        /// <returns></returns>
-        private Tuple<string, string> GetNextPreviousComicIds(Comic currentComic, List<Comic> comics)
+        /// <param name="currentComic">The current <see cref="Comic"/> being viewed.</param>
+        /// <param name="comics">The list of <see cref="Comic"/> items to query.</param>
+        /// <returns><see cref="Tuple{string, string}"/> consisting of the next comic ID and previous comic ID respectively.</returns>
+        private static Tuple<string, string> GetNextPreviousComicIds(Comic currentComic, List<Comic> comics)
         {
             var currentIndex = comics.IndexOf(currentComic);
             var previousComicId = currentIndex + 1 <= comics.Count - 1 ? comics[currentIndex + 1].Id : string.Empty;

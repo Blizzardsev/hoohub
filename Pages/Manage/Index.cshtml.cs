@@ -24,19 +24,31 @@ namespace hoohub.Pages.Manage
         [BindProperty]
         public ManageInput ManageInputModel { get; set; } = new ManageInput();
 
+        /// <summary>
+        /// The display picture to load when the Manage Me tab is opened.
+        /// </summary>
         public string DisplayPictureOnLoad { get; set; } = string.Empty;
 
         /// <summary>
-        /// 
+        /// Whether or not the app is considered to be in Night Mode.<br/>
+        /// Some assets may need replacement based on this.
         /// </summary>
         public bool IsNightMode { get; private set; } = false;
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="IndexModel"/> class.
+        /// </summary>
+        /// <param name="hooContext">Injected app context.</param>
+        /// <param name="userManager">Injected <see cref="UserManager{TUser}"/>.</param>
         public IndexModel(HooHubContext hooContext, UserManager<HooHubUser> userManager)
         {
             _hooContext = hooContext;
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Input validation models.
+        /// </summary>
         public class ManageInput
         {
             public class NewComic
@@ -181,7 +193,7 @@ namespace hoohub.Pages.Manage
         }
 
         /// <summary>
-        /// Returns the page.
+        /// Returns the page and populates the input validation models for any data that should be pre-filled (E.G user handle).
         /// </summary>
         public async Task<IActionResult> OnGet()
         {
