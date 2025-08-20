@@ -1,4 +1,6 @@
 using hoohub.Data;
+using hoohub.Enums;
+using hoohub.Requests.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,6 +19,11 @@ namespace hoohub.Pages
         /// By default this is today's comic, but depending on request could be a specific comic or a comic based on an index.
         /// </summary>
         public Comic? Comic { get; private set; }
+
+        /// <summary>
+        /// Whether the comic has been previously liked from the current IP address.
+        /// </summary>
+        public bool ComicIsLiked { get; private set; }
 
         /// <summary>
         /// The ID of the next comic chronologically relative to the one currently being displayed.
@@ -70,6 +77,7 @@ namespace hoohub.Pages
                 {
                     comicToDisplay = await _hooContext.Comics
                         .Include(comicItem => comicItem.UploadedBy)
+                        .Include(comicItem => comicItem.ComicLikes)
                         .AsSplitQuery()
                         .SingleOrDefaultAsync(comicItem => comicItem.Id == comic && !comicItem.IsHidden);
                 }
@@ -78,6 +86,7 @@ namespace hoohub.Pages
                 {
                     comicToDisplay = await _hooContext.Comics
                         .Include(comic => comic.UploadedBy)
+                        .Include(comic => comic.ComicLikes)
                         .AsSplitQuery()
                         .Where(comic => !comic.IsHidden)
                         .OrderByDescending(comic => comic.ComicNumber).FirstOrDefaultAsync();
@@ -90,6 +99,7 @@ namespace hoohub.Pages
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = comicToDisplay;
+                ComicIsLiked = Comic.ComicLikes.Any(comicItem => comicItem.IpAddress == Request.HttpContext.Connection.RemoteIpAddress.ToString());
 
                 return Page();
             }
@@ -114,6 +124,7 @@ namespace hoohub.Pages
 			{
                 var allComics = await _hooContext.Comics
                     .Include(comic => comic.UploadedBy)
+                    .Include(comic => comic.ComicLikes)
                     .AsSplitQuery()
                     .Where(comic => !comic.IsHidden && comic.Id != currentComic)
                     .OrderByDescending(comic => comic.ComicNumber)
@@ -123,6 +134,8 @@ namespace hoohub.Pages
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = randomComic;
+                ComicIsLiked = Comic.ComicLikes.Any(comicItem => comicItem.IpAddress == Request.HttpContext.Connection.RemoteIpAddress.ToString());
+
                 return Page();
             }
 			catch (Exception exception)
@@ -146,6 +159,7 @@ namespace hoohub.Pages
             {
                 var allComics = await _hooContext.Comics
                     .Include(comic => comic.UploadedBy)
+                    .Include(comic => comic.ComicLikes)
                     .AsSplitQuery()
                     .Where(comic => !comic.IsHidden)
                     .OrderByDescending(comic => comic.ComicNumber)
@@ -155,6 +169,8 @@ namespace hoohub.Pages
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = firstComic;
+                ComicIsLiked = Comic.ComicLikes.Any(comicItem => comicItem.IpAddress == Request.HttpContext.Connection.RemoteIpAddress.ToString());
+
                 return Page();
             }
             catch (Exception exception)
@@ -178,6 +194,7 @@ namespace hoohub.Pages
             {
                 var allComics = await _hooContext.Comics
                     .Include(comic => comic.UploadedBy)
+                    .Include(comic => comic.ComicLikes)
                     .AsSplitQuery()
                     .Where(comic => !comic.IsHidden)
                     .OrderByDescending(comic => comic.ComicNumber)
@@ -187,6 +204,8 @@ namespace hoohub.Pages
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = lastComic;
+                ComicIsLiked = Comic.ComicLikes.Any(comicItem => comicItem.IpAddress == Request.HttpContext.Connection.RemoteIpAddress.ToString());
+
                 return Page();
             }
             catch (Exception exception)
@@ -229,6 +248,73 @@ namespace hoohub.Pages
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
                 return RedirectToPage("./Error");
+            }
+        }
+
+        /// <summary>
+        /// Attempts to toggle the liked state of the given comic for the current IP address.<br/>
+        /// If no <see cref="ComicLike"/> exists for the comic and this IP address, a new one is created.<br/>
+        /// Otherwise, the existing like is deleted.<br/>
+        /// The count of likes is then returned.<br/>
+        /// Finally, returns a <see cref="JsonResult"/> representing the result of the request.
+        /// </summary>
+        /// <param name="comicGuid">The ID of the comic to toggle the liked state for.</param>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
+        public async Task<JsonResult> OnPatchComicLikedAsync(string comicGuid)
+        {
+            try
+            {
+                var comic = await _hooContext.Comics
+                    .Include(comicItem => comicItem.ComicLikes)
+                    .AsSplitQuery()
+                    .SingleOrDefaultAsync(comicItem => comicItem.Id == comicGuid);
+                if (comic == null)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"Comic GUID {comicGuid} not found"));
+                }
+
+                var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                var existingLike = await _hooContext.ComicLikes
+                    .Include(comicLike => comicLike.Comic)
+                    .SingleOrDefaultAsync(comicLike => comicLike.Comic.Id == comic.Id && comicLike.IpAddress == remoteIpAddress);
+                
+                if (existingLike == null)
+                {
+                    // No existing like - create it
+                    await _hooContext.ComicLikes.AddAsync(new ComicLike(
+                        comic: comic,
+                        ipAddress: remoteIpAddress));
+                    await _hooContext.Events.AddAsync(new Event(
+                        eventType: EventTypes.ComicLikeCreated,
+                        details: $"Comic GUID {comicGuid} was hearted from IP address {remoteIpAddress}"));
+                }
+                else
+                {
+                    // Existing like - remove it
+                    _hooContext.ComicLikes.Remove(existingLike);
+                    await _hooContext.Events.AddAsync(new Event(
+                        eventType: EventTypes.ComicLikeDeleted,
+                        details: $"Comic GUID {comicGuid} was unhearted from IP address {remoteIpAddress}"));
+                }
+
+                await _hooContext.SaveChangesAsync(); // Force a save so the upcoming count is current
+                return new JsonResult(new ComicLikeResult(
+                    success: true,
+                    likeCount: _hooContext.ComicLikes
+                        .Include(comicLike => comicLike.Comic)
+                        .Where(comicLike => comicLike.Comic.Id == comicGuid).Count(),
+                    wasLiked: existingLike == null));
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to update comic GUID {comicGuid}: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: false));
             }
         }
 

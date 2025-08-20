@@ -64,6 +64,11 @@ namespace hoohub.Requests.Results
         public string DisplayLastModified { get; init; }
 
         /// <summary>
+        /// The amount of <see cref="ComicLike"/> items associated with this comic.
+        /// </summary>
+        public int LikeCount { get; init; } = 0;
+
+        /// <summary>
         /// Initialises a new instance of the <see cref="ManageComicDetailsResult"/> class.
         /// </summary>
         /// <param name="success">The success state to set.</param>
@@ -84,6 +89,7 @@ namespace hoohub.Requests.Results
             DisplayPublished = comic.PublishDate.HasValue ? FormattingService.GetDateTimeAsString(PublishDate.Value) : "N/A";
             DisplayLastModified = $"{FormattingService.GetDateTimeAsString(comic.LastModifiedDate)}\nby {(comic.LastEditedBy == null ? "Unknown" : comic.LastEditedBy.Handle)}";
             Message = message;
+            LikeCount = comic.ComicLikes.Count;
         }
     }
 }

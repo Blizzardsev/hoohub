@@ -160,10 +160,18 @@ function clearForm(form) {
     $(form).find(":checkbox").prop("checked", false)
 }
 
+/**
+ * Shows the given modal, based on the ID.
+ * @param {any} modalId - The ID of the modal to show
+ */
 function showModal(modalId) {
     $(`#${modalId}`).fadeIn(200)
 }
 
+/**
+ * Hides the given modal, based on the ID.
+ * @param {any} modalId - The ID of the modal to hide
+ */
 function hideModal(modalId) {
     $(`#${modalId}`).fadeOut(200)
 }

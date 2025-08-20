@@ -275,6 +275,7 @@ function loadManageComic(element, comicGuid) {
 
                     $("#manage-comic-published-info").text(result.displayPublished)
                     $("#manage-comic-modified-info").text(result.displayLastModified)
+                    $("#manage-comic-heart-info").text(result.likeCount)
 
                     if (result.scheduledDate != null && result.publishDate == null) {
                         loadedComicToManageWasScheduled = true

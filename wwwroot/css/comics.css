@@ -8,7 +8,7 @@
 	margin-top: 4vh;
 	top: 50%;
 	transform: translateY(-50%);
-	/*left: 28.5%;*/
+	left: 26vw;
 	margin: auto;
 }
 
@@ -19,3 +19,33 @@
 	#comic-menu .container {
 		display: inline-grid;
 	}
+
+@media (max-width: 1000px) {
+	#comic-menu {
+		left: 2%;
+	}
+}
+
+@media (max-width: 1250px) {
+	#comic-menu {
+		left: 20vw;
+	}
+}
+
+@media (min-width: 1400px) {
+	#comic-menu {
+		left: 26vw;
+	}
+}
+
+.heart {
+	background-color: red;
+}
+
+#comic-like-count {
+	font-weight: 900;
+	font-size: 1.33em;
+	padding-left: 20px;
+	border-radius: 10px;
+	padding-right: 20px;
+}

@@ -65,6 +65,12 @@ namespace hoohub.Enums
         EmailSent,
 
         [Description("Unknown")]
-        Unknown
+        Unknown,
+
+        [Description("Comic hearted")]
+        ComicLikeCreated,
+
+        [Description("Comic unhearted")]
+        ComicLikeDeleted
     }
 }

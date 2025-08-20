@@ -376,6 +376,7 @@ namespace hoohub.Pages.Manage
             {
                 var comic = await _hooContext.Comics
                     .Include(comic => comic.LastEditedBy)
+                    .Include(comic => comic.ComicLikes)
                     .AsSplitQuery()
                     .SingleOrDefaultAsync(comic => comic.Id == comicGuid);
                 if (comic == null)
@@ -434,7 +435,9 @@ namespace hoohub.Pages.Manage
                 var comic = await _hooContext.Comics.SingleOrDefaultAsync(comic => comic.Id == comicGuid);
                 if (comic == null)
                 {
-                    return new JsonResult(new BaseResult(success: false, message: $"Comic GUID {comicGuid} not found"));
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"Comic GUID {comicGuid} not found"));
                 }
 
                 if (comicNumber != comic.ComicNumber && _hooContext.Comics.Any(comic => comic.Id != comicGuid && comic.ComicNumber == comicNumber))

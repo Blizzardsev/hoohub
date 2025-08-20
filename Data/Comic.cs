@@ -1,5 +1,4 @@
-﻿using Org.BouncyCastle.Crypto.Macs;
-using System.Web;
+﻿using System.Web;
 
 namespace hoohub.Data
 {
@@ -68,6 +67,11 @@ namespace hoohub.Data
         /// The date/time the comic was last updated.
         /// </summary>
         public DateTime LastModifiedDate { get; set; }
+
+        /// <summary>
+        /// The collection of <see cref="ComicLike"/> items associated with this comic.
+        /// </summary>
+        public ICollection<ComicLike> ComicLikes { get; set; } = [];
 
         /// <summary>
         /// Default constructor.

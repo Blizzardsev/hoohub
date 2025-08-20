@@ -14,16 +14,15 @@ builder.Services.AddSession(options => {
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-
-builder.Services.AddWebOptimizer(pipeline =>
+if (!Debugger.IsAttached)
 {
-    if (!Debugger.IsAttached)
+    builder.Services.AddWebOptimizer(pipeline =>
     {
         pipeline.MinifyJsFiles("js/*");
         pipeline.MinifyCssFiles("css/*");
         pipeline.MinifyHtmlFiles("html/*");
-    }
-});
+    });
+}
 
 // Identity scaffolding
 builder.Services.AddDbContext<HooHubContext>();
@@ -64,7 +63,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseWebOptimizer();
+if (!Debugger.IsAttached)
+{
+    app.UseWebOptimizer();
+}
 app.UseStaticFiles();
 
 app.UseRouting();

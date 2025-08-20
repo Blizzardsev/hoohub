@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="~/css/comics.css" />
 }
 
+@Html.AntiForgeryToken()
+
 @if (Model.Comic != null)
 {
     var uploaderDisplayPicture = Model.Comic.UploadedBy != null && Model.Comic.UploadedBy.DisplayPicture != null
@@ -40,7 +42,23 @@
         @if(Model.Comic != null)
         {
             <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow" title="Get link" onclick="copyToClipboard('@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id })')">link</div>
-            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2 mb-4" onclick="showModal('about-comic')">info</div>
+            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Comic info..." onclick="showModal('about-comic')">info</div>
+            
+            <div class="row">
+                <div class="col align-content-center">
+                    <div id="comic-like"
+                         role="button"
+                         tabindex="0"
+                         class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2 mb-4 @(Model.ComicIsLiked ? "heart" : string.Empty)"
+                         title="@(Model.ComicIsLiked ? "Unlike this comic..." : "Like this comic!")"
+                         onclick="heartComic(this, '@(Model.Comic.Id)')">
+                        favorite
+                    </div>
+                </div>
+                <div class="col align-content-center">
+                    <p id="comic-like-count" class="heart box-shadow d-none">@(Model.Comic.ComicLikes.Count)</p>
+                </div>
+            </div>
         }
         else
         {
@@ -96,3 +114,9 @@
         <h4 class="text-center animate__animated animate__fadeIn animate__fast">Doodle not found</h4>
     }
 </div>
+
+@section Scripts {
+    <script type="text/javascript" src="~/js/comics.js" asp-append-version="true"></script>
+    <script src="@("https://cdn.jsdelivr.net/npm/@tsparticles/confetti@3.0.3/tsparticles.confetti.bundle.min.js")"></script>
+    <partial name="_ValidationScriptsPartial" />
+}
