@@ -104,7 +104,7 @@ namespace hoohub.Areas.Identity.Pages.Account
                         address: user.Email,
                         subject: "Reset your password",
                         body: TemplateService.GetTemplateSubstitutions(
-                            template: "{toName}, {buttonUrl}", // TODO: Email template
+                            template: Properties.Resources.UserPasswordResetTemplate,
                             substitutions: new Dictionary<string, string>()
                             {
                                 { "{toName}", user.Handle},

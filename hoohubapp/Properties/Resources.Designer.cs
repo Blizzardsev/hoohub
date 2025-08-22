@@ -99,6 +99,16 @@ namespace hoohub.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;!doctype html&gt;&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;&lt;head&gt;&lt;title&gt;HooHub - Your Hoo-factor code&lt;/title&gt;&lt;!--[if !mso]&gt;&lt;!-- --&gt;&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;&lt;!--&lt;![endif]--&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;&lt;style type=&quot;text/css&quot;&gt;#outlook a { padding:0; }
+        ///          .ReadMsgBody { width:100%; }        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TwoFactorCodeTemplate {
+            get {
+                return ResourceManager.GetString("TwoFactorCodeTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to iVBORw0KGgoAAAANSUhEUgAAArwAAAK8CAYAAAANumxDAAAABGdBTUEAALGPC/xhBQAACjdpQ0NQc1JHQiBJRUM2MTk2Ni0yLjEAAEiJnZZ3VFPZFofPvTe9UJIQipTQa2hSAkgNvUiRLioxCRBKwJAAIjZEVHBEUZGmCDIo4ICjQ5GxIoqFAVGx6wQZRNRxcBQblklkrRnfvHnvzZvfH/d+a5+9z91n733WugCQ/IMFwkxYCYAMoVgU4efFiI2LZ2AHAQzwAANsAOBws7NCFvhGApkCfNiMbJkT+Be9ug4g+fsq0z+MwQD/n5S5WSIxAFCYjOfy+NlcGRfJOD1XnCW3T8mYtjRNzjBKziJZgjJWk3PyLFt89pllDznzMoQ8GctzzuJl8OTcJ+ONORK+jJFgGRfnCPi5Mr4mY4N0SYZAxm/ksRl8TjYAKJLcLuZzU2RsLWOSKDKCLeN5AOBIyV/w0i9YzM8Tyw/FzsxaLhIkp4gZJlxTho2TE4vhz89N [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string UploadPlaceholderBase64 {
@@ -113,6 +123,17 @@ namespace hoohub.Properties {
         internal static string UploadPlaceholderNightBase64 {
             get {
                 return ResourceManager.GetString("UploadPlaceholderNightBase64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!doctype html&gt;&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;&lt;head&gt;&lt;title&gt;HooHub - Reset your password&lt;/title&gt;&lt;!--[if !mso]&gt;&lt;!-- --&gt;&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;&lt;!--&lt;![endif]--&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;&lt;style type=&quot;text/css&quot;&gt;#outlook a { padding:0; }
+        ///          .ReadMsgBody { width:100%; }
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string UserPasswordResetTemplate {
+            get {
+                return ResourceManager.GetString("UserPasswordResetTemplate", resourceCulture);
             }
         }
     }

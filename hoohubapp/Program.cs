@@ -14,7 +14,7 @@ builder.Services.AddSession(options => {
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-if (!Debugger.IsAttached)
+if (!builder.Environment.IsDevelopment())
 {
     builder.Services.AddWebOptimizer(pipeline =>
     {
@@ -50,6 +50,7 @@ builder.Configuration.GetSection("AccountSettings").Bind(accountSettings);
 
 var smtpSettings = new SmtpSettings();
 builder.Configuration.GetSection("SmtpSettings").Bind(smtpSettings);
+smtpSettings.Password = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
 builder.Services.Add(new ServiceDescriptor(typeof(SmtpService), new SmtpService(smtpSettings)));
 
 var app = builder.Build();
@@ -63,7 +64,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-if (!Debugger.IsAttached)
+if (!app.Environment.IsDevelopment())
 {
     app.UseWebOptimizer();
 }

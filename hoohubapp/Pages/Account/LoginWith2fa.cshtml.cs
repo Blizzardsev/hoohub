@@ -83,7 +83,7 @@ namespace hoohub.Areas.Identity.Pages.Account
                     address: user.Email,
                     subject: "Your Hoo-factor code",
                     body: TemplateService.GetTemplateSubstitutions(
-                        "{toName}: {twoFactorCode}",
+                        template: Properties.Resources.TwoFactorCodeTemplate,
                         substitutions: new Dictionary<string, string>()
                         {
                             { "{toName}", user.Handle },
