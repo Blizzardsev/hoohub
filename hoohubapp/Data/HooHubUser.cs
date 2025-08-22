@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.Drawing;
 
 namespace hoohub.Data
 {
@@ -36,7 +35,7 @@ namespace hoohub.Data
         /// <summary>
         /// The display picture of the user.
         /// </summary>
-        public byte[] DisplayPicture { get; set; } = (byte[])new ImageConverter().ConvertTo(Properties.Resources.hoo_pfp, typeof(byte[]));
+        public byte[] DisplayPicture { get; set; } = Convert.FromBase64String(Properties.Resources.hoo_pfp);
 
         /// <summary>
         /// The preferred social media link of the user.
@@ -51,7 +50,7 @@ namespace hoohub.Data
         {
             if (DisplayPicture == null || DisplayPicture.Length == 0)
             {
-                DisplayPicture = (byte[])new ImageConverter().ConvertTo(Properties.Resources.hoo_pfp, typeof(byte[]));
+                DisplayPicture = Convert.FromBase64String(Properties.Resources.hoo_pfp);
             }
         }
 

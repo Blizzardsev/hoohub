@@ -1,7 +1,6 @@
 ﻿using hoohub.Enums;
 using hoohub.Properties;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using NUglify.JavaScript.Syntax;
 using System.ComponentModel;
 
 namespace hoohub.Services

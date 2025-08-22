@@ -79,28 +79,18 @@ namespace hoohub.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQCAIAAAAP3aGbAAAACXBIWXMAAAsTAAALEwEAmpwYAAAgAElEQVR4nMy96bMkx3En6B5HHlX17vf6QjfQaBxsNC6CAAmCICmR4jWSSbaSZmdGY6NdzZh2bT+N7dp+3c/7aT/tH7Mf1sZmNLpmqCFIgbhBAAT67ne/OvKMCJ8PkZmVd9V73aDoVvZeVWZkhEdkxC88PNw98E9vPAHdpI25eWfPEH3t6ctfv7S95krE7Fao9Pv7J1+cBEQEAAQQxyoIYq0NAdk0CAgISaqOp1MhJENur3pSbK0PB74DAGGUBEGijQniVGljjBoKvj3wfvjMldHQVZz99O7BOEnnGQIgwLNbKze2VgHg/f3xx4cTKvGM0EfYfbvnQQQwRHGswjDRxtTSr7ry2urgya3V9RX/KFE/u38Ya9OVoW0u1s0H9nKzoHa9dyF/IwtpiSRnTAwAYZSEYUL5O0MEKcXAdzhnlWwRrqwOXthe [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static System.Drawing.Bitmap hoo_logo_placeholder {
+        internal static string hoo_pfp {
             get {
-                object obj = ResourceManager.GetObject("hoo_logo_placeholder", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap hoo_pfp {
-            get {
-                object obj = ResourceManager.GetObject("hoo_pfp", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("hoo_pfp", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;!doctype html&gt;&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;&lt;head&gt;&lt;title&gt;HooHub - Your Hoo-factor code&lt;/title&gt;&lt;!--[if !mso]&gt;&lt;!-- --&gt;&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;&lt;!--&lt;![endif]--&gt;&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;&lt;style type=&quot;text/css&quot;&gt;#outlook a { padding:0; }
-        ///          .ReadMsgBody { width:100%; }        /// [rest of string was truncated]&quot;;.
+        ///          .ReadMsgBody { width:100%; }
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TwoFactorCodeTemplate {
             get {

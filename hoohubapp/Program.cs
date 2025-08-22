@@ -4,7 +4,6 @@ using hoohub.Enums;
 using hoohub.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
