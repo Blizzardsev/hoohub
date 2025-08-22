@@ -4,5 +4,5 @@ spec:
   - dockerfile_path: Dockerfile
     git:
       branch: main
-      repo_clone_url: https://github.com/Blizzardsev/hoohub.git
+      repo_clone_url: https://github.com/Blizzardsev/hoohub.github
     name: hoohub
