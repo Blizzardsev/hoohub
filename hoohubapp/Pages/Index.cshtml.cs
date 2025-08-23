@@ -2,6 +2,7 @@ using hoohub.Data;
 using hoohub.Enums;
 using hoohub.Requests.Results;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ namespace hoohub.Pages
     public class IndexModel : PageModel
     {
         private readonly HooHubContext _hooContext;
+        private readonly SignInManager<HooHubUser> _signInManager;
 
         /// <summary>
         /// The comic to render on the page.<br/>
@@ -45,9 +47,11 @@ namespace hoohub.Pages
         /// Initialises a new instance of the <see cref="IndexModel"/> class.
         /// </summary>
         /// <param name="hooContext">Injected app context.</param>
-        public IndexModel(HooHubContext hooContext)
+        /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/>.</param>
+        public IndexModel(HooHubContext hooContext, SignInManager<HooHubUser> signInManager)
         {
             _hooContext = hooContext;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -61,6 +65,12 @@ namespace hoohub.Pages
         {
             try
             {
+                var redirectString = await GetOfflineRedirectAsync();
+                if (!string.IsNullOrWhiteSpace(redirectString))
+                {
+                    return RedirectToPage(redirectString);
+                }
+
                 string? nightModeSetting = Request.Cookies["nightMode"];
                 if (string.IsNullOrWhiteSpace(nightModeSetting))
                 {
@@ -122,6 +132,12 @@ namespace hoohub.Pages
         {
 			try
 			{
+                var redirectString = await GetOfflineRedirectAsync();
+                if (!string.IsNullOrWhiteSpace(redirectString))
+                {
+                    return RedirectToPage(redirectString);
+                }
+
                 var otherComics = await _hooContext.Comics
                     .Include(comic => comic.UploadedBy)
                     .Include(comic => comic.ComicLikes)
@@ -183,6 +199,12 @@ namespace hoohub.Pages
         {
             try
             {
+                var redirectString = await GetOfflineRedirectAsync();
+                if (!string.IsNullOrWhiteSpace(redirectString))
+                {
+                    return RedirectToPage(redirectString);
+                }
+
                 var allComics = await _hooContext.Comics
                     .Include(comic => comic.UploadedBy)
                     .Include(comic => comic.ComicLikes)
@@ -218,6 +240,12 @@ namespace hoohub.Pages
         {
             try
             {
+                var redirectString = await GetOfflineRedirectAsync();
+                if (!string.IsNullOrWhiteSpace(redirectString))
+                {
+                    return RedirectToPage(redirectString);
+                }
+
                 var allComics = await _hooContext.Comics
                     .Include(comic => comic.UploadedBy)
                     .Include(comic => comic.ComicLikes)
@@ -358,6 +386,24 @@ namespace hoohub.Pages
             var nextComicId  = currentIndex - 1 >= 0 ? comics[currentIndex - 1].Id : string.Empty;
 
             return new Tuple<string, string>(nextComicId, previousComicId);
+        }
+
+        /// <summary>
+        /// Returns a redirection string if the site is considered closed based on settings, or an empty string otherwise.
+        /// </summary>
+        /// <returns>Redirection string if the site is considered closed, or an empty string otherwise.</returns>
+        public async Task<string> GetOfflineRedirectAsync()
+        {
+            var settings = await _hooContext.Settings.FirstOrDefaultAsync();
+            if (settings != null)
+            {
+                if (!settings.PublicAccessEnabled && !_signInManager.IsSignedIn(User))
+                {
+                    return "./Offline";
+                }
+            }
+
+            return string.Empty;
         }
     }
 }

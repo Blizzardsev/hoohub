@@ -19,13 +19,16 @@
             <span>New comic</span>
         </div>
         <div role="button" tabindex="0" data-tab-id="1" class="col-auto tab-header" onclick="switchTab(1);getManageComicsList($('#manage-comics-refresh'))">
-            <span>Manage comics</span>
+            <span>All comics</span>
         </div>
         <div role="button" tabindex="0" data-tab-id="3" class="col-auto tab-header" onclick="switchTab(3)">
             <span>Me</span>
         </div>
         <div role="button" tabindex="0" data-tab-id="4" class="col-auto tab-header" onclick="switchTab(4);getEvents($('#logs-update'))">
             <span>Events</span>
+        </div>
+        <div role="button" tabindex="0" data-tab-id="5" class="col-auto tab-header" onclick="switchTab(5)">
+            <span>App</span>
         </div>
     </div>
     <div class="row">
@@ -49,27 +52,27 @@
                             <input class="d-none" id="new-comic-image-data" asp-for="ManageInputModel.NewComicInput.ImageData" accept=".png,.jpg,.jpeg,.gif"/>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" asp-for="ManageInputModel.NewComicInput.ComicNumber"></label>
+                            <label class="form-label fw-bold" asp-for="ManageInputModel.NewComicInput.ComicNumber"></label>
                             <input id="new-comic-comic-number" asp-for="ManageInputModel.NewComicInput.ComicNumber" class="form-control" />
                             <span asp-validation-for="ManageInputModel.NewComicInput.ComicNumber" class="text-warning"></span>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" asp-for="ManageInputModel.NewComicInput.ComicTitle"></label>
+                            <label class="form-label fw-bold" asp-for="ManageInputModel.NewComicInput.ComicTitle"></label>
                             <input id="new-comic-comic-title" asp-for="ManageInputModel.NewComicInput.ComicTitle" class="form-control" />
                             <span asp-validation-for="ManageInputModel.NewComicInput.ComicTitle" class="text-warning"></span>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" asp-for="ManageInputModel.NewComicInput.ComicDescription"></label>
+                            <label class="form-label fw-bold" asp-for="ManageInputModel.NewComicInput.ComicDescription"></label>
                             <input id="new-comic-comic-description" asp-for="ManageInputModel.NewComicInput.ComicDescription" class="form-control" />
                             <span asp-validation-for="ManageInputModel.NewComicInput.ComicDescription" class="text-warning"></span>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" asp-for="ManageInputModel.NewComicInput.Tags"></label>
+                            <label class="form-label fw-bold" asp-for="ManageInputModel.NewComicInput.Tags"></label>
                             <input id="new-comic-comic-tags" asp-for="ManageInputModel.NewComicInput.Tags" class="form-control" />
                             <span asp-validation-for="ManageInputModel.NewComicInput.Tags" class="text-warning"></span>
                         </div>
                         <div class="row">
-                            <label class="form-label" asp-for="ManageInputModel.NewComicInput.IsHidden"></label>
+                            <label class="form-label fw-bold" asp-for="ManageInputModel.NewComicInput.IsHidden"></label>
                         </div>
                         <div class="row">
                             <label class="switch form-group scale-75">
@@ -80,7 +83,7 @@
                         <div class="row">
                             <div class="col-auto">
                                 <div class="row">
-                                    <label class="form-label" asp-for="ManageInputModel.NewComicInput.IsScheduled"></label>
+                                    <label class="form-label fw-bold" asp-for="ManageInputModel.NewComicInput.IsScheduled"></label>
                                 </div>
                                 <div class="row">
                                     <label class="switch form-group justify-content-center scale-75">
@@ -159,27 +162,27 @@
                                     <span asp-validation-for="ManageInputModel.ManageComicInput.ComicGuid" class="text-warning"></span>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ComicNumber"></label>
+                                    <label class="form-label fw-bold" asp-for="ManageInputModel.ManageComicInput.ComicNumber"></label>
                                     <input id="manage-comic-comic-number" asp-for="ManageInputModel.ManageComicInput.ComicNumber" class="form-control" />
                                     <span asp-validation-for="ManageInputModel.ManageComicInput.ComicNumber" class="text-warning"></span>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ComicTitle"></label>
+                                    <label class="form-label fw-bold" asp-for="ManageInputModel.ManageComicInput.ComicTitle"></label>
                                     <input id="manage-comic-comic-title" asp-for="ManageInputModel.ManageComicInput.ComicTitle" class="form-control" />
                                     <span asp-validation-for="ManageInputModel.ManageComicInput.ComicTitle" class="text-warning"></span>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ComicDescription"></label>
+                                    <label class="form-label fw-bold" asp-for="ManageInputModel.ManageComicInput.ComicDescription"></label>
                                     <input id="manage-comic-comic-description" asp-for="ManageInputModel.ManageComicInput.ComicDescription" class="form-control" />
                                     <span asp-validation-for="ManageInputModel.ManageComicInput.ComicDescription" class="text-warning"></span>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.Tags"></label>
+                                    <label class="form-label fw-bold" asp-for="ManageInputModel.ManageComicInput.Tags"></label>
                                     <input id="manage-comic-comic-tags" asp-for="ManageInputModel.ManageComicInput.Tags" class="form-control" />
                                     <span asp-validation-for="ManageInputModel.ManageComicInput.Tags" class="text-warning"></span>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" asp-for="ManageInputModel.ManageComicInput.IsHidden"></label>
+                                    <label class="form-label fw-bold" asp-for="ManageInputModel.ManageComicInput.IsHidden"></label>
                                     <br />
                                     <label class="switch row justify-content-center scale-75">
                                         <input id="manage-comic-is-hidden" type="checkbox" onclick="toggleComicIsHidden(this, 'manage')">
@@ -189,7 +192,7 @@
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="row">
-                                            <label class="form-label" asp-for="ManageInputModel.ManageComicInput.IsScheduled"></label>
+                                            <label class="form-label fw-bold" asp-for="ManageInputModel.ManageComicInput.IsScheduled"></label>
                                         </div>
                                         <div class="row">
                                             <label class="switch form-group justify-content-center scale-75">
@@ -231,12 +234,12 @@
                         <input class="d-none" id="manage-me-image-data" asp-for="ManageInputModel.ManageMeInput.ImageData" accept=".png,.jpg,.jpeg,.gif" />
                     </div>
                     <div class="form-group">
-                        <label class="form-label" asp-for="ManageInputModel.ManageMeInput.Handle"></label>
+                        <label class="form-label fw-bold" asp-for="ManageInputModel.ManageMeInput.Handle"></label>
                         <input id="manage-me-handle" asp-for="ManageInputModel.ManageMeInput.Handle" class="form-control w-75"/>
                         <span asp-validation-for="ManageInputModel.ManageMeInput.Handle" class="text-warning"></span>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" asp-for="ManageInputModel.ManageMeInput.SocialLink"></label>
+                        <label class="form-label fw-bold" asp-for="ManageInputModel.ManageMeInput.SocialLink"></label>
                         <input id="manage-me-social" asp-for="ManageInputModel.ManageMeInput.SocialLink" class="form-control w-75" />
                         <span asp-validation-for="ManageInputModel.ManageMeInput.SocialLink" class="text-warning"></span>
                     </div>
@@ -260,6 +263,57 @@
                         <div role="button" tabindex="0" id="logs-update" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="getEvents(this)" title="Refresh">sync</div>
                         <br />
                         <span class="option-tip">Refresh</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-tab-id="5" class="container tab-body">
+            <div class="row overflow-hidden">
+                <div class="container mx-auto my-auto">
+                    <form id="manage-app-form" class="w-75 mx-auto" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold" asp-for="ManageInputModel.ManageAppInput.PublicAccessEnabled"></label>
+                            <br />
+                            <label class="form-label fst-italic">Determines whether the site itself is available to any non-authorised users</label>
+                            <select id="manage-app-public-access" asp-for="ManageInputModel.ManageAppInput.PublicAccessEnabled" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                            <span asp-validation-for="ManageInputModel.ManageAppInput.PublicAccessEnabled" class="text-warning"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold" asp-for="ManageInputModel.ManageAppInput.ArchiveAccess"></label>
+                            <br />
+                            <label class="form-label fst-italic">Determines to what level the Archive page is available to site users</label>
+                            <select id="manage-app-archive-access" asp-for="ManageInputModel.ManageAppInput.ArchiveAccess" class="form-control" asp-items="@Html.GetEnumSelectList<AccessTypes>()"></select>
+                            <span asp-validation-for="ManageInputModel.ManageAppInput.ArchiveAccess" class="text-warning"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold" asp-for="ManageInputModel.ManageAppInput.ArchiveMaximumComicsPerFetch"></label>
+                            <br />
+                            <label class="form-label fst-italic">Determines how many comics at maximum to fetch per scroll of the archive</label>
+                            <input id="manage-app-max-comics-per-fetch" asp-for="ManageInputModel.ManageAppInput.ArchiveMaximumComicsPerFetch" class="form-control" min="3" />
+                            <span asp-validation-for="ManageInputModel.ManageAppInput.ArchiveMaximumComicsPerFetch" class="text-warning"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold" asp-for="ManageInputModel.ManageAppInput.ManageEventsMaximumHistory"></label>
+                            <br />
+                            <label class="form-label fst-italic">
+                                Determines the maximum amount of entries to show when displaying events
+                                <br/>
+                                Events that meet or exceed 30 days old are automatically deleted
+                            </label>
+                            <input id="manage-app-max-event-history" asp-for="ManageInputModel.ManageAppInput.ManageEventsMaximumHistory" class="form-control" min="30" />
+                            <span asp-validation-for="ManageInputModel.ManageAppInput.ManageEventsMaximumHistory" class="text-warning"></span>
+                        </div>
+                    </form>
+                    <div class="row mt-4 d-flex justify-content-center mx-auto">
+                        <div class="col-auto mx-auto">
+                            <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="patchAppSettings(this)" title="Update">update</div>
+                            <br />
+                            <span class="option-tip">Update</span>
+                        </div>
                     </div>
                 </div>
             </div>

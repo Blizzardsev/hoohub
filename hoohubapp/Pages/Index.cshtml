@@ -29,7 +29,7 @@
                 <h5 class="fst-italic mb-2">Uploaded by @(Model.Comic.UploadedBy.Handle)</h5>
             }
 
-            <h5 class="fst-italic mt-4">@Model.Comic.GetComicDisplayDescription()</h5>
+            <h5 class="fst-italic mt-4">@Model.Comic.GetComicDisplayDescription(false)</h5>
             <h5 class="fst-italic">Tags | @Model.Comic.GetComicDisplayTags()</h5>
 
             <h5 class="fst-italic mt-5" style="filter: opacity(0.5)">Click anywhere to dismiss</h5>

@@ -147,10 +147,11 @@ namespace hoohub.Data
         /// <summary>
         /// Returns the description of the comic if it exists, or a placeholder if not.
         /// </summary>
+        /// <param name="htmlEncode">If true, HTML encodes the description. Only needed for AJAX requests.</param>
         /// <returns>The description of the comic if it exists, or a placeholder if not.</returns>
-        public string GetComicDisplayDescription() => string.IsNullOrWhiteSpace(ComicDescription)
+        public string GetComicDisplayDescription(bool htmlEncode = true) => string.IsNullOrWhiteSpace(ComicDescription)
             ? "(No description)"
-            : HttpUtility.HtmlEncode(ComicDescription);
+            : htmlEncode ? HttpUtility.HtmlEncode(ComicDescription) : ComicDescription;
 
         /// <summary>
         /// Returns the <see cref="ImageData"/> of the comic as a Base64 string for presentation in image elements or for downloads.

@@ -137,6 +137,14 @@ using (var _scope = app.Services.CreateScope())
     using var emailStore = (IUserEmailStore<HooHubUser>)userStore;
     using var userManager = _scope.ServiceProvider.GetService<UserManager<HooHubUser>>();
 
+    if (!_hooContext.Settings.Any())
+    {
+        _hooContext.Settings.Add(new HooHubSettings());
+        await _hooContext.Events.AddAsync(new Event(
+            eventType: EventTypes.AppSettingsCreated,
+            details: "No settings entry was found - new entry created."));
+    }
+
     if (!_hooContext.Users.Any())
     {
         foreach (var settings in accountSettings)

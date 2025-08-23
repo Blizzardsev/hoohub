@@ -53,7 +53,7 @@ footer {
 }
 
 .warning-tag, .text-danger, .text-warning {
-    color: #963636 !important; 
+    color: var(--validation-warning-foreground-color);
     font-weight: 700 !important;
 }
 
@@ -295,7 +295,7 @@ h1 {
     position: fixed;
     z-index: 200;
     top: 0;
-    margin-top: 10vh;
+    margin-top: 7vh;
 }
 
 .alert-content {
@@ -471,15 +471,15 @@ input:disabled + .slider {
     width: 18px;
     aspect-ratio: 1;
     border-radius: 50%;
-    background: #280501;
+    background: var(--loader-background-a);
     animation: l2 1.5s infinite;
-  }
+}
   @keyframes l2 {
     0%,
-    100%{transform:translate(-35px);box-shadow:  0     0 #84706D, 0     0 #DFDAD9}
-    40% {transform:translate( 35px);box-shadow: -15px  0 #84706D,-30px  0 #DFDAD9}
-    50% {transform:translate( 35px);box-shadow:  0     0 #84706D, 0     0 #DFDAD9}
-    90% {transform:translate(-35px);box-shadow:  15px  0 #84706D, 30px  0 #DFDAD9}
+    100%{transform:translate(-35px);box-shadow:  0     0 var(--loader-background-b), 0     0 var(--loader-background-c)}
+    40% {transform:translate( 35px);box-shadow: -15px  0 var(--loader-background-b),-30px  0 var(--loader-background-c)}
+    50% {transform:translate( 35px);box-shadow:  0     0 var(--loader-background-b), 0     0 var(--loader-background-c)}
+    90% {transform:translate(-35px);box-shadow:  15px  0 var(--loader-background-b), 30px  0 var(--loader-background-c)}
   }
 
 .no-scroll {
