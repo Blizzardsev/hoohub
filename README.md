@@ -104,4 +104,4 @@ Minification options can be modified under `Program.cs`.
 
 ## Deployment process
 
-HooHub is managed via [Digital Ocean](https://www.digitalocean.com/).
+HooHub is managed via [Digital Ocean](https://www.digitalocean.com/). 
