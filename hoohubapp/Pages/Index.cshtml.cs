@@ -122,15 +122,41 @@ namespace hoohub.Pages
         {
 			try
 			{
-                var allComics = await _hooContext.Comics
+                var otherComics = await _hooContext.Comics
                     .Include(comic => comic.UploadedBy)
                     .Include(comic => comic.ComicLikes)
                     .AsSplitQuery()
                     .Where(comic => !comic.IsHidden && comic.Id != currentComic)
                     .OrderByDescending(comic => comic.ComicNumber)
                     .ToListAsync();
-				var randomComic = allComics.ElementAt(new Random().Next(0, allComics.Count));
-                var nextPreviousComicIds = GetNextPreviousComicIds(randomComic, allComics);
+
+                if (otherComics.Count == 0)
+                {
+                    // We have no unique comics, so we either have none at all, or just one at the moment
+                    var allComics = await _hooContext.Comics
+                        .Include(comic => comic.UploadedBy)
+                        .Include(comic => comic.ComicLikes)
+                        .AsSplitQuery()
+                        .Where(comic => !comic.IsHidden)
+                        .OrderByDescending(comic => comic.ComicNumber)
+                        .ToListAsync();
+
+                    if (allComics.FirstOrDefault() == null)
+                    {
+                        // We have no cats Kathleen!
+                        return RedirectToPage("./Error");
+                    }
+
+                    NextComicId = string.Empty;
+                    PreviousComicId = string.Empty;
+                    Comic = allComics.First();
+
+                    // We only have one comic, so return that
+                    return Page();
+                }
+
+                var randomComic = otherComics.ElementAt(new Random().Next(0, otherComics.Count));
+                var nextPreviousComicIds = GetNextPreviousComicIds(randomComic, otherComics);
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = randomComic;

@@ -6,7 +6,6 @@ namespace hoohub.Data
 {
     public class HooHubContext : IdentityDbContext<HooHubUser>
     {
-		private readonly string _sqLitePath = "context.db";
 		public DbSet<Comic> Comics { get; set; }
 		public DbSet<Event> Events { get; set; }
 		public DbSet<HooHubUser> Users { get; set; }
@@ -18,8 +17,8 @@ namespace hoohub.Data
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseSqlite($"Data Source={_sqLitePath}");
-			base.OnConfiguring(optionsBuilder);
+            optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_URL"));
+            base.OnConfiguring(optionsBuilder);
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
