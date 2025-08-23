@@ -1,0 +1,29 @@
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace hoohub.Migrations
+{
+    /// <inheritdoc />
+    public partial class AppEventHistorySetting : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AddColumn<int>(
+                name: "ManageEventsMaximumHistory",
+                table: "Settings",
+                type: "integer",
+                nullable: false,
+                defaultValue: 1000);
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "ManageEventsMaximumHistory",
+                table: "Settings");
+        }
+    }
+}

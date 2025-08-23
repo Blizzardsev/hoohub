@@ -194,6 +194,11 @@ namespace hoohub.Pages.Manage
                 [Required(ErrorMessage = "Archive maximum comics per scroll must be provided")]
                 [RegularExpression("^([3-9]|[1-9][0-9])$", ErrorMessage = "Not a valid value")]
                 public int ArchiveMaximumComicsPerFetch { get; set; }
+
+                [Display(Name = "Manage events maximum history")]
+                [Required(ErrorMessage = "Manage events maximum history must be provided")]
+                [RegularExpression("^(?:[3-9]\\d|[1-9]\\d{2}|1000)$", ErrorMessage = "Not a valid value")]
+                public int ManageEventsMaximumHistory { get; set; }
             }
 
             public NewComic NewComicInput;
@@ -242,6 +247,7 @@ namespace hoohub.Pages.Manage
                 ManageInputModel.ManageAppInput.PublicAccessEnabled = appSettings != null ? appSettings.PublicAccessEnabled : true;
                 ManageInputModel.ManageAppInput.ArchiveAccess = appSettings != null ? appSettings.ArchiveAccess : AccessTypes.AllUsers;
                 ManageInputModel.ManageAppInput.ArchiveMaximumComicsPerFetch = appSettings != null ? appSettings.ArchiveMaximumComicsPerFetch : 20;
+                ManageInputModel.ManageAppInput.ManageEventsMaximumHistory = appSettings != null ? appSettings.ManageEventsMaximumHistory : 1000;
 
                 return Page();
             }
@@ -642,11 +648,13 @@ namespace hoohub.Pages.Manage
         /// <param name="publicAccessEnabled">The public access state to set.</param>
         /// <param name="archiveAccess">The archive access state to set.</param>
         /// <param name="archiveMaximumComicsPerFetch">The maximum comics per scroll value to set.</param>
+        /// <param name="manageEventsMaximumHistory">The manage events maximum history value to set.</param>
         /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
         public async Task<JsonResult> OnPatchAppSettingsAsync(
             bool publicAccessEnabled,
             AccessTypes archiveAccess,
-            int archiveMaximumComicsPerFetch)
+            int archiveMaximumComicsPerFetch,
+            int manageEventsMaximumHistory)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             var settings = _hooContext.Settings.FirstOrDefault();
@@ -666,19 +674,28 @@ namespace hoohub.Pages.Manage
                         message: "Archive maximum comics per scroll must be a valid value"));
                 }
 
+                if (manageEventsMaximumHistory < 30 || manageEventsMaximumHistory > 1000)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "Manage events maximum history must be a valid value"));
+                }
+
                 if (settings == null)
                 {
                     settings = new HooHubSettings(
                         publicAccessEnabled: publicAccessEnabled,
                         archiveAccess: archiveAccess,
-                        archiveMaximumComicsPerFetch: archiveMaximumComicsPerFetch);
+                        archiveMaximumComicsPerFetch: archiveMaximumComicsPerFetch,
+                        manageEventsMaximumHistory: manageEventsMaximumHistory);
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.Error,
                         details: $"App settings created by {currentUser.GetEventLogString()}" +
                             "\n---" +
                             $"\nPublic access enabled: {FormattingService.GetBooleanAsYesNoString(publicAccessEnabled)}" +
                             $"\nArchive access: {FormattingService.GetEnumDescription(archiveAccess)}" +
-                            $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetch}"));
+                            $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetch}" +
+                            $"\nManage events maximum history: {manageEventsMaximumHistory}"));
                 }
                 else
                 {
@@ -691,10 +708,14 @@ namespace hoohub.Pages.Manage
                     var archiveMaximumComicsPerFetchChange = settings.ArchiveMaximumComicsPerFetch != archiveMaximumComicsPerFetch 
                         ? $"{settings.ArchiveMaximumComicsPerFetch} -> {archiveMaximumComicsPerFetch}" 
                         : "(Unchanged)";
+                    var manageEventsMaximumHistoryChange = settings.ManageEventsMaximumHistory != manageEventsMaximumHistory
+                        ? $"{settings.ManageEventsMaximumHistory} -> {manageEventsMaximumHistory}"
+                        : "(Unchanged)";
 
                     settings.PublicAccessEnabled = publicAccessEnabled;
                     settings.ArchiveAccess = archiveAccess;
                     settings.ArchiveMaximumComicsPerFetch = archiveMaximumComicsPerFetch;
+                    settings.ManageEventsMaximumHistory = manageEventsMaximumHistory;
                     settings.LastModifiedDate = DateTime.UtcNow;
 
                     await _hooContext.Events.AddAsync(new Event(
@@ -703,7 +724,8 @@ namespace hoohub.Pages.Manage
                             "\n---" +
                             $"\nPublic access enabled: {publicAccessEnabledChange}" +
                             $"\nArchive access: {archiveAccessChange}" +
-                            $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetchChange}"));
+                            $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetchChange}" +
+                            $"\nManage events maximum history: {manageEventsMaximumHistoryChange}"));
                 }
                     
                 await _hooContext.SaveChangesAsync();
@@ -729,10 +751,12 @@ namespace hoohub.Pages.Manage
         {
             try
             {
+                var settings = await _hooContext.Settings.FirstOrDefaultAsync();
+                var maxEvents = settings == null ? 1000 : settings.ManageEventsMaximumHistory;
                 var events = _hooContext.Events
                     .AsNoTracking()
                     .OrderByDescending(eventItem => eventItem.CreatedDate)
-                    .Take(10000)
+                    .Take(maxEvents)
                     .AsEnumerable();
 
                 return new JsonResult(new EventsResult(

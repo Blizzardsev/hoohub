@@ -29,6 +29,11 @@ namespace hoohub.Data
         public int ArchiveMaximumComicsPerFetch { get; set; } = 5;
 
         /// <summary>
+        /// The maximum number of events to return when going through the management menu.
+        /// </summary>
+        public int ManageEventsMaximumHistory { get; set; } = 1000;
+
+        /// <summary>
         /// The date/time the comic was last updated.
         /// </summary>
         public DateTime LastModifiedDate { get; set; } = DateTime.UtcNow;
@@ -46,14 +51,17 @@ namespace hoohub.Data
         /// <param name="publicAccessEnabled">The public access enabled state to set.</param>
         /// <param name="archiveAccess">The archive access state to set.</param>
         /// <param name="archiveMaximumComicsPerFetch">The archive maximum comics per fetch value to set.</param>
+        /// <param name="manageEventsMaximumHistory">The manage events maximum history value to set.</param>
         public HooHubSettings(
             bool publicAccessEnabled,
             AccessTypes archiveAccess,
-            int archiveMaximumComicsPerFetch)
+            int archiveMaximumComicsPerFetch,
+            int manageEventsMaximumHistory)
         {
             PublicAccessEnabled = publicAccessEnabled;
             ArchiveAccess = archiveAccess;
             ArchiveMaximumComicsPerFetch = archiveMaximumComicsPerFetch;
+            ManageEventsMaximumHistory = manageEventsMaximumHistory;
             LastModifiedDate = DateTime.UtcNow;
         }
     }

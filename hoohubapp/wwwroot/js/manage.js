@@ -498,6 +498,7 @@ function toggleComicIsHidden(element, comicType) {
     formData.append("publicAccessEnabled", $("#manage-app-public-access").val())
     formData.append("archiveAccess", $("#manage-app-archive-access").val())
     formData.append("archiveMaximumComicsPerFetch", $("#manage-app-max-comics-per-fetch").val())
+    formData.append("manageEventsMaximumHistory", $("#manage-app-max-event-history").val())
 
     setFormLockState(manageAppForm, true)
     let loaderId = displayLoading()

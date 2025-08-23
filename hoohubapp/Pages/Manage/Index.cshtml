@@ -19,7 +19,7 @@
             <span>New comic</span>
         </div>
         <div role="button" tabindex="0" data-tab-id="1" class="col-auto tab-header" onclick="switchTab(1);getManageComicsList($('#manage-comics-refresh'))">
-            <span>Manage comics</span>
+            <span>All comics</span>
         </div>
         <div role="button" tabindex="0" data-tab-id="3" class="col-auto tab-header" onclick="switchTab(3)">
             <span>Me</span>
@@ -295,6 +295,17 @@
                             <label class="form-label fst-italic">Determines how many comics at maximum to fetch per scroll of the archive</label>
                             <input id="manage-app-max-comics-per-fetch" asp-for="ManageInputModel.ManageAppInput.ArchiveMaximumComicsPerFetch" class="form-control" min="3" />
                             <span asp-validation-for="ManageInputModel.ManageAppInput.ArchiveMaximumComicsPerFetch" class="text-warning"></span>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label class="form-label fw-bold" asp-for="ManageInputModel.ManageAppInput.ManageEventsMaximumHistory"></label>
+                            <br />
+                            <label class="form-label fst-italic">
+                                Determines the maximum amount of entries to show when displaying events
+                                <br/>
+                                Events that meet or exceed 30 days old are automatically deleted
+                            </label>
+                            <input id="manage-app-max-event-history" asp-for="ManageInputModel.ManageAppInput.ManageEventsMaximumHistory" class="form-control" min="30" />
+                            <span asp-validation-for="ManageInputModel.ManageAppInput.ManageEventsMaximumHistory" class="text-warning"></span>
                         </div>
                     </form>
                     <div class="row mt-4 d-flex justify-content-center mx-auto">
