@@ -51,7 +51,7 @@ namespace hoohub.Services
 
                     // Publish any scheduled comics
                     var comicsToPublish = _hooContext.Comics
-                        .Where(comic => comic.PublishDate <= DateTime.Now && comic.IsHidden)
+                        .Where(comic => comic.PublishDate <= DateTime.UtcNow && comic.IsHidden)
                         .AsEnumerable();
                     comicsToPublish.ForEach(async comic =>
                     {
@@ -82,7 +82,7 @@ namespace hoohub.Services
                                     template: "", // TODO: email template 
                                     substitutions: new Dictionary<string, string>()
                                     {
-                                        { "{text}", $"One or more errors occurred while performing maintenance tasks at {FormattingService.GetDateTimeAsString(DateTime.Now)}: check logs." },
+                                        { "{text}", $"One or more errors occurred while performing maintenance tasks at {FormattingService.GetDateTimeAsString(DateTime.UtcNow)}: check logs." },
                                         { "{buttonUrl}", "https://vip.visisoft.co.uk/Admin?Tab=1" } // Hardcoded URLs are bad, but cannot access a pagemodel here to build a dynamic link
                                     }));
                         }

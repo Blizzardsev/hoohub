@@ -175,7 +175,7 @@ namespace hoohub.Areas.Identity.Pages.Account
                         }
 
                         user.AccessFailedCount = 0;
-                        user.LastLoginDate = DateTime.Now;
+                        user.LastLoginDate = DateTime.UtcNow;
                         user.LastLoginIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
                         await _context.Events.AddAsync(new Event(
@@ -197,7 +197,7 @@ namespace hoohub.Areas.Identity.Pages.Account
                                 details: $"User {user.GetEventLogString()} logged in at safe address {user.LastLoginIpAddress}; 2FA bypassed."));
 
                             user.AccessFailedCount = 0;
-                            user.LastLoginDate = DateTime.Now;
+                            user.LastLoginDate = DateTime.UtcNow;
                             user.LastLoginIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
                             await _context.SaveChangesAsync();
@@ -215,9 +215,9 @@ namespace hoohub.Areas.Identity.Pages.Account
                     if (user.AccessFailedCount >= 3)
                     {
                         ErrorMessage = "Too many login attempts. Please try again later.";
-                        if (user.LockoutEnd == null || user.LockoutEnd < DateTime.Now)
+                        if (user.LockoutEnd == null || user.LockoutEnd < DateTime.UtcNow)
                         {
-                            user.LockoutEnd = DateTime.Now.AddMinutes(10);
+                            user.LockoutEnd = DateTime.UtcNow.AddMinutes(10);
                             await _context.Events.AddAsync(new Event(
                                 eventType: EventTypes.UserLockedOut,
                                 details: $"User {user.GetEventLogString()} locked out; login attempts exceeded."));

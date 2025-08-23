@@ -141,7 +141,7 @@ namespace hoohub.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     user.AccessFailedCount = 0;
-                    user.LastLoginDate = DateTime.Now;
+                    user.LastLoginDate = DateTime.UtcNow;
                     user.LastLoginIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
 
                     _context.Events.Add(new Event(
