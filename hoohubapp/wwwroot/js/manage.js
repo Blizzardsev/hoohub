@@ -478,3 +478,52 @@ function toggleComicIsHidden(element, comicType) {
         $(`#${comicType}-comic-is-scheduled`).prop("checked", false)
     }
 }
+
+/**
+* Attempts to update the app settings.
+* If successful, informs the user.
+* Otherwise, notifies of any errors.
+* @param {*} element - The calling control to be disabled/enabled.
+*/function patchAppSettings(element) {
+    let manageAppForm = $("#manage-app-form")
+
+    $(manageAppForm).validate()
+    if ($(element).hasClass("disabled") || !$(manageAppForm).valid()) {
+        return
+    }
+    $(element).addClass("disabled")
+
+    let formData = new FormData()
+    formData.append("__RequestVerificationToken", $('input[name="__RequestVerificationToken"]').val())
+    formData.append("publicAccessEnabled", $("#manage-app-public-access").val())
+    formData.append("archiveAccess", $("#manage-app-archive-access").val())
+    formData.append("archiveMaximumComicsPerFetch", $("#manage-app-max-comics-per-fetch").val())
+
+    setFormLockState(manageAppForm, true)
+    let loaderId = displayLoading()
+    setTimeout(function () {
+        $.ajax({
+            type: "PATCH",
+            url: "?handler=AppSettings",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result.success) {
+                    displayAlert("App settings updated!")
+                }
+                else {
+                    displayAlert(result.message)
+                }
+            },
+            failure: function () {
+                displayAlert("Failed to update app settings")
+            },
+            complete: function () {
+                hideLoading(loaderId)
+                $(element).removeClass("disabled")
+                setFormLockState(manageAppForm, false)
+            }
+        })
+    }, 500)
+}

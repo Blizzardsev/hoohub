@@ -180,15 +180,33 @@ namespace hoohub.Pages.Manage
                 public IFormFile ImageData { get; set; }
             }
 
+            public class ManageApp
+            {
+                [Display(Name = "Site public access enabled")]
+                [Required(ErrorMessage = "Site public access state must be provided")]
+                public bool PublicAccessEnabled { get; set; }
+
+                [Display(Name = "Archive access")]
+                [Required(ErrorMessage = "Archive access state must be provided")]
+                public AccessTypes ArchiveAccess { get; set; }
+
+                [Display(Name = "Archive comics per scroll")]
+                [Required(ErrorMessage = "Archive maximum comics per scroll must be provided")]
+                [RegularExpression("^([3-9]|[1-9][0-9])$", ErrorMessage = "Not a valid value")]
+                public int ArchiveMaximumComicsPerFetch { get; set; }
+            }
+
             public NewComic NewComicInput;
             public ManageComic ManageComicInput;
             public ManageMe ManageMeInput;
+            public ManageApp ManageAppInput;
 
             public ManageInput()
             {
                 NewComicInput = new NewComic();
                 ManageComicInput = new ManageComic();
                 ManageMeInput = new ManageMe();
+                ManageAppInput = new ManageApp();
             }
         }
 
@@ -219,6 +237,12 @@ namespace hoohub.Pages.Manage
                 DisplayPictureOnLoad = Convert.ToBase64String(currentUser.DisplayPicture);
                 ManageInputModel.ManageMeInput.Handle = currentUser.Handle;
                 ManageInputModel.ManageMeInput.SocialLink = currentUser.SocialLink;
+
+                var appSettings = await _hooContext.Settings.FirstOrDefaultAsync();
+                ManageInputModel.ManageAppInput.PublicAccessEnabled = appSettings != null ? appSettings.PublicAccessEnabled : true;
+                ManageInputModel.ManageAppInput.ArchiveAccess = appSettings != null ? appSettings.ArchiveAccess : AccessTypes.AllUsers;
+                ManageInputModel.ManageAppInput.ArchiveMaximumComicsPerFetch = appSettings != null ? appSettings.ArchiveMaximumComicsPerFetch : 20;
+
                 return Page();
             }
             catch (Exception exception)
@@ -609,6 +633,91 @@ namespace hoohub.Pages.Manage
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: false));
+            }
+        }
+
+        /// <summary>
+        /// Attempts to update the current app settings, returning a <see cref="JsonResult"/> representing the result of the request.
+        /// </summary>
+        /// <param name="publicAccessEnabled">The public access state to set.</param>
+        /// <param name="archiveAccess">The archive access state to set.</param>
+        /// <param name="archiveMaximumComicsPerFetch">The maximum comics per scroll value to set.</param>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
+        public async Task<JsonResult> OnPatchAppSettingsAsync(
+            bool publicAccessEnabled,
+            AccessTypes archiveAccess,
+            int archiveMaximumComicsPerFetch)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            var settings = _hooContext.Settings.FirstOrDefault();
+            try
+            {
+                if (currentUser == null)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "You are not authorised to perform this action"));
+                }
+
+                if (archiveMaximumComicsPerFetch < 3 || archiveMaximumComicsPerFetch > 99)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "Archive maximum comics per scroll must be a valid value"));
+                }
+
+                if (settings == null)
+                {
+                    settings = new HooHubSettings(
+                        publicAccessEnabled: publicAccessEnabled,
+                        archiveAccess: archiveAccess,
+                        archiveMaximumComicsPerFetch: archiveMaximumComicsPerFetch);
+                    await _hooContext.Events.AddAsync(new Event(
+                        eventType: EventTypes.Error,
+                        details: $"App settings created by {currentUser.GetEventLogString()}" +
+                            "\n---" +
+                            $"\nPublic access enabled: {FormattingService.GetBooleanAsYesNoString(publicAccessEnabled)}" +
+                            $"\nArchive access: {FormattingService.GetEnumDescription(archiveAccess)}" +
+                            $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetch}"));
+                }
+                else
+                {
+                    var publicAccessEnabledChange = settings.PublicAccessEnabled != publicAccessEnabled 
+                        ? $"{FormattingService.GetBooleanAsYesNoString(settings.PublicAccessEnabled)} -> {FormattingService.GetBooleanAsYesNoString(publicAccessEnabled)}" 
+                        : "(Unchanged)";
+                    var archiveAccessChange = settings.ArchiveAccess != archiveAccess 
+                        ? $"{FormattingService.GetEnumDescription(settings.ArchiveAccess)} -> {FormattingService.GetEnumDescription(archiveAccess)}" 
+                        : "(Unchanged)";
+                    var archiveMaximumComicsPerFetchChange = settings.ArchiveMaximumComicsPerFetch != archiveMaximumComicsPerFetch 
+                        ? $"{settings.ArchiveMaximumComicsPerFetch} -> {archiveMaximumComicsPerFetch}" 
+                        : "(Unchanged)";
+
+                    settings.PublicAccessEnabled = publicAccessEnabled;
+                    settings.ArchiveAccess = archiveAccess;
+                    settings.ArchiveMaximumComicsPerFetch = archiveMaximumComicsPerFetch;
+                    settings.LastModifiedDate = DateTime.UtcNow;
+
+                    await _hooContext.Events.AddAsync(new Event(
+                        eventType: EventTypes.Error,
+                        details: $"App settings updated by {currentUser.GetEventLogString()}" +
+                            "\n---" +
+                            $"\nPublic access enabled: {publicAccessEnabledChange}" +
+                            $"\nArchive access: {archiveAccessChange}" +
+                            $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetchChange}"));
+                }
+                    
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: true));
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to update app settings: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: false));
+
             }
         }
 

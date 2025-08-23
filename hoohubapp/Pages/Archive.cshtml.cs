@@ -2,8 +2,10 @@ using hoohub.Data;
 using hoohub.Requests.Data;
 using hoohub.Requests.Results;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
@@ -13,6 +15,7 @@ namespace hoohub.Pages
     public class ArchiveModel : PageModel
     {
         private readonly HooHubContext _hooContext;
+        private readonly SignInManager<HooHubUser> _signInManager;
 
         [DataType(DataType.Text)]
         [MaxLength(200)]
@@ -21,27 +24,44 @@ namespace hoohub.Pages
         public string TagInput { get; set; }
 
         /// <summary>
-        /// 
+        /// Whether or not the app is considered to be in Night Mode.<br/>
+        /// Some assets may need replacement based on this.
         /// </summary>
         public bool IsNightMode { get; private set; } = false;
 
         /// <summary>
-        /// 
+        /// Initialises a new instance of the <see cref="ArchiveModel"/> page.
         /// </summary>
-        /// <param name="hooContext"></param>
-        public ArchiveModel(HooHubContext hooContext)
+        /// <param name="hooContext">Injected app context.</param>
+        /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/>.</param>
+        public ArchiveModel(HooHubContext hooContext, SignInManager<HooHubUser> signInManager)
         {
             _hooContext = hooContext;
+            _signInManager = signInManager;
         }
 
         /// <summary>
-        /// 
+        /// Returns the Archive page, or the Offline page depending on current access configuration.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The Archive page, or the Offline page depending on current access configuration.</returns>
         public async Task<IActionResult> OnGet()
         {
             try
             {
+                var settings = _hooContext.Settings.FirstOrDefault();
+                if (settings != null)
+                {
+                    if (!settings.PublicAccessEnabled && !_signInManager.IsSignedIn(User))
+                    {
+                        return RedirectToPage("./Offline");
+                    }
+                    if (settings.ArchiveAccess == Enums.AccessTypes.None 
+                        || (settings.ArchiveAccess == Enums.AccessTypes.AuthorisedUsers && !_signInManager.IsSignedIn(User)))
+                    {
+                        return RedirectToPage("./Index");
+                    }
+                }
+
                 string? nightModeSetting = Request.Cookies["nightMode"];
                 if (string.IsNullOrWhiteSpace(nightModeSetting))
                 {
@@ -67,11 +87,12 @@ namespace hoohub.Pages
         }
 
         /// <summary>
-        /// 
+        /// Attempts to fetch a selection of comics from the archive, depending on any query, as well as caps on archive querying according to the app settinbgs.<br/>
+        /// Returns a <see cref="JsonResult"/> representing the result of the request.
         /// </summary>
-        /// <param name="startAtComic"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
+        /// <param name="startAtComic">Optional comic GUID to begin from, for example if the user is scrolling through the full list.</param>
+        /// <param name="query">Optionasl query for filtering the resulting comics, for example tags.</param>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
         public async Task<JsonResult> OnGetComics(
             string startAtComic = "",
             string query = "")
@@ -104,7 +125,10 @@ namespace hoohub.Pages
                     ? allComics.IndexOf(startFromComic)
                     : -1;
 
-                var archiveComics = allComics.Skip(startIndex + 1).Take(20);
+                var settings = await _hooContext.Settings.FirstOrDefaultAsync();
+                var takeComics = settings != null ? settings.ArchiveMaximumComicsPerFetch : 20;
+                var archiveComics = allComics.Skip(startIndex + 1).Take(takeComics);
+
                 return new JsonResult(new ArchiveResult(
                     success: true,
                     endOfResults: archiveComics.Count() == 0 || archiveComics.Last().Id == allComics.Last().Id,

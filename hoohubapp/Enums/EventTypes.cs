@@ -71,6 +71,12 @@ namespace hoohub.Enums
         ComicLikeCreated,
 
         [Description("Comic unhearted")]
-        ComicLikeDeleted
+        ComicLikeDeleted,
+
+        [Description("App settings created")]
+        AppSettingsCreated,
+
+        [Description("App settings updated")]
+        AppSettingsUpdated,
     }
 }

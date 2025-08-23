@@ -74,6 +74,7 @@
     #manage-comic-preview {
         max-width: 70%;
         max-height: auto;
+        height: auto;
         position: initial;
     }
 
@@ -131,3 +132,13 @@ input {
     .manage-comic-item.selected {
         filter: brightness(80%)
     }
+
+input,
+textarea,
+select,
+.form-control,
+.form-control:focus,
+.form-control:read-only {
+    min-width: 367.5px;
+    max-width: 100vw !important;
+}

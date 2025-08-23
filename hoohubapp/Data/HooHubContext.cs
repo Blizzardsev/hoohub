@@ -10,6 +10,7 @@ namespace hoohub.Data
 		public DbSet<Event> Events { get; set; }
 		public DbSet<HooHubUser> Users { get; set; }
 		public DbSet<ComicLike> ComicLikes { get; set; }
+        public DbSet<HooHubSettings> Settings { get; set; }
 
 		public HooHubContext()
 		{
@@ -30,6 +31,7 @@ namespace hoohub.Data
 			modelBuilder.Entity<Event>().ToTable("Events").HasKey("Id");
             modelBuilder.Entity<HooHubUser>().ToTable("Users").HasKey("Id");
             modelBuilder.Entity<ComicLike>().ToTable("ComicLikes").HasKey("Id");
+            modelBuilder.Entity<HooHubSettings>().ToTable("Settings").HasKey("Id");
         }
 
         public class HooHubUserEntityConfiguration : IEntityTypeConfiguration<HooHubUser>
