@@ -265,3 +265,5 @@ context.db-wal
 context.db-shm
 context.db
 *.db
+
+hoohubapp/Properties/launchSettings.json
