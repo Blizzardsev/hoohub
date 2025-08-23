@@ -55,7 +55,8 @@ namespace hoohub.Pages
                     {
                         return RedirectToPage("./Offline");
                     }
-                    if (settings.ArchiveAccess == Enums.AccessTypes.None 
+                    if (settings.ArchiveAccess == Enums.AccessTypes.None
+                        || (settings.ArchiveAccess == Enums.AccessTypes.RegisteredUsers && !_signInManager.IsSignedIn(User))
                         || (settings.ArchiveAccess == Enums.AccessTypes.AuthorisedUsers && !_signInManager.IsSignedIn(User)))
                     {
                         return RedirectToPage("./Index");

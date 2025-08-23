@@ -162,7 +162,7 @@ function getEvents(element) {
             },
             success: function (result) {
                 if (result.success) {
-                    $("#manage-events-count").text(`Displaying ${result.eventData.length} events`)
+                    $("#manage-events-count").text(`Displaying ${result.eventData.length} ${result.eventData.length === 1 ? "event" : "events"}`)
                     let eventsList = []
                     result.eventData.forEach(function (event) {
                         eventsList.push(`
@@ -216,7 +216,7 @@ function getManageComicsList(element) {
             },
             success: function (result) {
                 if (result.success) {
-                    $("#manage-comics-count").text(`Displaying ${result.manageComicListData.length} comics`)
+                    $("#manage-comics-count").text(`Displaying ${result.manageComicListData.length} ${result.manageComicListData.length === 1 ? "comic" : "comics"}`)
                     let manageComicsList = []
                     result.manageComicListData.forEach(function(comic) {
                         manageComicsList.push(`

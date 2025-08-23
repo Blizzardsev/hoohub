@@ -1,8 +1,10 @@
 using hoohub.Configuration;
 using hoohub.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace hoohub.Pages
@@ -12,6 +14,7 @@ namespace hoohub.Pages
     {
         private readonly HooHubContext _hooContext;
         private readonly AppSettings _appSettings;
+        private readonly SignInManager<HooHubUser> _signInManager;
 
         /// <summary>
         /// The <see cref="HooHubUser"/> corresponding to the artist to credit and link on the page.
@@ -28,10 +31,15 @@ namespace hoohub.Pages
         /// </summary>
         /// <param name="hooContext">Injected app context.</param>
         /// <param name="appSettings">Injected app settings.</param>
-        public AboutModel(HooHubContext hooContext, AppSettings appSettings)
+        /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/>.</param>
+        public AboutModel(
+            HooHubContext hooContext,
+            AppSettings appSettings,
+            SignInManager<HooHubUser> signInManager)
         {
             _hooContext = hooContext;
             _appSettings = appSettings;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -41,6 +49,15 @@ namespace hoohub.Pages
         {
             try
             {
+                var settings = await _hooContext.Settings.FirstOrDefaultAsync();
+                if (settings != null)
+                {
+                    if (!settings.PublicAccessEnabled && !_signInManager.IsSignedIn(User))
+                    {
+                        return RedirectToPage("./Offline");
+                    }
+                }
+
                 ArtistCreditUser = _hooContext.Users
                     .AsEnumerable()
                     .First(user => string.Equals(user.Email, _appSettings.ArtistCredit, StringComparison.OrdinalIgnoreCase));
