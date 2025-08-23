@@ -1,5 +1,10 @@
 # hoohub
 
+<p align="center">
+    <img src="hoo_splash.png?raw=true" height="500"/>
+</p>
+
+
 ## Contents
 
 - [About](#about)
