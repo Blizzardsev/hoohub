@@ -17,7 +17,7 @@ namespace hoohub.Data
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-            optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("DATABASE_URL"));
+            optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("DB_STRING"));
             base.OnConfiguring(optionsBuilder);
 		}
 

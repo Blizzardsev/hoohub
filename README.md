@@ -70,7 +70,7 @@ The following environment variables are **required**:
 
 - ASPNETCORE_ENVIRONMENT (Release/Development): The environment of the app when running.
 - SMTP_PASSWORD: The SMTP password for the SMTP email server, as given in the appsettings.
-- DATABASE_URL: The URL for the PostGres instance to connect to.
+- DB_STRING: The URL for the PostGres instance to connect to.
 
 ---
 
