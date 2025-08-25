@@ -30,5 +30,10 @@
         /// The social media link of the artist to assign credit for.
         /// </summary>
         public string WriterSocial { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The base site URL to use in situations where constructing the URL from a request/context is not available.
+        /// </summary>
+        public string SiteBaseUrl { get; set; } = string.Empty;
     }
 }
