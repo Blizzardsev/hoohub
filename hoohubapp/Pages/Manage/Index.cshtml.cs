@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Win32.SafeHandles;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
@@ -199,6 +200,10 @@ namespace hoohub.Pages.Manage
                 [Required(ErrorMessage = "Manage events maximum history must be provided")]
                 [RegularExpression("^(?:[3-9]\\d|[1-9]\\d{2}|1000)$", ErrorMessage = "Not a valid value")]
                 public int ManageEventsMaximumHistory { get; set; }
+
+                [Display(Name = "Scheduled comic release time")]
+                [Required(ErrorMessage = "Scheduled comic release time must be provided")]
+                public TimeOnly ScheduledComicReleaseTime { get; set; }
             }
 
             public NewComic NewComicInput;
@@ -248,6 +253,7 @@ namespace hoohub.Pages.Manage
                 ManageInputModel.ManageAppInput.ArchiveAccess = appSettings != null ? appSettings.ArchiveAccess : AccessTypes.AllUsers;
                 ManageInputModel.ManageAppInput.ArchiveMaximumComicsPerFetch = appSettings != null ? appSettings.ArchiveMaximumComicsPerFetch : 20;
                 ManageInputModel.ManageAppInput.ManageEventsMaximumHistory = appSettings != null ? appSettings.ManageEventsMaximumHistory : 1000;
+                ManageInputModel.ManageAppInput.ScheduledComicReleaseTime = appSettings != null ? appSettings.ScheduledComicReleaseTime : new TimeOnly(hour: 12, minute: 00);
 
                 return Page();
             }
@@ -315,18 +321,31 @@ namespace hoohub.Pages.Manage
                         message: $"Comics must be uploaded in jpg or png format"));
                 }
 
-                if (isScheduled && scheduleFor.HasValue && DateTime.UtcNow > scheduleFor.Value.ToUniversalTime())
+                DateTime? scheduleForAsUtcDateTime = null;
+                if (isScheduled && scheduleFor.HasValue)
                 {
-                    return new JsonResult(new BaseResult(
-                        success: false,
-                        message: $"Cannot schedule for a date in the past: current time is {FormattingService.GetDateTimeAsString(DateTime.UtcNow)}"));
+                    var settings = await _hooContext.Settings.FirstAsync();
+                    scheduleForAsUtcDateTime = new DateTime(
+                        year: scheduleFor.Value.Year,
+                        month: scheduleFor.Value.Month,
+                        day: scheduleFor.Value.Day,
+                        hour: settings.ScheduledComicReleaseTime.Hour,
+                        minute: settings.ScheduledComicReleaseTime.Minute,
+                        second: 0).ToUniversalTime();
                 }
 
-                if (isScheduled && !scheduleFor.HasValue)
+                if (scheduleForAsUtcDateTime.HasValue && DateTime.UtcNow > scheduleForAsUtcDateTime)
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
-                        message: "Scheduled comics must have a date"));
+                        message: $"Cannot schedule for a date/time in the past"));
+                }
+
+                if (isScheduled && !scheduleForAsUtcDateTime.HasValue)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "Cannot schedule a comic without a date"));
                 }
 
                 if (isScheduled)
@@ -343,13 +362,13 @@ namespace hoohub.Pages.Manage
                     tags: string.IsNullOrWhiteSpace(tags) ? string.Empty : tags,
                     isHidden: isScheduled ? true : isHidden,
                     uploadedBy: currentUser,
-                    scheduledDate: scheduleFor != null && isScheduled ? scheduleFor.Value.ToUniversalTime() : null,
+                    scheduledDate: scheduleForAsUtcDateTime.HasValue && isScheduled ? scheduleForAsUtcDateTime.Value : null,
                     wasPublished: !isHidden && !isScheduled);
 
                 await _hooContext.Comics.AddAsync(newComic);
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.ComicCreated,
-                    details: $"Comic GUID {newComic.Id} created by {currentUser.GetEventLogString()}{(isScheduled ? $" and scheduled for {FormattingService.GetDateTimeAsString(scheduleFor.Value.ToUniversalTime())}" : string.Empty)}."));
+                    details: $"Comic GUID {newComic.Id} created by {currentUser.GetEventLogString()}{(isScheduled ? $" and scheduled for {FormattingService.GetDateTimeAsString(scheduleForAsUtcDateTime.Value)} UTC" : string.Empty)}."));
 
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: true));
@@ -491,29 +510,31 @@ namespace hoohub.Pages.Manage
                         message: $"Comics must be uploaded in jpg or png format"));
                 }
 
-                DateTime scheduleForAsUtcDateTime = new DateTime();
+                DateTime? scheduleForAsUtcDateTime = null;
                 if (isScheduled && scheduleFor.HasValue)
                 {
+                    var settings = await _hooContext.Settings.FirstAsync();
                     scheduleForAsUtcDateTime = new DateTime(
                         year: scheduleFor.Value.Year,
                         month: scheduleFor.Value.Month,
-                        day: scheduleFor.Value.Day)
-                        .AddHours(12)
-                        .ToUniversalTime();
+                        day: scheduleFor.Value.Day,
+                        hour: settings.ScheduledComicReleaseTime.Hour,
+                        minute: settings.ScheduledComicReleaseTime.Minute,
+                        second: 0).ToUniversalTime();
                 }
 
-                if (isScheduled && scheduleFor.HasValue && DateTime.UtcNow > scheduleForAsUtcDateTime)
+                if (scheduleForAsUtcDateTime.HasValue && DateTime.UtcNow > scheduleForAsUtcDateTime)
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
-                        message: $"Cannot schedule for a date in the past: current time is {FormattingService.GetDateTimeAsString(DateTime.UtcNow)}"));
+                        message: $"Cannot schedule for a date/time in the past"));
                 }
 
-                if (isScheduled && !scheduleFor.HasValue)
+                if (isScheduled && !scheduleForAsUtcDateTime.HasValue)
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
-                        message: "Scheduled comics must have a date"));
+                        message: "Cannot schedule a comic without a date"));
                 }
 
                 if (isScheduled)
@@ -529,8 +550,8 @@ namespace hoohub.Pages.Manage
                 var comicHiddenChange = comic.IsHidden != isHidden 
                     ? $"{FormattingService.GetBooleanAsYesNoString(comic.IsHidden)} -> {FormattingService.GetBooleanAsYesNoString(isHidden)}"
                     : "(Unchanged)";
-                var comicScheduledChange = comic.ScheduledDate != scheduleFor 
-                    ? $"{(comic.ScheduledDate.HasValue ? FormattingService.GetDateTimeAsString(comic.ScheduledDate.Value) : "N/A")} -> {(scheduleFor.HasValue ? FormattingService.GetDateTimeAsString(scheduleFor.Value) : "N/A")}"
+                var comicScheduledChange = comic.ScheduledDate != scheduleForAsUtcDateTime
+                    ? $"{(comic.ScheduledDate.HasValue ? FormattingService.GetDateTimeAsString(comic.ScheduledDate.Value) : "N/A")} -> {(scheduleForAsUtcDateTime.HasValue ? FormattingService.GetDateTimeAsString(scheduleForAsUtcDateTime.Value) : "N/A")}"
                     : "(Unchanged)";
 
                 comic.LastModifiedDate = DateTime.UtcNow;
@@ -555,7 +576,7 @@ namespace hoohub.Pages.Manage
                 {
                     // Scheduled date was added
                     comic.PublishDate = null;
-                    comic.ScheduledDate = scheduleFor.Value.ToUniversalTime();
+                    comic.ScheduledDate = scheduleForAsUtcDateTime;
                 }
 
                 await _hooContext.Events.AddAsync(new Event(
@@ -660,12 +681,14 @@ namespace hoohub.Pages.Manage
         /// <param name="archiveAccess">The archive access state to set.</param>
         /// <param name="archiveMaximumComicsPerFetch">The maximum comics per scroll value to set.</param>
         /// <param name="manageEventsMaximumHistory">The manage events maximum history value to set.</param>
+        /// <param name="scheduledComicReleaseTime">The scheduled comic release time value to set.</param>
         /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
         public async Task<JsonResult> OnPatchAppSettingsAsync(
             bool publicAccessEnabled,
             AccessTypes archiveAccess,
             int archiveMaximumComicsPerFetch,
-            int manageEventsMaximumHistory)
+            int manageEventsMaximumHistory,
+            TimeOnly scheduledComicReleaseTime)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             var settings = _hooContext.Settings.FirstOrDefault();
@@ -692,13 +715,16 @@ namespace hoohub.Pages.Manage
                         message: "Manage events maximum history must be a valid value"));
                 }
 
+                var updateComicScheduledDates = false;
+
                 if (settings == null)
                 {
                     settings = new HooHubSettings(
                         publicAccessEnabled: publicAccessEnabled,
                         archiveAccess: archiveAccess,
                         archiveMaximumComicsPerFetch: archiveMaximumComicsPerFetch,
-                        manageEventsMaximumHistory: manageEventsMaximumHistory);
+                        manageEventsMaximumHistory: manageEventsMaximumHistory,
+                        scheduledComicReleaseTime: scheduledComicReleaseTime);
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.AppSettingsCreated,
                         details: $"App settings created by {currentUser.GetEventLogString()}" +
@@ -706,7 +732,10 @@ namespace hoohub.Pages.Manage
                             $"\nPublic access enabled: {FormattingService.GetBooleanAsYesNoString(publicAccessEnabled)}" +
                             $"\nArchive access: {FormattingService.GetEnumDescription(archiveAccess)}" +
                             $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetch}" +
-                            $"\nManage events maximum history: {manageEventsMaximumHistory}"));
+                            $"\nManage events maximum history: {manageEventsMaximumHistory}" +
+                            $"\nScheduled comic release time: {scheduledComicReleaseTime}"));
+
+                    updateComicScheduledDates = true;
                 }
                 else
                 {
@@ -722,11 +751,16 @@ namespace hoohub.Pages.Manage
                     var manageEventsMaximumHistoryChange = settings.ManageEventsMaximumHistory != manageEventsMaximumHistory
                         ? $"{settings.ManageEventsMaximumHistory} -> {manageEventsMaximumHistory}"
                         : "(Unchanged)";
+                    var scheduledComicReleaseTimeChange = settings.ScheduledComicReleaseTime != scheduledComicReleaseTime
+                        ? $"{settings.ScheduledComicReleaseTime} -> {scheduledComicReleaseTime}"
+                        : "(Unchanged)";
+                    updateComicScheduledDates = settings.ScheduledComicReleaseTime != scheduledComicReleaseTime;
 
                     settings.PublicAccessEnabled = publicAccessEnabled;
                     settings.ArchiveAccess = archiveAccess;
                     settings.ArchiveMaximumComicsPerFetch = archiveMaximumComicsPerFetch;
                     settings.ManageEventsMaximumHistory = manageEventsMaximumHistory;
+                    settings.ScheduledComicReleaseTime = scheduledComicReleaseTime;
                     settings.LastModifiedDate = DateTime.UtcNow;
 
                     await _hooContext.Events.AddAsync(new Event(
@@ -736,7 +770,28 @@ namespace hoohub.Pages.Manage
                             $"\nPublic access enabled: {publicAccessEnabledChange}" +
                             $"\nArchive access: {archiveAccessChange}" +
                             $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetchChange}" +
-                            $"\nManage events maximum history: {manageEventsMaximumHistoryChange}"));
+                            $"\nManage events maximum history: {manageEventsMaximumHistoryChange}" + 
+                            $"\nScheduled comic release time: {scheduledComicReleaseTimeChange}"));
+                }
+
+                if (updateComicScheduledDates)
+                {
+                    // Scheduled comic release time updated - scheduled comics must reflect new time
+                    var scheduledComics = _hooContext.Comics.Where(comic => comic.IsHidden && comic.ScheduledDate.HasValue);
+                    foreach (var scheduledComic in scheduledComics)
+                    {
+                        scheduledComic.ScheduledDate = new DateTime(
+                            year: scheduledComic.ScheduledDate.Value.Year,
+                            month: scheduledComic.ScheduledDate.Value.Month,
+                            day: scheduledComic.ScheduledDate.Value.Day,
+                            hour: scheduledComicReleaseTime.Hour,
+                            minute: scheduledComicReleaseTime.Minute,
+                            second: 0).ToUniversalTime();
+                        await _hooContext.Events.AddAsync(new Event(
+                            eventType: EventTypes.ComicUpdated,
+                            details: $"Comic GUID {scheduledComic.Id} was rescheduled due to a change in app settings;" +
+                                $" new scheduled date/time is: {FormattingService.GetDateTimeAsString(scheduledComic.ScheduledDate.Value)} UTC"));
+                    }
                 }
                     
                 await _hooContext.SaveChangesAsync();
