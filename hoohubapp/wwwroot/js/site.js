@@ -9,7 +9,7 @@ $("html").on("click", function (event) {
 
 /**
  * Toggles the site navigation menu visibility.
- * @param {*} element - Button summoning the navigation menu
+ * @param {*} elementButton summoning the navigation menu
  */
 function toggleMenu(element) {
     if (menuTransitioning) {
@@ -41,7 +41,7 @@ function toggleMenu(element) {
 
 /**
  * After a brief delay, redirect to the site home page
- * @param {*} delay - The time (in milliseconds) to wait before redirecting, if any.
+ * @param {*} delayThe time (in milliseconds) to wait before redirecting, if any.
  */
 function resetRedirect(delay = 2000) {
     setTimeout(() => {
@@ -61,7 +61,7 @@ function uuidv4() {
 
 /**
  * Copies the given content to the clipboard.
- * @param {*} content - The content to copy to the clipboard.
+ * @param {*} contentThe content to copy to the clipboard.
  */
 function copyToClipboard(content) {
     navigator.clipboard.writeText(content);
@@ -69,9 +69,9 @@ function copyToClipboard(content) {
 }
 
 /**
- * 
- * @param {*} text 
- * @param {*} delay 
+ * Displays a temporary pop-up alert with the given text, and optional delay before it disappears.
+ * @param {*} text The text to display on the pop-up.
+ * @param {*} delay The amount of time (in ms) before the popup automatically disappears. Default is 3000 (3 seconds).
  */
 function displayAlert(text, delay = 3000) {
     let alertId = uuidv4()
@@ -87,8 +87,8 @@ function displayAlert(text, delay = 3000) {
 }
 
 /**
- * 
- * @returns 
+ * Displays the full-screen loader graphic.
+ * @returnsThe Id of the created loader for later dismissal.
  */
 function displayLoading() {
     let loaderId = uuidv4()
@@ -102,8 +102,8 @@ function displayLoading() {
 }
 
 /**
- * 
- * @param {*} loaderId 
+ * Hides the specific full-screen loader graphic.
+ * @param {*} loaderIdThe Id of the loader to remove.
  */
 function hideLoading(loaderId) {
     $(`#${loaderId}`).remove()
@@ -111,8 +111,8 @@ function hideLoading(loaderId) {
 
 /**
 * Returns true when an element is scrolled to the bottom.
-* @param {*} element - The element to test
-* @returns - true if the element is scrolled to the bottom
+* @param {*} elementThe element to test
+* @returnstrue if the element is scrolled to the bottom
 */
 function elementIsScrolledToBottom(element) {
     console.log(element.scrollTop)
@@ -121,8 +121,8 @@ function elementIsScrolledToBottom(element) {
 
 /**
  * Sets the lock state of a form, determining if the controls on the form (select, input and textarea) elements may be interacted with.
- * @param {*} form - The form to evaluate for controls to lock/unlock
- * @param {*} state - The locked/unlocked state to set (true to lock)
+ * @param {*} formThe form to evaluate for controls to lock/unlock
+ * @param {*} stateThe locked/unlocked state to set (true to lock)
  */
 function setFormLockState(form, state) {
     $(form).find("input").prop("readonly", state)
@@ -143,7 +143,7 @@ function setFormLockState(form, state) {
 
 /**
  * Sets the read only state of a single element, based on its existing state.
- * @param {*} element - The element to evaluate
+ * @param {*} elementThe element to evaluate
  */
 function toggleElementReadOnlyState(element) {
     $(element).prop("readonly", !$(element).prop("readonly"))
@@ -162,7 +162,7 @@ function clearForm(form) {
 
 /**
  * Shows the given modal, based on the ID.
- * @param {any} modalId - The ID of the modal to show
+ * @param {any} modalIdThe ID of the modal to show
  */
 function showModal(modalId) {
     $(`#${modalId}`).fadeIn(200)
@@ -170,7 +170,7 @@ function showModal(modalId) {
 
 /**
  * Hides the given modal, based on the ID.
- * @param {any} modalId - The ID of the modal to hide
+ * @param {any} modalIdThe ID of the modal to hide
  */
 function hideModal(modalId) {
     $(`#${modalId}`).fadeOut(200)

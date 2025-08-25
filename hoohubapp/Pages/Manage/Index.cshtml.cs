@@ -805,7 +805,6 @@ namespace hoohub.Pages.Manage
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: false));
-
             }
         }
 
