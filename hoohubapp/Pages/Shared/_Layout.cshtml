@@ -8,6 +8,8 @@
 
     var isNightMode = Context.Request.Cookies["nightMode"] == "true";
     var logoPath = isNightMode ? "hoo_logo_alt_night.png" : "hoo_logo_alt.png";
+    var menuLogoPath = isNightMode ? "hoo_logo_no_tagline_night.png" : "hoo_logo_no_tagline.png";
+
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
     var previewImageUrl = new Uri($"{Context.Request.Scheme}://{Context.Request.Host}/img/hoo_embed.png");
 }
@@ -97,7 +99,7 @@
 
     <div id="site-menu">
         <div class="container box-shadow">
-            <img src="~/img/hoo_logo_no_tagline.png" />
+            <img src="~/img/@menuLogoPath" />
             <a asp-page="/Index">
                 <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow" title="Home">home</div>
             </a>

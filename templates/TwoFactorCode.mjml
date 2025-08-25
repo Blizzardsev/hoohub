@@ -1,7 +1,7 @@
 <mjml>
     <mj-head>
         <mj-title>HooHub - Your Hoo-factor code</mj-title>
-        <mj-font name="Heebo" href="https://fonts.googleapis.com/css2?family=Heebo:wght@300&display=swap" />
+        <mj-font name="Lato" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Trocchi&display=swap" />
         <mj-attributes>
         <mj-section padding="0px" background-color="#f4f4f8"></mj-section>
             <mj-class name="defaultWidth" width="600px"/>
@@ -9,10 +9,10 @@
             <mj-class name="backdropTheme" background-color="#e6e6ea"/>
             <mj-class name="whiteTheme" background-color="#f4f4f8"/>
             <mj-class name="accentTheme" background-color="#F26645"/>
-            <mj-class name="mainText" align="center" font-size="22px" line-height="22px" font-family="Heebo" color="#280501"/>
-            <mj-class name="headerText" align="center" font-size="30px" line-height="30px" font-family="Heebo" color="#fff"/>
-            <mj-class name="bodyText" align="center" font-size="18px" line-height="20px" font-family="Heebo"/>
-            <mj-class name="footerText" align="left" font-size="12px" line-height="12px" font-family="Heebo" color="#fff"/>
+            <mj-class name="mainText" align="center" font-size="22px" line-height="22px" font-family="Lato" color="#280501"/>
+            <mj-class name="headerText" align="center" font-size="30px" line-height="30px" font-family="Lato" color="#fff"/>
+            <mj-class name="bodyText" align="center" font-size="18px" line-height="20px" font-family="Lato"/>
+            <mj-class name="footerText" align="left" font-size="12px" line-height="12px" font-family="Lato" color="#fff"/>
             <mj-class name="button" background-color="#F26645" align="center" font-size="22px" line-height="22px" href="{buttonUrl}"/>
             <mj-class name="2fa" background-color="#F26645" align="center" font-size="35px" line-height="35px"/>
         </mj-attributes>

@@ -4,13 +4,17 @@
     ViewData["Title"] = "Hoo-factor authentication required";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/identity.css" />
+}
+
 <div class="container content-panel text-center animate__animated animate__fadeIn">
     <h1 class="text-center mb-4">Hoo-factor authentication required</h1>
     <h5 class="mb-4">Enter the code you received to continue</h5>
     <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
         <div class="row d-flex justify-content-center text-center mx-auto w-75">
             <div class="form-group">
-                <input asp-for="Input.TwoFactorCode" class="form-control" aria-required="true" />
+                <input id="two-factor" asp-for="Input.TwoFactorCode" class="form-control" aria-required="true" />
             </div>
         </div>
         <div class="row mt-2 d-flex justify-content-center mx-auto">

@@ -1,6 +1,6 @@
 <mjml>
     <mj-head>
-        <mj-title>HooHub - Reset your password</mj-title>
+        <mj-title>HooHub - One or more errors have occurred</mj-title>
         <mj-font name="Lato" href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Trocchi&display=swap" />
         <mj-attributes>
         <mj-section padding="0px" background-color="#f4f4f8"></mj-section>
@@ -8,12 +8,12 @@
             <mj-class name="headerFooterTheme" background-color="#5F251B"/>
             <mj-class name="backdropTheme" background-color="#e6e6ea"/>
             <mj-class name="whiteTheme" background-color="#f4f4f8"/>
-            <mj-class name="accentTheme" background-color="#F26645"/>
+            <mj-class name="accentTheme" background-color="red"/>
             <mj-class name="mainText" align="center" font-size="22px" line-height="22px" font-family="Lato" color="#280501"/>
             <mj-class name="headerText" align="center" font-size="30px" line-height="30px" font-family="Lato" color="#fff"/>
             <mj-class name="bodyText" align="center" font-size="18px" line-height="20px" font-family="Lato"/>
             <mj-class name="footerText" align="left" font-size="12px" line-height="12px" font-family="Lato" color="#fff"/>
-            <mj-class name="button" background-color="#F26645" align="center" font-size="22px" line-height="22px" href="{buttonUrl}"/>
+            <mj-class name="button" background-color="red" align="center" font-size="22px" line-height="22px" href="{buttonUrl}"/>
             <mj-class name="2fa" background-color="#F26645" align="center" font-size="35px" line-height="35px"/>
         </mj-attributes>
     </mj-head>
@@ -27,17 +27,16 @@
         <!--Title-->
       	<mj-section>
             <mj-column mj-class="defaultWidth accentTheme" padding-top="20px" padding-bottom="20px">
-                <mj-text mj-class="headerText">Reset your password</mj-text>
+                <mj-text mj-class="headerText">One or more errors have occurred</mj-text>
             </mj-column>
       	</mj-section>
         <!--Body-->
         <mj-section>
             <mj-column mj-class="defaultWidth backdropTheme" padding-top="20px" padding-bottom="50px">
                 <mj-text mj-class="bodyText">{toName},</mj-text>
-                <mj-text mj-class="bodyText">Click the button below to reset your password for HooHub.</mj-text>
-                <mj-text mj-class="bodyText">If you did not request a password reset, you can ignore this email.</mj-text>
+                <mj-text mj-class="bodyText">{text}</mj-text>
                 <mj-spacer height="50px"/>
-                <mj-button mj-class="button" href="{buttonUrl}">Reset password</mj-button>
+                <mj-button mj-class="button" href="{buttonUrl}">Check logs</mj-button>
             </mj-column>
         </mj-section>
         <!--Footer-->

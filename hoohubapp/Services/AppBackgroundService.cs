@@ -1,4 +1,7 @@
-﻿using hoohub.Configuration;
+﻿#pragma warning disable CS8602
+#pragma warning disable CS8604
+
+using hoohub.Configuration;
 using hoohub.Data;
 using hoohub.Enums;
 using Microsoft.AspNetCore.Identity;
@@ -79,11 +82,11 @@ namespace hoohub.Services
                                 address: user.Email,
                                 subject: "One or more errors have occurred",
                                 body: TemplateService.GetTemplateSubstitutions(
-                                    template: "", // TODO: email template 
+                                    template: Properties.Resources.ErrorsTemplate,
                                     substitutions: new Dictionary<string, string>()
                                     {
                                         { "{text}", $"One or more errors occurred while performing maintenance tasks at {FormattingService.GetDateTimeAsString(DateTime.UtcNow)}: check logs." },
-                                        { "{buttonUrl}", "https://vip.visisoft.co.uk/Admin?Tab=1" } // Hardcoded URLs are bad, but cannot access a pagemodel here to build a dynamic link
+                                        { "{buttonUrl}", $"{_appSettings.SiteBaseUrl}/Manage" }
                                     }));
                         }
                         catch (Exception emailException)

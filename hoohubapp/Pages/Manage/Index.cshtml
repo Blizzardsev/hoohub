@@ -1,6 +1,7 @@
 ﻿@page
 @using hoohub.Enums
 @using hoohub.Services
+@using System.Reflection;
 @model hoohub.Pages.Manage.IndexModel
 @{
     ViewData["Title"] = "Manage";
@@ -273,6 +274,11 @@
                     <form id="manage-app-form" class="w-75 mx-auto" enctype="multipart/form-data">
                         <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                         <div class="col">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold">HooHub version</label>
+                                <br />
+                                <label class="form-label fst-italic">@(Assembly.GetExecutingAssembly().GetName().Version.ToString())</label>
+                            </div>
                             <div class="form-group mb-3">
                                 <label class="form-label fw-bold" asp-for="ManageInputModel.ManageAppInput.PublicAccessEnabled"></label>
                                 <br />
