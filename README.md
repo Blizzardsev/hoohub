@@ -52,6 +52,7 @@ Use the relevant `appsettings.json` file to configure _HooHub_:
     - TrustedLocations: IP addresses for which two-factor should not apply. This should only consist of the loopback address when running _HooHub_ locally!
     - ArtistCredit: The email address of the HooHubUser to link for artist credit on the About page
     - WriterCredit: The email address of the HooHubUser to link for writer credit on the About page
+    - SiteBaseUrl: The base site URL to use when sending emails, in a context that doesn't have access to a web request
 - AccountSettings: Settings for the initial accounts to be set up when _HooHub_ is initially started, or database recreated
     - Email: Email address for login
     - Handle: Handle for public display

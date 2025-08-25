@@ -1,4 +1,5 @@
 ﻿using hoohub.Data;
+using hoohub.Migrations;
 
 namespace hoohub.Requests.Results
 {
@@ -26,6 +27,11 @@ namespace hoohub.Requests.Results
         /// The comic description for display to the user.
         /// </summary>
         public string ComicDescription { get; init; }
+
+        /// <summary>
+        /// The comic alt description for display to the user.
+        /// </summary>
+        public string ComicAltDescription { get; init; }
 
         /// <summary>
         /// The comic image to render.
@@ -85,6 +91,7 @@ namespace hoohub.Requests.Results
             ComicNumber = comic.ComicNumber;
             ComicTitle = comic.ComicTitle;
             ComicDescription = comic.ComicDescription;
+            ComicAltDescription = comic.ComicAltDescription;
             ImageData = comic.ImageData;
             Tags = comic.Tags;
             IsHidden = comic.IsHidden;

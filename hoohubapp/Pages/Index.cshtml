@@ -26,7 +26,7 @@
 
             @if (Model.Comic.UploadedBy != null)
             {
-                <img class="mb-4" src="@(uploaderDisplayPicture)">
+                <img class="mb-4" src="@(uploaderDisplayPicture)" alt="Uploaded by @(Model.Comic.UploadedBy.Handle)">
                 <h5 class="fst-italic mb-2">Uploaded by @(Model.Comic.UploadedBy.Handle)</h5>
             }
 
@@ -102,13 +102,13 @@
 </div>
 
 <div class="container content-panel text-center">
-    <img id="banner" class="mt-2 mb-2 d-block m-auto animate__animated animate__fadeIn animate__fast" src="~/img/@(bannerPath)" />
+    <img id="banner" class="mt-2 mb-2 d-block m-auto animate__animated animate__fadeIn animate__fast" src="~/img/@(bannerPath)" alt="Hoo - Hate everything."/>
     @if (Model.Comic != null)
     {
         string imageSource = Model.Comic != null ? $@"data:image/jpg;base64, {Model.Comic.GetImageAsBase64String()}" : "~/img/notfound.png";
         var notFoundClass = Model.Comic == null ? "athena" : string.Empty;
 
-        <img id="comic-display" class="d-block m-auto animate__animated animate__fadeIn animate__fast @(notFoundClass)" src="@(imageSource)" />
+        <img id="comic-display" class="d-block m-auto animate__animated animate__fadeIn animate__fast @(notFoundClass)" src="@(imageSource)" alt="@Model.Comic.ComicAltDescription"/>
     }
     else
     {

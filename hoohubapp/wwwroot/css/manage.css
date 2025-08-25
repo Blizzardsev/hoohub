@@ -53,7 +53,7 @@
 #manage-comic-preview,
 #manage-me-preview {
     width: 90%;
-    height: 90%;
+    aspect-ratio: 1/1;
     border: 2px solid var(--main-foreground-colour);
     border-radius: 5px;
     margin: auto;

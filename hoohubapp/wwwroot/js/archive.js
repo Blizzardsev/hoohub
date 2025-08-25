@@ -9,7 +9,7 @@ $(document).ready(function () {
 })
 
 /**
- * 
+ * On scrolling the window, attempt to load more comics.
  */
 $(window).on("scroll", function () {
     if (!archiveLoadInProgress && getIsWindowScrolledToBottom()) {
@@ -19,7 +19,7 @@ $(window).on("scroll", function () {
 })
 
 /**
- * 
+ * When the user finishes typing their search query, initiate the search after a brief grace period.
  */
 $("#archive-query").on("keyup", function () {
     if (archiveSearchPending || archiveLoadInProgress) {
@@ -33,8 +33,8 @@ $("#archive-query").on("keyup", function () {
 })
 
 /**
- * 
- * @returns 
+ * Returns whether the window is currently scrolled to the bottom.
+ * @returns True if the window is currently scrolled to the bottom, otherwise false.
  */
 function getIsWindowScrolledToBottom() {
     return ((window.scrollY + window.innerHeight) >= (document.body.scrollHeight + 20) && window.scrollY > lastScrollPosition)
@@ -42,10 +42,9 @@ function getIsWindowScrolledToBottom() {
 
 
 /**
- * 
- * @param {*} newSearch 
- * @param {*} displayEndOfResultsPrompt 
- * @returns 
+ * Attempts to fetch the next batch of comics, based on the last comic currently displayed, and renders them.
+ * @param {*} newSearch Whether this is a new comic query, or trailing from what is existing.
+ * @param {*} displayEndOfResultsPrompt Whether to display the end of results prompt or not.
  */
 function getComics(newSearch=false, displayEndOfResultsPrompt=true) {
     if (archiveLoadInProgress) {
@@ -85,12 +84,13 @@ function getComics(newSearch=false, displayEndOfResultsPrompt=true) {
                         let newComics = []
                         result.archiveComicData.forEach(function (comic) {
                             newComics.push(`
-                                <div class="col-auto animate__animated animate__fadeIn">
+                                <div class="col-auto d-flex align-middle animate__animated animate__fadeIn">
                                     <img 
                                         data-guid="${comic.guid}" 
                                         data-display-name="${comic.displayName}"
                                         data-display-publish-date="${comic.displayPublishDate != undefined ? UtcDateTimeToLocalDateTimeString(comic.displayPublishDate) : "(Not yet published)"}"
                                         data-description="${comic.description}"
+                                        data-alt-description="${comic.altDescription}"
                                         data-display-tags="${comic.displayTags}"
                                         class="archive-comic" src="data:image/jpg;base64,${comic.imageData}" 
                                         title="View ${comic.displayName}..." 
@@ -121,8 +121,8 @@ function getComics(newSearch=false, displayEndOfResultsPrompt=true) {
 }
 
 /**
- * 
- * @param {any} comic
+ * Loads the selected comic into the full view, then displays it.
+ * @param {any} comic The comic to render in the full view.
  */
 function showComicFullView(comic) {
     $("header").append(`
@@ -130,7 +130,7 @@ function showComicFullView(comic) {
             <div class="archive-comic-view-content">
                 <h2>${$(comic).data("display-name")}</h2>
                 <h5 class="fst-italic mb-4">${$(comic).data("display-publish-date")}</h5>
-                <img class="mb-4" src="${$(comic).attr("src")}">
+                <img class="mb-4" src="${$(comic).attr("src")}" alt="${$(comic).attr("alt-description")}">
                 <h5 class="fst-italic">${$(comic).data("description")}</h5>
                 <h5 class="fst-italic">Tags | ${$(comic).data("display-tags")}</h5>
             </div>
@@ -140,7 +140,7 @@ function showComicFullView(comic) {
 }
 
 /**
- * 
+ * Hides the comic full view.
  * @param {any} element
  */
 function hideComicFullView(element) {

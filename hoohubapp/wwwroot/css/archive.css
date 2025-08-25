@@ -7,7 +7,8 @@
 	width: 25vw;
 	cursor: pointer;
 	transition: .5s;
-	object-fit: cover;
+	display: inline;
+	object-fit: contain;
 }
 
 	.archive-comic:hover {

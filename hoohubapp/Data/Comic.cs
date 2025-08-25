@@ -29,6 +29,11 @@ namespace hoohub.Data
         public string ComicDescription { get; set; } = string.Empty;
 
         /// <summary>
+        /// The alt description to use for the comic, for visually impaired site users.
+        /// </summary>
+        public string ComicAltDescription { get; set; } = string.Empty;
+
+        /// <summary>
         /// The date the comic was published.
         /// </summary>
         public DateTime? PublishDate { get; set; }
@@ -86,6 +91,7 @@ namespace hoohub.Data
         /// <param name="comicTitle">The comic title to set.</param>
         /// <param name="comicNumber">The comic number to set.</param>
         /// <param name="comicDescription">The comic description to set.</param>
+        /// <param name="comicAltDescription">The comic alt description to set.</param>
         /// <param name="imageData">The comic image data to set.</param>
         /// <param name="tags">The comic tags to set.</param>
         /// <param name="isHidden">The hidden state to set.</param>
@@ -94,18 +100,19 @@ namespace hoohub.Data
         public Comic(
             string comicTitle, 
             string comicNumber, 
-            string comicDescription, 
+            string comicDescription,
+            string comicAltDescription,
             byte[] imageData, 
             string tags,
             bool isHidden,
             HooHubUser uploadedBy = null,
-            DateTime? scheduledDate = null,
-            bool wasPublished = false)
+            DateTime? scheduledDate = null)
         {
             LastModifiedDate = DateTime.UtcNow;
             ComicNumber = comicNumber;
             ComicTitle = comicTitle;
             ComicDescription = comicDescription;
+            ComicAltDescription = comicAltDescription;
 
             if (scheduledDate == null)
             {
@@ -145,6 +152,15 @@ namespace hoohub.Data
         /// <returns>The description of the comic if it exists, or a placeholder if not.</returns>
         public string GetComicDisplayDescription(bool htmlEncode = true) => string.IsNullOrWhiteSpace(ComicDescription)
             ? "(No description)"
+            : htmlEncode ? HttpUtility.HtmlEncode(ComicDescription) : ComicDescription;
+
+        /// <summary>
+        /// Returns the alt description of the comic.
+        /// </summary>
+        /// <param name="htmlEncode">If true, HTML encodes the description. Only needed for AJAX requests.</param>
+        /// <returns>The description of the comic.</returns>
+        public string GetComicDisplayAltDescription(bool htmlEncode = true) => string.IsNullOrWhiteSpace(ComicDescription)
+            ? "(No alt description given)"
             : htmlEncode ? HttpUtility.HtmlEncode(ComicDescription) : ComicDescription;
 
         /// <summary>

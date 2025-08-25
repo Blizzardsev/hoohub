@@ -24,44 +24,51 @@
                 Hoo is a little webcomic about Athena: the life of our little owl who (understandably) hates just about everything!
                 <br /><br />
                 We started Hoo as a way of sharing our grievances, pet hates and general frustations in an adorably convenient owl-based format for others to enjoy.
-                <br/></br/>
+                <br/><br/>
                 We sincerely hope you enjoy our comics as much as we enjoy creating them! ♥
             </p>
             <hr />
             <h3 class="mb-4">Hoo's involved?</h3>
             <div class="row">
-                <div class="col align-middle text-center">
-                    <img class="contributor-pfp" src="@(artistDisplayPicture)" />
-                    <h5 class="mt-2">@(Model.ArtistCreditUser.Handle) | Artist</h5>
-                    @if (!string.IsNullOrWhiteSpace(Model.ArtistCreditUser.SocialLink))
-                    {
-                        <div class="row mt-2 d-flex justify-content-center mx-auto">
-                            <div class="col-auto mx-auto text-center scale-75">
-                                <a href="@(Model.ArtistCreditUser.SocialLink)" target="_blank">
-                                    <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Find me on X...">share</div>
-                                </a>
+                @if (Model.ArtistCreditUser != null)
+                {
+                    <div class="col align-middle text-center">
+                        <img class="contributor-pfp" src="@(artistDisplayPicture)" alt="@(Model.ArtistCreditUser.Handle)'s profile picture" />
+                        <h5 class="mt-2">@(Model.ArtistCreditUser.Handle) | Artist</h5>
+                        @if (!string.IsNullOrWhiteSpace(Model.ArtistCreditUser.SocialLink))
+                        {
+                            <div class="row mt-2 d-flex justify-content-center mx-auto">
+                                <div class="col-auto mx-auto text-center scale-75">
+                                    <a href="@(Model.ArtistCreditUser.SocialLink)" target="_blank">
+                                        <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Find me on X...">share</div>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    }
-                </div>
-                <div class="col align-middle text-center">
-                    <img class="contributor-pfp" src="@(writerDisplayPicture)" />
-                    <h5 class="mt-2">@(Model.WriterCreditUser.Handle) | Writer</h5>
-                    @if (!string.IsNullOrWhiteSpace(Model.WriterCreditUser.SocialLink))
-                    {
-                        <div class="row mt-2 d-flex justify-content-center mx-auto">
-                            <div class="col-auto mx-auto text-center scale-75">
-                                <a href="@(Model.WriterCreditUser.SocialLink)" target="_blank">
-                                    <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Find me on X...">share</div>
-                                </a>
+                        }
+                    </div>
+                }
+                
+                @if (Model.WriterCreditUser != null)
+                {
+                    <div class="col align-middle text-center">
+                        <img class="contributor-pfp" src="@(writerDisplayPicture)" alt="@(Model.WriterCreditUser.Handle)'s profile picture" />
+                        <h5 class="mt-2">@(Model.WriterCreditUser.Handle) | Writer</h5>
+                        @if (!string.IsNullOrWhiteSpace(Model.WriterCreditUser.SocialLink))
+                        {
+                            <div class="row mt-2 d-flex justify-content-center mx-auto">
+                                <div class="col-auto mx-auto text-center scale-75">
+                                    <a href="@(Model.WriterCreditUser.SocialLink)" target="_blank">
+                                        <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Find me on X...">share</div>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    }
-                </div>
+                        }
+                    </div>
+                }
             </div>
         </div>
         <div class="col d-flex align-items-center">
-            <img class="comic-display mx-auto athena" style="max-width: 45vh" src="~/img/flower.png" />
+            <img class="comic-display mx-auto athena" style="max-width: 45vh" src="~/img/flower.png" alt="Athena smelling a little flower"/>
         </div>
     </div>
     <div class="row mt-4 d-flex justify-content-center mx-auto">

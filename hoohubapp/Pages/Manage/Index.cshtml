@@ -16,19 +16,19 @@
 
 <div class="container content-panel animate__animated animate__fadeIn">
     <div class="row vw-75 mx-auto">
-        <div role="button" tabindex="0" data-tab-id="0" class="col-auto tab-header selected" onclick="switchTab(0)">
+        <div role="button" tabindex="0" data-tab-id="0" class="col-auto tab-header selected" onclick="switchTab(0)" title="Post a new comic">
             <span>New comic</span>
         </div>
-        <div role="button" tabindex="0" data-tab-id="1" class="col-auto tab-header" onclick="switchTab(1);getManageComicsList($('#manage-comics-refresh'))">
+        <div role="button" tabindex="0" data-tab-id="1" class="col-auto tab-header" onclick="switchTab(1);getManageComicsList($('#manage-comics-refresh'))" title="Edit an existing comic">
             <span>All comics</span>
         </div>
-        <div role="button" tabindex="0" data-tab-id="3" class="col-auto tab-header" onclick="switchTab(3)">
+        <div role="button" tabindex="0" data-tab-id="3" class="col-auto tab-header" onclick="switchTab(3)" title="Edit your details">
             <span>Me</span>
         </div>
-        <div role="button" tabindex="0" data-tab-id="4" class="col-auto tab-header" onclick="switchTab(4);getEvents($('#logs-update'))">
+        <div role="button" tabindex="0" data-tab-id="4" class="col-auto tab-header" onclick="switchTab(4);getEvents($('#logs-update'))" title="View the event log">
             <span>Events</span>
         </div>
-        <div role="button" tabindex="0" data-tab-id="5" class="col-auto tab-header" onclick="switchTab(5)">
+        <div role="button" tabindex="0" data-tab-id="5" class="col-auto tab-header" onclick="switchTab(5)" title="Edit app settings">
             <span>App</span>
         </div>
     </div>
@@ -66,6 +66,11 @@
                             <label class="form-label fw-bold" asp-for="ManageInputModel.NewComicInput.ComicDescription"></label>
                             <input id="new-comic-comic-description" asp-for="ManageInputModel.NewComicInput.ComicDescription" class="form-control" />
                             <span asp-validation-for="ManageInputModel.NewComicInput.ComicDescription" class="text-warning"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label fw-bold" asp-for="ManageInputModel.NewComicInput.ComicAltDescription"></label>
+                            <input id="new-comic-comic-alt-description" asp-for="ManageInputModel.NewComicInput.ComicAltDescription" class="form-control" />
+                            <span asp-validation-for="ManageInputModel.NewComicInput.ComicAltDescription" class="text-warning"></span>
                         </div>
                         <div class="form-group">
                             <label class="form-label fw-bold" asp-for="ManageInputModel.NewComicInput.Tags"></label>
@@ -129,6 +134,7 @@
                 <div class="col mx-auto overflow-auto">
                     <div class="row w-100">
                         <div class="col mx-auto">
+                            <label class="form-label text-center w-100">Preview</label>
                             <img 
                                 id="manage-comic-preview" 
                                 title="Upload a comic..." 
@@ -153,7 +159,7 @@
                             </div>
                         </div>
                         <div class="col mx-auto">
-                            <form id="manage-comic-form" class="w-100 mx-auto" enctype="multipart/form-data">
+                            <form id="manage-comic-form" class="w-100 mx-auto enctype="multipart/form-data">
                                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                                 <div class="form-group">
                                     <input class="d-none" id="manage-comic-image-data" asp-for="ManageInputModel.ManageComicInput.ImageData" accept=".png,.jpg,.jpeg,.gif" />
@@ -176,6 +182,11 @@
                                     <label class="form-label fw-bold" asp-for="ManageInputModel.ManageComicInput.ComicDescription"></label>
                                     <input id="manage-comic-comic-description" asp-for="ManageInputModel.ManageComicInput.ComicDescription" class="form-control" />
                                     <span asp-validation-for="ManageInputModel.ManageComicInput.ComicDescription" class="text-warning"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label fw-bold" asp-for="ManageInputModel.ManageComicInput.ComicAltDescription"></label>
+                                    <input id="manage-comic-comic-alt-description" asp-for="ManageInputModel.ManageComicInput.ComicAltDescription" class="form-control" />
+                                    <span asp-validation-for="ManageInputModel.ManageComicInput.ComicAltDescription" class="text-warning"></span>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label fw-bold" asp-for="ManageInputModel.ManageComicInput.Tags"></label>
