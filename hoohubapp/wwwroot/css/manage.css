@@ -125,6 +125,7 @@ input {
     border-bottom: 1px solid #808080;
     transition: 0.5s;
     cursor: pointer;
+    user-select: text;
 }
 
     .manage-comic-item:hover,

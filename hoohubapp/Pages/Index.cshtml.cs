@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using NUglify.Helpers;
 
 namespace hoohub.Pages
 {
@@ -15,6 +16,7 @@ namespace hoohub.Pages
     {
         private readonly HooHubContext _hooContext;
         private readonly SignInManager<HooHubUser> _signInManager;
+        private readonly UserManager<HooHubUser> _userManager;
 
         /// <summary>
         /// The comic to render on the page.<br/>
@@ -48,10 +50,15 @@ namespace hoohub.Pages
         /// </summary>
         /// <param name="hooContext">Injected app context.</param>
         /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/>.</param>
-        public IndexModel(HooHubContext hooContext, SignInManager<HooHubUser> signInManager)
+        /// <param name="userManager">Injected <see cref="UserManager{TUser}"/>.</param>
+        public IndexModel(
+            HooHubContext hooContext,
+            SignInManager<HooHubUser> signInManager,
+            UserManager<HooHubUser> userManager)
         {
             _hooContext = hooContext;
             _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -109,14 +116,19 @@ namespace hoohub.Pages
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = comicToDisplay;
-                ComicIsLiked = Comic.ComicLikes.Any(comicItem => comicItem.IpAddress == Request.HttpContext.Connection.RemoteIpAddress.ToString());
+
+                var currentUser = await _userManager.GetUserAsync(User);
+                string? userGuid = currentUser != null
+                    ? currentUser.Id
+                    : Request.Cookies["uniqueId"];
+                ComicIsLiked = !string.IsNullOrWhiteSpace(userGuid) && Comic.ComicLikes.Any(comicItem => comicItem.UserGuid == userGuid);
 
                 return Page();
             }
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.Error,
+                    eventType: EventTypes.Error,
                     details: $"Failed to load comic GUID {comic}: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
@@ -183,7 +195,7 @@ namespace hoohub.Pages
 			catch (Exception exception)
 			{
                 await _hooContext.Events.AddAsync(new Event(
-                eventType: Enums.EventTypes.Error,
+                eventType: EventTypes.Error,
                     details: $"Failed to load random comic GUID: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
@@ -224,7 +236,7 @@ namespace hoohub.Pages
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
-                eventType: Enums.EventTypes.Error,
+                eventType: EventTypes.Error,
                     details: $"Failed to load first comic: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
@@ -265,7 +277,7 @@ namespace hoohub.Pages
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.Error,
+                    eventType: EventTypes.Error,
                     details: $"Failed to load last comic: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
@@ -297,7 +309,7 @@ namespace hoohub.Pages
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.Error,
+                    eventType: EventTypes.Error,
                     details: $"Failed to switch themes: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
@@ -306,8 +318,8 @@ namespace hoohub.Pages
         }
 
         /// <summary>
-        /// Attempts to toggle the liked state of the given comic for the current IP address.<br/>
-        /// If no <see cref="ComicLike"/> exists for the comic and this IP address, a new one is created.<br/>
+        /// Attempts to toggle the liked state of the given comic for the current user GUID.<br/>
+        /// If no <see cref="ComicLike"/> exists for the comic and the current user GUID (either user ID if signed in, or cookie value as guest), a new one is created.<br/>
         /// Otherwise, the existing like is deleted.<br/>
         /// The count of likes is then returned.<br/>
         /// Finally, returns a <see cref="JsonResult"/> representing the result of the request.
@@ -329,20 +341,34 @@ namespace hoohub.Pages
                         message: $"Comic GUID {comicGuid} not found"));
                 }
 
-                var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                // If signed in, we can link the like to the current user: otherwise, we have a guest: use the unique GUID from cookies
+                var currentUser = _userManager.GetUserAsync(User).Result;
+                string? userGuid = currentUser != null
+                    ? currentUser.Id
+                    : Request.Cookies["uniqueId"];
+
+                if (string.IsNullOrWhiteSpace(userGuid))
+                {
+                    // No unregistered user GUID; create it
+                    userGuid = Guid.NewGuid().ToString();
+                    Response.Cookies.Append("uniqueId", userGuid);
+                }
+
                 var existingLike = await _hooContext.ComicLikes
                     .Include(comicLike => comicLike.Comic)
-                    .SingleOrDefaultAsync(comicLike => comicLike.Comic.Id == comic.Id && comicLike.IpAddress == remoteIpAddress);
+                    .SingleOrDefaultAsync(comicLike => comicLike.Comic.Id == comic.Id && comicLike.UserGuid == userGuid);
                 
                 if (existingLike == null)
                 {
                     // No existing like - create it
                     await _hooContext.ComicLikes.AddAsync(new ComicLike(
                         comic: comic,
-                        ipAddress: remoteIpAddress));
+                        ipAddress: Request.HttpContext.Connection.RemoteIpAddress.ToString(),
+                        userGuid: userGuid));
+
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.ComicLikeCreated,
-                        details: $"Comic GUID {comicGuid} was hearted from IP address {remoteIpAddress}"));
+                        details: $"Comic GUID {comicGuid} was hearted by {(currentUser != null ? currentUser.GetEventLogString() : $"Guest user (GUID: {userGuid})")}"));
                 }
                 else
                 {
@@ -350,7 +376,7 @@ namespace hoohub.Pages
                     _hooContext.ComicLikes.Remove(existingLike);
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.ComicLikeDeleted,
-                        details: $"Comic GUID {comicGuid} was unhearted from IP address {remoteIpAddress}"));
+                        details: $"Comic GUID {comicGuid} was unhearted by {(currentUser != null ? currentUser.GetEventLogString() : $"Guest user (GUID: {userGuid})")}"));
                 }
 
                 await _hooContext.SaveChangesAsync(); // Force a save so the upcoming count is current
@@ -365,7 +391,7 @@ namespace hoohub.Pages
             {
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.Error,
-                    details: $"Failed to update comic GUID {comicGuid}: {exception.Message}",
+                    details: $"Failed to update heart status for comic GUID {comicGuid}: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: false));

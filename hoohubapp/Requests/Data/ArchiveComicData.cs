@@ -21,7 +21,7 @@ namespace hoohub.Requests.Data
         /// <summary>
         /// The published date of the comic to display.
         /// </summary>
-        public string DisplayPublishDate { get; init; }
+        public DateTime? DisplayPublishDate { get; init; }
 
         /// <summary>
         /// The tags of the comic to display.
@@ -46,7 +46,7 @@ namespace hoohub.Requests.Data
         {
             Guid = comic.Id;
             DisplayName = HttpUtility.HtmlEncode(comic.GetComicDisplayName());
-            DisplayPublishDate = comic.GetComicDisplayPublishDate();
+            DisplayPublishDate = comic.PublishDate.HasValue ? comic.PublishDate.Value : null;
             DisplayTags = comic.GetComicDisplayTags();
             Description = comic.GetComicDisplayDescription();
             ImageData = comic.ImageData;

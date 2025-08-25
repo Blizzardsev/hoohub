@@ -89,7 +89,7 @@ function getComics(newSearch=false, displayEndOfResultsPrompt=true) {
                                     <img 
                                         data-guid="${comic.guid}" 
                                         data-display-name="${comic.displayName}"
-                                        data-display-publish-date="${comic.displayPublishDate}"
+                                        data-display-publish-date="${comic.displayPublishDate != undefined ? UtcDateTimeToLocalDateTimeString(comic.displayPublishDate) : "(Not yet published)"}"
                                         data-description="${comic.description}"
                                         data-display-tags="${comic.displayTags}"
                                         class="archive-comic" src="data:image/jpg;base64,${comic.imageData}" 

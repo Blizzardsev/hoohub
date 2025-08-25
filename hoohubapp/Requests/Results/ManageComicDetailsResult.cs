@@ -56,12 +56,17 @@ namespace hoohub.Requests.Results
         /// <summary>
         /// The date the comic was published, if it exists.
         /// </summary>
-        public string DisplayPublished { get; init; }
+        public DateTime? DisplayPublished { get; init; }
 
         /// <summary>
         /// The date the comic was last modified, and who by.
         /// </summary>
-        public string DisplayLastModified { get; init; }
+        public DateTime? DisplayLastModified { get; init; }
+
+        /// <summary>
+        /// The handle of the user who last modified the  comic.
+        /// </summary>
+        public string LastModifiedHandle { get; init; }
 
         /// <summary>
         /// The amount of <see cref="ComicLike"/> items associated with this comic.
@@ -86,8 +91,9 @@ namespace hoohub.Requests.Results
             IsHidden = comic.IsHidden;
             ScheduledDate = comic.ScheduledDate;
             PublishDate = comic.PublishDate;
-            DisplayPublished = comic.PublishDate.HasValue ? FormattingService.GetDateTimeAsString(PublishDate.Value) : "N/A";
-            DisplayLastModified = $"{FormattingService.GetDateTimeAsString(comic.LastModifiedDate)}\nby {(comic.LastEditedBy == null ? "Unknown" : comic.LastEditedBy.Handle)}";
+            DisplayPublished = comic.PublishDate.HasValue ? PublishDate : null;
+            DisplayLastModified = comic.LastModifiedDate;
+            LastModifiedHandle = comic.LastEditedBy == null ? "Unknown" : comic.LastEditedBy.Handle;
             Message = message;
             LikeCount = comic.ComicLikes.Count;
         }

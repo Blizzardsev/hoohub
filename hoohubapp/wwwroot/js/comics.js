@@ -1,15 +1,21 @@
 ﻿let mouseX = 0
 let mouseY = 0
 
+$(document).ready(function () {
+    // Ensure the publish date for the comic is handled according to locale
+    let publishDateValue = $("#about-comic-publish-date-info").val()
+    $("#about-comic-publish-date-display").text(`First published  ${publishDateValue.length > 0 ? UtcDateTimeToLocalDateTimeString(publishDateValue) : "(Unknown)"}`)
+})
+
 $("html").click(function (event) { 
     mouseX = event.pageX
     mouseY = event.pageY
 })
 
 /**
- * 
- * @param {any} comicGuid
- * @returns
+ * Attempts to toggle the heart/liked status for the currently viewed comic.
+ * @param {any} element - Calling element to disable
+ * @param {any} comicGuid - The GUID of the comic to toggle the heart/liked status for
  */
 function heartComic(element, comicGuid) {
     if ($(element).hasClass("disabled")) {

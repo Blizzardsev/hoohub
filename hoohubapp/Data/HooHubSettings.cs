@@ -34,6 +34,11 @@ namespace hoohub.Data
         public int ManageEventsMaximumHistory { get; set; } = 1000;
 
         /// <summary>
+        /// The time (in a 24-hour format) that any scheduled comics will be released.
+        /// </summary>
+        public TimeOnly ScheduledComicReleaseTime { get; set; } = new TimeOnly(hour: 12, minute: 00);
+
+        /// <summary>
         /// The date/time the comic was last updated.
         /// </summary>
         public DateTime LastModifiedDate { get; set; } = DateTime.UtcNow;
@@ -52,16 +57,19 @@ namespace hoohub.Data
         /// <param name="archiveAccess">The archive access state to set.</param>
         /// <param name="archiveMaximumComicsPerFetch">The archive maximum comics per fetch value to set.</param>
         /// <param name="manageEventsMaximumHistory">The manage events maximum history value to set.</param>
+        /// <param name="scheduledComicReleaseTime">The scheduled comic release time to set.</param>
         public HooHubSettings(
             bool publicAccessEnabled,
             AccessTypes archiveAccess,
             int archiveMaximumComicsPerFetch,
-            int manageEventsMaximumHistory)
+            int manageEventsMaximumHistory,
+            TimeOnly scheduledComicReleaseTime)
         {
             PublicAccessEnabled = publicAccessEnabled;
             ArchiveAccess = archiveAccess;
             ArchiveMaximumComicsPerFetch = archiveMaximumComicsPerFetch;
             ManageEventsMaximumHistory = manageEventsMaximumHistory;
+            ScheduledComicReleaseTime = scheduledComicReleaseTime;
             LastModifiedDate = DateTime.UtcNow;
         }
     }

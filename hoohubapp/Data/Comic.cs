@@ -131,12 +131,6 @@ namespace hoohub.Data
         public string GetComicDisplayName() => $"{ComicNumber} | {ComicTitle}";
 
         /// <summary>
-        /// Returns the published date of the comic to use when presenting it to the user, or a placeholder if no date is defined.
-        /// </summary>
-        /// <returns>The published date of the comic to use when presenting it to the user, or a placeholder if no date is defined.</returns>
-        public string GetComicDisplayPublishDate() => PublishDate.HasValue ? PublishDate.Value.ToLocalTime().ToString("dddd, dd | MM | yyyy") : "(Not yet published)";
-
-        /// <summary>
         /// Returns the tags of the comic in a comma-separated and spaced format to use when presenting it to the user, or a placeholder if no tags are defined.
         /// </summary>
         /// <returns>The tags of the comic in a comma-separated and spaced format to use when presenting it to the user, or a placeholder if no tags are defined.</returns>

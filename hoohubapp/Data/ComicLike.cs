@@ -1,5 +1,8 @@
 ﻿namespace hoohub.Data
 {
+    /// <summary>
+    /// A like/heart against a comic for feedback purposes.
+    /// </summary>
     public class ComicLike
     {
         /// <summary>
@@ -18,10 +21,15 @@
         public DateTime CreatedDate { get; init; } = DateTime.UtcNow;
 
         /// <summary>
-        /// The IP address associated with this like.<br/>
-        /// Each IP address is limited to a single like per comic.
+        /// The IP address associated with this like.
         /// </summary>
         public string IpAddress { get; init; } = string.Empty;
+
+        /// <summary>
+        /// The user GUID associated with this like.<br/>
+        /// Users that aren't logged in are assigned a GUID via cookie, which is used to link likes.
+        /// </summary>
+        public string UserGuid { get; init; } = string.Empty;
 
         /// <summary>
         /// Default constructor.
@@ -35,10 +43,12 @@
         /// </summary>
         /// <param name="comic">The <see cref="Comic"/> to set.</param>
         /// <param name="ipAddress">The IP address to set.</param>
-        public ComicLike(Comic comic, string ipAddress)
+        /// <param name="userGuid">The user GUID to set.</param>
+        public ComicLike(Comic comic, string ipAddress, string userGuid)
         {
             Comic = comic;
             IpAddress = ipAddress;
+            UserGuid = userGuid;
         }
     }
 }
