@@ -290,7 +290,7 @@ namespace hoohub.Pages
         /// Night mode features a softer theme ideal for night browsing.
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> OnGetToggleNightModeAsync()
+        public async Task<IActionResult> OnGetToggleNightModeAsync(string returnUrl = null)
         {
             try
             {
@@ -304,7 +304,7 @@ namespace hoohub.Pages
                     Response.Cookies.Append("nightMode", Request.Cookies["nightMode"] == "true" ? "false" : "true");
                 }
 
-                return RedirectToPage();
+                return Url.IsLocalUrl(returnUrl) ? LocalRedirect(returnUrl) : RedirectToPage("/Index");
             }
             catch (Exception exception)
             {

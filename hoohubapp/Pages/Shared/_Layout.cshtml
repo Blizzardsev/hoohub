@@ -8,6 +8,7 @@
 
     var isNightMode = Context.Request.Cookies["nightMode"] == "true";
     var logoPath = isNightMode ? "hoo_logo_alt_night.png" : "hoo_logo_alt.png";
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
 }
 
 <!DOCTYPE html>
@@ -16,6 +17,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Hate everything.</title>
+
+    <meta content="@ViewData["Title"] - Hate everything." property="og:title" />
+    <meta content="The (mis)adventures of an unfortunate little owl." property="og:description" />
+    <meta content="@returnUrl" property="og:url" />
+    <meta content="~/img/hoo_embed.png" property="og:image" />
+    <meta content="#ED7454" data-react-helmet="true" name="theme-color" />
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/hoohub.styles.css" asp-append-version="true" />
@@ -109,7 +117,7 @@
                     <div role="button" tabindex="0" class="row site-option mt-4 material-symbols-outlined align-items-center justify-content-center box-shadow" title="Log in">person</div>
                 </a>
             }
-            <a asp-page="/Index" asp-page-handler="ToggleNightMode">
+            <a asp-page="/Index" asp-page-handler="ToggleNightMode" asp-route-returnUrl="@returnUrl">
                 @{
                     var modeTitle = $"Switch to {(isNightMode ? "day" : "night")} mode";
                     var modeMaterialIcon = isNightMode ? "clear_day" : "mode_night";
