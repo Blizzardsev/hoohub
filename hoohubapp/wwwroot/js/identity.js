@@ -1,4 +1,4 @@
-const twoFactor = $(".two-factor")
+const twoFactor = $("#two-factor")
 
 $(document).ready(function () {
     $(twoFactor).val("")
@@ -34,7 +34,7 @@ $("input").keydown(function (event) {
  */
 function identitySubmit(element) {
     let form = $(element).closest("form")
-    let button = $(element).closest(".submit-form")
+    let button = element
 
     if (form.valid() && !$(element).hasClass("disabled")) {
         $(form).find("input").prop("readonly", true)
