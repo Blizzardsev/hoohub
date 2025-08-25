@@ -92,7 +92,7 @@ namespace hoohub.Pages.Manage
                 [Required]
                 public bool IsScheduled { get; set; } = false;
 
-                [Display(Name = "Schedule for")]
+                [Display(Name = "Schedule for (UTC)")]
                 [DataType(DataType.DateTime)]
                 public DateTime ScheduleFor { get; set; } = DateTime.UtcNow;
 
@@ -155,7 +155,7 @@ namespace hoohub.Pages.Manage
                 [Required]
                 public bool IsScheduled { get; set; } = false;
 
-                [Display(Name = "Schedule for")]
+                [Display(Name = "Schedule for (UTC)")]
                 [DataType(DataType.DateTime)]
                 public DateTime ScheduleFor { get; set; } = DateTime.UtcNow;
             }
@@ -254,7 +254,7 @@ namespace hoohub.Pages.Manage
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
-                eventType: Enums.EventTypes.Error,
+                eventType: EventTypes.Error,
                     details: $"Failed to load comic archive: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
@@ -326,7 +326,7 @@ namespace hoohub.Pages.Manage
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
-                        message: "Scheduled comics must have a date and/or time"));
+                        message: "Scheduled comics must have a date"));
                 }
 
                 if (isScheduled)
@@ -357,7 +357,7 @@ namespace hoohub.Pages.Manage
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.Error,
+                    eventType: EventTypes.Error,
                     details: $"Failed to create new comic: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
 
@@ -386,7 +386,7 @@ namespace hoohub.Pages.Manage
             catch (Exception exception) 
             {
                 await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.Error,
+                    eventType: EventTypes.Error,
                     details: $"Failed to load comics list: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
 
@@ -419,7 +419,7 @@ namespace hoohub.Pages.Manage
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.Error,
+                    eventType: EventTypes.Error,
                     details: $"Failed to load details for comic GUID {comicGuid}: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
 
@@ -491,7 +491,18 @@ namespace hoohub.Pages.Manage
                         message: $"Comics must be uploaded in jpg or png format"));
                 }
 
-                if (isScheduled && scheduleFor.HasValue && DateTime.UtcNow > scheduleFor.Value.ToUniversalTime())
+                DateTime scheduleForAsUtcDateTime = new DateTime();
+                if (isScheduled && scheduleFor.HasValue)
+                {
+                    scheduleForAsUtcDateTime = new DateTime(
+                        year: scheduleFor.Value.Year,
+                        month: scheduleFor.Value.Month,
+                        day: scheduleFor.Value.Day)
+                        .AddHours(12)
+                        .ToUniversalTime();
+                }
+
+                if (isScheduled && scheduleFor.HasValue && DateTime.UtcNow > scheduleForAsUtcDateTime)
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
@@ -502,7 +513,7 @@ namespace hoohub.Pages.Manage
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
-                        message: "Scheduled comics must have a date and/or time"));
+                        message: "Scheduled comics must have a date"));
                 }
 
                 if (isScheduled)
@@ -544,7 +555,7 @@ namespace hoohub.Pages.Manage
                 {
                     // Scheduled date was added
                     comic.PublishDate = null;
-                    comic.ScheduledDate = scheduleFor.Value;
+                    comic.ScheduledDate = scheduleFor.Value.ToUniversalTime();
                 }
 
                 await _hooContext.Events.AddAsync(new Event(
@@ -634,7 +645,7 @@ namespace hoohub.Pages.Manage
             catch (Exception exception)
             {
                 await _hooContext.Events.AddAsync(new Event(
-                    eventType: Enums.EventTypes.Error,
+                    eventType: EventTypes.Error,
                     details: $"Failed to update profile for {currentUser.GetEventLogString()}: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
@@ -689,7 +700,7 @@ namespace hoohub.Pages.Manage
                         archiveMaximumComicsPerFetch: archiveMaximumComicsPerFetch,
                         manageEventsMaximumHistory: manageEventsMaximumHistory);
                     await _hooContext.Events.AddAsync(new Event(
-                        eventType: EventTypes.Error,
+                        eventType: EventTypes.AppSettingsCreated,
                         details: $"App settings created by {currentUser.GetEventLogString()}" +
                             "\n---" +
                             $"\nPublic access enabled: {FormattingService.GetBooleanAsYesNoString(publicAccessEnabled)}" +
@@ -719,7 +730,7 @@ namespace hoohub.Pages.Manage
                     settings.LastModifiedDate = DateTime.UtcNow;
 
                     await _hooContext.Events.AddAsync(new Event(
-                        eventType: EventTypes.Error,
+                        eventType: EventTypes.AppSettingsUpdated,
                         details: $"App settings updated by {currentUser.GetEventLogString()}" +
                             "\n---" +
                             $"\nPublic access enabled: {publicAccessEnabledChange}" +

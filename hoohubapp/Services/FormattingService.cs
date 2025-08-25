@@ -68,5 +68,12 @@ namespace hoohub.Services
         /// <param name="expression">The expression to evaluate.</param>
         /// <returns>Yes if the expression is True, otherwise No.</returns>
         public static string GetBooleanAsYesNoString(bool expression) => expression ? "Yes" : "No";
+
+        /// <summary>
+        /// Given a datetime already in UTC format, returns it as a UTC string that can be transformed into a locale string with JS.
+        /// </summary>
+        /// <param name="dateTime">The datetime to translate.</param>
+        /// <returns>UTC string that can be transformed into a locale string with JS.</returns>
+        public static string GetUtcDateTimeAsUtcString(DateTime dateTime) => dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
     }
 }

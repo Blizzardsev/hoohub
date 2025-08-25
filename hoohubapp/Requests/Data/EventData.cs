@@ -16,7 +16,7 @@ namespace hoohub.Requests.Data
         /// <summary>
         /// The created date of the event to display to the user.
         /// </summary>
-        public string DisplayCreatedDate { get; init; }
+        public DateTime DisplayCreatedDate { get; init; }
 
         /// <summary>
         /// The event type description to display to the user.
@@ -35,7 +35,7 @@ namespace hoohub.Requests.Data
         public EventData(Event eventItem)
         {
             Guid = eventItem.Id;
-            DisplayCreatedDate = FormattingService.GetDateTimeAsString(eventItem.CreatedDate.ToLocalTime());
+            DisplayCreatedDate = eventItem.CreatedDate;
             DisplayEventType = FormattingService.GetEnumDescription(eventItem.EventType);
             Details = eventItem.Details;
         }

@@ -1,4 +1,8 @@
-﻿.archive-comic {
+﻿body {
+	overflow-y: scroll;
+}
+
+.archive-comic {
 	padding: 2%;
 	width: 25vw;
 	cursor: pointer;

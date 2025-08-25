@@ -1,7 +1,6 @@
 ﻿.contributor-pfp {
 	width: 10vh;
 	height: 10vh;
-	object-fit: contain;
 	border-radius: 100%;
 	box-shadow: 0 5px 5px 0 rgba(0,0,0,.15);
 }

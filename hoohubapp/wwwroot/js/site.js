@@ -175,3 +175,21 @@ function showModal(modalId) {
 function hideModal(modalId) {
     $(`#${modalId}`).fadeOut(200)
 }
+
+/**
+ * 
+ * @param {any} dateTime
+ * @returns
+ */
+function UtcDateTimeToLocalDateTimeString(dateTime) {
+    return new Date(dateTime).toLocaleString()
+}
+
+/**
+* 
+* @param {any} dateTime
+* @returns
+*/
+function LocalDateTimeToUtcDateTimeString(dateTime) {
+    return new Date(dateTime).toUTCString()
+}

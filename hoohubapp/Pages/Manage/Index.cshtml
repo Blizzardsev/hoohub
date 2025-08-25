@@ -94,8 +94,8 @@
                             </div>
                             <div class="col">
                                 <div id="new-comic-schedule-details" class="form-group" style="display: none">
-                                    <label class="form-label" asp-for="ManageInputModel.NewComicInput.ScheduleFor"></label>
-                                    <input id="new-comic-schedule-for" asp-for="ManageInputModel.NewComicInput.ScheduleFor" type="datetime-local" class="form-control" readonly/>
+                                    <label id="new-comic-schedule-for-label" class="form-label fw-bold" asp-for="ManageInputModel.NewComicInput.ScheduleFor"></label>
+                                    <input id="new-comic-schedule-for" asp-for="ManageInputModel.NewComicInput.ScheduleFor" type="date" class="form-control" readonly/>
                                     <span asp-validation-for="ManageInputModel.NewComicInput.ScheduleFor" class="text-warning"></span>
                                 </div>
                             </div>
@@ -203,8 +203,8 @@
                                     </div>
                                     <div class="row">
                                         <div id="manage-comic-schedule-details" class="form-group">
-                                            <label class="form-label" asp-for="ManageInputModel.ManageComicInput.ScheduleFor"></label>
-                                            <input id="manage-comic-schedule-for" asp-for="ManageInputModel.ManageComicInput.ScheduleFor" type="datetime-local" class="form-control" readonly />
+                                            <label id="manage-comic-schedule-for-label" class="form-label fw-bold" asp-for="ManageInputModel.ManageComicInput.ScheduleFor"></label>
+                                            <input id="manage-comic-schedule-for" asp-for="ManageInputModel.ManageComicInput.ScheduleFor" type="date" class="form-control" readonly />
                                             <span asp-validation-for="ManageInputModel.ManageComicInput.ScheduleFor" class="text-warning"></span>
                                         </div>
                                     </div>

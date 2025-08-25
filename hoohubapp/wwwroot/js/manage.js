@@ -167,7 +167,7 @@ function getEvents(element) {
                     result.eventData.forEach(function (event) {
                         eventsList.push(`
                             <div class="row manage-events-item w-100 mx-auto">
-                                <div class="col">${event.displayCreatedDate}</div>
+                                <div class="col">${UtcDateTimeToLocalDateTimeString(event.displayCreatedDate)}</div>
                                 <div class="col">${event.displayEventType}</div>
                                 <div class="col" style="white-space: break-spaces;">${event.details}</div>
                             </div>
@@ -220,7 +220,10 @@ function getManageComicsList(element) {
                     let manageComicsList = []
                     result.manageComicListData.forEach(function(comic) {
                         manageComicsList.push(`
-                            <div class="row w-100 mx-auto manage-comic-item" onclick="loadManageComic(this, '${comic.guid}')">${comic.displayName}</div>
+                            <div class="row w-100 mx-auto manage-comic-item" onclick="loadManageComic(this, '${comic.guid}')">
+                                <div class="col-5 fw-bold">${comic.displayName}</div>
+                                <div class="col fst-italic">${comic.guid}</div>
+                            </div>
                         `)
                     })
                     $("#manage-comics-list").html(manageComicsList.join(""))
@@ -273,14 +276,15 @@ function loadManageComic(element, comicGuid) {
                     $("#manage-comic-comic-description").val(result.comicDescription)
                     $("#manage-comic-comic-tags").val(result.tags)
 
-                    $("#manage-comic-published-info").text(result.displayPublished)
-                    $("#manage-comic-modified-info").text(result.displayLastModified)
+                    $("#manage-comic-published-info").text(result.displayPublished === null ? "N/A" : UtcDateTimeToLocalDateTimeString(result.displayPublished))
+                    $("#manage-comic-modified-info").text(`${UtcDateTimeToLocalDateTimeString(result.displayLastModified)} by ${result.lastModifiedHandle}`)
                     $("#manage-comic-heart-info").text(result.likeCount)
 
                     if (result.scheduledDate != null && result.publishDate == null) {
                         loadedComicToManageWasScheduled = true
                         $("#manage-comic-schedule-details").show()
-                        $("#manage-comic-schedule-for").val(result.scheduledDate)
+                        $("#manage-comic-schedule-for").val(result.scheduledDate.split("T")[0])
+
                         $("#manage-comic-schedule-for").prop("readonly", false)
                         $("#manage-comic-is-scheduled").prop("checked", true)
                     }

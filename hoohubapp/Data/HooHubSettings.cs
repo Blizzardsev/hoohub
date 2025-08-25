@@ -34,6 +34,11 @@ namespace hoohub.Data
         public int ManageEventsMaximumHistory { get; set; } = 1000;
 
         /// <summary>
+        /// 
+        /// </summary>
+        public TimeOnly ScheduledComicReleaseTime { get; set; } = new TimeOnly(hour: 12, minute: 00);
+
+        /// <summary>
         /// The date/time the comic was last updated.
         /// </summary>
         public DateTime LastModifiedDate { get; set; } = DateTime.UtcNow;
