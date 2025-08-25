@@ -31,7 +31,7 @@
         <div role="button" tabindex="0" data-tab-id="5" class="col-auto tab-header" onclick="switchTab(5)" title="Edit app settings">
             <span>App</span>
         </div>
-        <div role="button" tabindex="0" data-tab-id="6" class="col-auto tab-header" onclick="switchTab(6)" title="Manage a user">
+        <div role="button" tabindex="0" data-tab-id="6" class="col-auto tab-header" onclick="switchTab(6);getManageUsersList($('#manage-users-refresh'))" title="Manage a user">
             <span>Users</span>
         </div>
     </div>
@@ -350,7 +350,29 @@
             </div>
         </div>
         <div data-tab-id="6" class="container tab-body">
-
+            <div class="row overflow-hidden">
+                <div class="col overflow-hidden">
+                    <h5 id="manage-users-count" class="mb-1">Displaying X users</h5>
+                    <div id="manage-users-list">
+                    </div>
+                    <div class="row mt-4 d-flex justify-content-center mx-auto">
+                        <div class="col-auto mx-auto">
+                            <div role="button" tabindex="0" id="manage-users-refresh" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="getManageUsersList(this)" title="Refresh">refresh</div>
+                            <br />
+                            <span class="option-tip">Refresh</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col mx-auto overflow-auto">
+                    <div class="row mt-4 d-flex justify-content-center mx-auto">
+                        <div class="col-auto mx-auto">
+                            <div role="button" tabindex="0" id="manage-user-update" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow disabled" onclick="patchUser(this)" title="Update">update</div>
+                            <br />
+                            <span class="option-tip">Update</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

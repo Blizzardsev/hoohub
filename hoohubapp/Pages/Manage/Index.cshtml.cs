@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace hoohub.Pages.Manage
 {
@@ -419,11 +420,11 @@ namespace hoohub.Pages.Manage
         {
             try
             {
-                return new JsonResult(new ManageComicListResult(
+                return new JsonResult(new ManageComicsListResult(
                     success: true,
-                    manageComicListData: _hooContext.Comics
+                    manageComicsListData: _hooContext.Comics
                         .OrderByDescending(comic => comic.ComicNumber)
-                        .Select(comic => new ManageComicListData(comic))
+                        .Select(comic => new ManageComicsListData(comic))
                         .ToList()));
             }
             catch (Exception exception) 
@@ -580,9 +581,9 @@ namespace hoohub.Pages.Manage
 
                 var comicNumberChange = comic.ComicNumber != comicNumber ? $"{comic.ComicNumber} -> {comicNumber}" : "(Unchanged)";
                 var comicTitleChange = comic.ComicTitle != comicTitle ? $"{comic.ComicTitle} -> {comicTitle}" : "(Unchanged)";
-                var comicDescriptionChange = comic.ComicDescription != comicDescription ? $"{comic.ComicDescription} -> {comicDescription}" : "(Unchanged)";
+                var comicDescriptionChange = comic.ComicDescription != comicDescription ? $"{(string.IsNullOrWhiteSpace(comic.ComicDescription) ? "N/A" : comic.ComicDescription)} -> {comicDescription}" : "(Unchanged)";
                 var comicAltDescriptionChange = comic.ComicAltDescription != comicAltDescription ? $"{comic.ComicAltDescription} -> {comicAltDescription}" : "(Unchanged)";
-                var comicTagsChange = comic.Tags != tags ? $"{comic.Tags} -> {tags}" : "(Unchanged)";
+                var comicTagsChange = comic.Tags != tags ? $"{(string.IsNullOrWhiteSpace(comic.Tags) ? "N/A" : comic.Tags)} -> {tags}" : "(Unchanged)";
                 var comicHiddenChange = comic.IsHidden != isHidden 
                     ? $"{FormattingService.GetBooleanAsYesNoString(comic.IsHidden)} -> {FormattingService.GetBooleanAsYesNoString(isHidden)}"
                     : "(Unchanged)";
@@ -871,6 +872,81 @@ namespace hoohub.Pages.Manage
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.Error,
                     details: $"Failed to fetch log entries: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: false));
+            }
+        }
+
+        /// <summary>
+        /// Attempts to fetch a list of all users for selection in the management menu, returning a <see cref="JsonResult"/> representing the result of the request.
+        /// </summary>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
+        public async Task<JsonResult> OnGetManageUsersListAsync()
+        {
+            try
+            {
+                return new JsonResult(new ManageUsersListResult(
+                    success: true,
+                    manageUsersListData: _hooContext.Users
+                        .OrderBy(user => user.Email)
+                        .Select(user => new ManageUsersListData(user))
+                        .ToList()));
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to load users list: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: false));
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userGuid"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<JsonResult> OnPatchUserUnlockedStateAsync(string userGuid)
+        {
+            try
+            {
+                var settings = await _hooContext.Settings.FirstOrDefaultAsync();
+                throw new NotImplementedException();
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to update user unlocked state: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: false));
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userGuid"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<JsonResult> OnPatchUserDisabledStateAsync(string userGuid)
+        {
+            try
+            {
+                var settings = await _hooContext.Settings.FirstOrDefaultAsync();
+                throw new NotImplementedException();
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to update user disabled state: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: false));

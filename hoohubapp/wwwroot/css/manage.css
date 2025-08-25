@@ -107,7 +107,8 @@ input {
 }
 
 #manage-comics-list,
-#manage-events-list {
+#manage-events-list,
+#manage-users-list {
     transition: 0.5s;
     min-height: 55vh;
     max-height: 55vh;
@@ -117,7 +118,8 @@ input {
 }
 
 .manage-comic-item,
-.manage-events-item {
+.manage-events-item,
+.manage-user-item {
     color: var(--list-item-foreground-colour);
     background-color: var(--list-item-background-colour);
     padding-top: 5px;
@@ -130,7 +132,8 @@ input {
 
     .manage-comic-item:hover,
     .manage-events-item:hover,
-    .manage-comic-item.selected {
+    .manage-comic-item.selected
+    .manage-user-item.selected {
         filter: brightness(80%)
     }
 

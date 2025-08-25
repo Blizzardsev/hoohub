@@ -217,9 +217,9 @@ function getManageComicsList(element) {
             },
             success: function (result) {
                 if (result.success) {
-                    $("#manage-comics-count").text(`Displaying ${result.manageComicListData.length} ${result.manageComicListData.length === 1 ? "comic" : "comics"}`)
+                    $("#manage-comics-count").text(`Displaying ${result.manageComicsListData.length} ${result.manageComicsListData.length === 1 ? "comic" : "comics"}`)
                     let manageComicsList = []
-                    result.manageComicListData.forEach(function(comic) {
+                    result.manageComicsListData.forEach(function(comic) {
                         manageComicsList.push(`
                             <div class="row w-100 mx-auto manage-comic-item" onclick="loadManageComic(this, '${comic.guid}')">
                                 <div class="col-5 fw-bold">${comic.displayName}</div>
@@ -532,6 +532,59 @@ function toggleComicIsHidden(element, comicType) {
                 hideLoading(loaderId)
                 $(element).removeClass("disabled")
                 setFormLockState(manageAppForm, false)
+            }
+        })
+    }, 500)
+}
+
+/**
+* Attempts to fetch the list of existing users and display them.
+* @param {any} element - The calling control to be disabled/enabled.
+*/
+function getManageUsersList(element) {
+    if (element != undefined) {
+        if ($(element).hasClass("disabled")) {
+            return
+        }
+        $(element).addClass("disabled")
+    }
+    $("#manage-users-list").css("filter", "brightness(80%)")
+    $("#manage-users-count").text("Fetching...")
+
+    setTimeout(function () {
+        $.ajax({
+            type: "GET",
+            url: "?handler=ManageUsersList",
+            dataType: "json",
+            data: {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+            },
+            success: function (result) {
+                if (result.success) {
+                    $("#manage-users-count").text(`Displaying ${result.manageUsersListData.length} ${result.manageUsersListData.length === 1 ? "user" : "users"}`)
+                    let manageUsersList = []
+                    result.manageUsersListData.forEach(function (user) {
+                        manageUsersList.push(`
+                            <div class="row w-100 mx-auto manage-user-item" onclick="loadManageUser(this, '${user.guid}')">
+                                <div class="col-5 fw-bold">${user.displayEmail}</div>
+                                <div class="col fst-italic">${user.guid}</div>
+                            </div>
+                        `)
+                    })
+                    $("#manage-users-list").html(manageUsersList.join(""))
+                }
+                else {
+                    displayAlert("Failed to load users")
+                }
+            },
+            failure: function () {
+                $("#manage-users-count").text("Failed to load users")
+                hideLoading(loaderId)
+                displayAlert("Failed to load users")
+            },
+            complete: function () {
+                $(element).removeClass("disabled")
+                $("#manage-users-list").css("filter", "none")
             }
         })
     }, 500)
