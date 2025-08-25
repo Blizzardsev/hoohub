@@ -9,6 +9,7 @@
     var isNightMode = Context.Request.Cookies["nightMode"] == "true";
     var logoPath = isNightMode ? "hoo_logo_alt_night.png" : "hoo_logo_alt.png";
     var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+    var previewImageUrl = new Uri($"{Context.Request.Scheme}://{Context.Request.Host}/img/hoo_embed.png");
 }
 
 <!DOCTYPE html>
@@ -21,7 +22,8 @@
     <meta content="@ViewData["Title"] - Hate everything." property="og:title" />
     <meta content="The (mis)adventures of an unfortunate little owl." property="og:description" />
     <meta content="@returnUrl" property="og:url" />
-    <meta content="~/img/hoo_embed.png" property="og:image" />
+    <meta content="@previewImageUrl" property="og:image" />
+    <meta content="image/png" property="og:image:type"/>
     <meta content="#ED7454" data-react-helmet="true" name="theme-color" />
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
