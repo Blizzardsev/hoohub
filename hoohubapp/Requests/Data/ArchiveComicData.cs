@@ -34,6 +34,11 @@ namespace hoohub.Requests.Data
         public string Description { get; init; }
 
         /// <summary>
+        /// The alt description of the comic to display for accessibility.
+        /// </summary>
+        public string AltDescription { get; init; }
+
+        /// <summary>
         /// The image data of the comic to render.
         /// </summary>
         public byte[] ImageData { get; init; }
@@ -49,6 +54,7 @@ namespace hoohub.Requests.Data
             DisplayPublishDate = comic.PublishDate.HasValue ? comic.PublishDate.Value : null;
             DisplayTags = comic.GetComicDisplayTags();
             Description = comic.GetComicDisplayDescription();
+            AltDescription = comic.GetComicDisplayAltDescription();
             ImageData = comic.ImageData;
         }
     }

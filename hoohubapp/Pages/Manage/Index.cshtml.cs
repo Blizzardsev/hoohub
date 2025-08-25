@@ -78,6 +78,13 @@ namespace hoohub.Pages.Manage
                 [DataType(DataType.Text)]
                 public string? ComicDescription { get; set; } = string.Empty;
 
+                [Display(Name = "Comic alt description", Prompt = "hate everything")]
+                [Required(AllowEmptyStrings = false, ErrorMessage = "Comic must have an alt description")]
+                [MinLength(1)]
+                [MaxLength(300)]
+                [DataType(DataType.Text)]
+                public string ComicAltDescription { get; set; } = string.Empty;
+
                 [Display(Name = "Tags", Prompt = "hoo,hate,everything")]
                 [MaxLength(100)]
                 [DataType(DataType.Text)]
@@ -140,6 +147,13 @@ namespace hoohub.Pages.Manage
                 [MaxLength(100)]
                 [DataType(DataType.Text)]
                 public string? ComicDescription { get; set; } = string.Empty;
+
+                [Display(Name = "Comic alt description", Prompt = "hate everything")]
+                [Required(AllowEmptyStrings = false, ErrorMessage = "Comic must have an alt description")]
+                [MinLength(1)]
+                [MaxLength(300)]
+                [DataType(DataType.Text)]
+                public string ComicAltDescription { get; set; } = string.Empty;
 
                 [Display(Name = "Tags", Prompt = "hoo,hate,everything")]
                 [MaxLength(100)]
@@ -273,6 +287,7 @@ namespace hoohub.Pages.Manage
         /// <param name="comicNumber">The number of the new comic to set. This must be unique.</param>
         /// <param name="comicTitle">The title of the new comic to set.</param>
         /// <param name="comicDescription">The description of the new comic to set.</param>
+        /// <param name="comicAltDescription">The alt description of the comic to set, for accessibility.</param>
         /// <param name="imageData">The content of the new comic to set.</param>
         /// <param name="tags">The optional tags of the new comic to set.</param>
         /// <param name="isHidden">The hidden state to the new comic to set; hidden comics are not visible publicly.</param>
@@ -283,6 +298,7 @@ namespace hoohub.Pages.Manage
             string comicNumber,
             string comicTitle,
             string comicDescription,
+            string comicAltDescription,
             IFormFile imageData,
             string tags,
             bool isHidden,
@@ -304,6 +320,15 @@ namespace hoohub.Pages.Manage
                     return new JsonResult(new BaseResult(
                         success: false,
                         message: $"Comic {comicNumber} already exists"));
+                }
+
+                if (string.IsNullOrWhiteSpace(comicNumber)
+                    || string.IsNullOrWhiteSpace(comicTitle)
+                    || string.IsNullOrWhiteSpace(comicAltDescription))
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "Comic number, title and/or alt description are required"));
                 }
 
                 if (imageData == null)
@@ -357,12 +382,12 @@ namespace hoohub.Pages.Manage
                     comicNumber: comicNumber,
                     comicTitle: comicTitle,
                     comicDescription: string.IsNullOrWhiteSpace(comicDescription) ? string.Empty : comicDescription,
+                    comicAltDescription: comicAltDescription,
                     imageData: FormattingService.GetIFormFileAsBytes(imageData),
                     tags: string.IsNullOrWhiteSpace(tags) ? string.Empty : tags,
                     isHidden: isScheduled ? true : isHidden,
                     uploadedBy: currentUser,
-                    scheduledDate: scheduleForAsUtcDateTime.HasValue && isScheduled ? scheduleForAsUtcDateTime.Value : null,
-                    wasPublished: !isHidden && !isScheduled);
+                    scheduledDate: scheduleForAsUtcDateTime.HasValue && isScheduled ? scheduleForAsUtcDateTime.Value : null);
 
                 await _hooContext.Comics.AddAsync(newComic);
                 await _hooContext.Events.AddAsync(new Event(
@@ -453,6 +478,7 @@ namespace hoohub.Pages.Manage
         /// <param name="comicNumber">The number of the comic to set. This must be unique.</param>
         /// <param name="comicTitle">The title of the comic to set.</param>
         /// <param name="comicDescription">The description of the comic to set.</param>
+        /// <param name="comicAltDescription">The alt description of the comic to set, for accessibility.</param>
         /// <param name="imageData">The content of the comic to set.</param>
         /// <param name="tags">The optional tags of the comic to set.</param>
         /// <param name="isHidden">The hidden state to the comic to set; hidden comics are not visible publicly.</param>
@@ -464,6 +490,7 @@ namespace hoohub.Pages.Manage
             string comicNumber,
             string comicTitle,
             string comicDescription,
+            string comicAltDescription,
             IFormFile imageData,
             string tags,
             bool isHidden,
@@ -493,6 +520,15 @@ namespace hoohub.Pages.Manage
                     return new JsonResult(new BaseResult(
                         success: false,
                         message: $"Comic {comicNumber} already exists"));
+                }
+
+                if (string.IsNullOrWhiteSpace(comicNumber) 
+                    || string.IsNullOrWhiteSpace(comicTitle)
+                    || string.IsNullOrWhiteSpace(comicAltDescription))
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "Comic number, title and/or alt description are required"));
                 }
 
                 if ((comic.ImageData == null || comic.ImageData.Length == 0) && imageData == null)
@@ -545,6 +581,7 @@ namespace hoohub.Pages.Manage
                 var comicNumberChange = comic.ComicNumber != comicNumber ? $"{comic.ComicNumber} -> {comicNumber}" : "(Unchanged)";
                 var comicTitleChange = comic.ComicTitle != comicTitle ? $"{comic.ComicTitle} -> {comicTitle}" : "(Unchanged)";
                 var comicDescriptionChange = comic.ComicDescription != comicDescription ? $"{comic.ComicDescription} -> {comicDescription}" : "(Unchanged)";
+                var comicAltDescriptionChange = comic.ComicAltDescription != comicAltDescription ? $"{comic.ComicAltDescription} -> {comicAltDescription}" : "(Unchanged)";
                 var comicTagsChange = comic.Tags != tags ? $"{comic.Tags} -> {tags}" : "(Unchanged)";
                 var comicHiddenChange = comic.IsHidden != isHidden 
                     ? $"{FormattingService.GetBooleanAsYesNoString(comic.IsHidden)} -> {FormattingService.GetBooleanAsYesNoString(isHidden)}"
@@ -557,6 +594,7 @@ namespace hoohub.Pages.Manage
                 comic.ComicNumber = comicNumber;
                 comic.ComicTitle = comicTitle;
                 comic.ComicDescription = comicDescription;
+                comic.ComicAltDescription = comicAltDescription;
                 if (imageData != null )
                 {
                     comic.ImageData = FormattingService.GetIFormFileAsBytes(imageData);
@@ -585,6 +623,7 @@ namespace hoohub.Pages.Manage
                         $"\nComic number: {comicNumberChange}" +
                         $"\nTitle: {comicTitleChange}" +
                         $"\nDescription: {comicDescriptionChange}" +
+                        $"\nAlt. description: {comicAltDescriptionChange}" +
                         $"\nTags: {comicTagsChange}" +
                         $"\nHidden: {comicHiddenChange}" +
                         $"\nScheduled date: {comicScheduledChange}"));

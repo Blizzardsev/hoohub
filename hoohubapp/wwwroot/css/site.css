@@ -145,8 +145,10 @@ h1 {
 }
 
 #comic-display {
-    max-width: 75vw;
-    max-height: 75vh;
+    max-width: 55%;
+    max-height: 55%;
+    aspect-ratio: 1/1;
+    object-fit: contain;
 }
 
 @media (max-height: 650px) {

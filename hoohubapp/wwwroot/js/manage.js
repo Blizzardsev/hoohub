@@ -100,6 +100,7 @@ function postNewComic(element) {
     formData.append("comicNumber", $("#new-comic-comic-number").val())
     formData.append("comicTitle", $("#new-comic-comic-title").val())
     formData.append("comicDescription", $("#new-comic-comic-description").val())
+    formData.append("comicAltDescription", $("#new-comic-comic-alt-description").val())
     formData.append("imageData", $("#new-comic-image-data").prop("files")[0])
     formData.append("tags", $("#new-comic-comic-tags").val())
     formData.append("isHidden", $("#new-comic-is-hidden").is(":checked"))
@@ -274,6 +275,7 @@ function loadManageComic(element, comicGuid) {
                     $("#manage-comic-comic-number").val(result.comicNumber)
                     $("#manage-comic-comic-title").val(result.comicTitle)
                     $("#manage-comic-comic-description").val(result.comicDescription)
+                    $("#manage-comic-comic-alt-description").val(result.comicAltDescription)
                     $("#manage-comic-comic-tags").val(result.tags)
 
                     $("#manage-comic-published-info").text(result.displayPublished === null ? "N/A" : UtcDateTimeToLocalDateTimeString(result.displayPublished))
@@ -361,6 +363,7 @@ function patchComic(element) {
     formData.append("comicNumber", $("#manage-comic-comic-number").val())
     formData.append("comicTitle", $("#manage-comic-comic-title").val())
     formData.append("comicDescription", $("#manage-comic-comic-description").val())
+    formData.append("comicAltDescription", $("#manage-comic-comic-alt-description").val())
     formData.append("imageData", $("#manage-comic-image-data").prop("files")[0])
     formData.append("tags", $("#manage-comic-comic-tags").val())
     formData.append("isHidden", $("#manage-comic-is-hidden").is(":checked"))
