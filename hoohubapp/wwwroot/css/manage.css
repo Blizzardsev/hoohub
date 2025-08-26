@@ -82,15 +82,19 @@
     #manage-me-preview,
     #manage-user-preview {
         max-width: 300px;
+        max-height: 300px;
         border-radius: 50%;
         object-fit: cover;
+        aspect-ratio: 1/1;
     }
 
     #manage-user-preview {
         border: 2px solid var(--main-foreground-colour);
         margin: auto;
         display: block;
-        max-width: 150px;
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
     }
 
     #new-comic-preview:hover,
