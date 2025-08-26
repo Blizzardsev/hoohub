@@ -1,6 +1,16 @@
 ﻿let mouseX = 0
 let mouseY = 0
 
+const defaults = {
+    spread: 15,
+    ticks: 10,
+    gravity: 2,
+    decay: 0.95,
+    startVelocity: 15,
+    shapes: ["heart"],
+    colors: ["#FF0000"],
+};
+
 $(document).ready(function () {
     // Ensure the publish date for the comic is handled according to locale
     let publishDateValue = $("#about-comic-publish-date-info").val()
@@ -10,6 +20,34 @@ $(document).ready(function () {
 $("html").click(function (event) { 
     mouseX = event.pageX
     mouseY = event.pageY
+})
+
+/**
+ * On swiping left, load the previous comic, if one exists.
+ */
+document.getElementById("view-comic-full").addEventListener("swiped-left", function (event) {
+    document.getElementById("comic-swipe-previous-link").click()
+})
+
+/**
+ * On swiping right, load the next comic, if one exists.
+ */
+document.getElementById("view-comic-full").addEventListener("swiped-right", function (event) {
+    document.getElementById("comic-swipe-next-link").click()
+})
+
+/**
+ * On swiping up, dimiss the full comic view
+ */
+document.getElementById("view-comic-full").addEventListener("swiped-up", function (event) {
+    hideModal('view-comic-full')
+})
+
+/**
+ * On swiping up, dimiss the about comic view
+ */
+document.getElementById("about-comic").addEventListener("swiped-up", function (event) {
+    hideModal('about-comic')
 })
 
 /**
@@ -84,13 +122,3 @@ function heartComic(element, comicGuid) {
         }
     })
 }
-
-const defaults = {
-    spread: 15,
-    ticks: 10,
-    gravity: 2,
-    decay: 0.95,
-    startVelocity: 15,
-    shapes: ["heart"],
-    colors: ["#FF0000"],
-};
