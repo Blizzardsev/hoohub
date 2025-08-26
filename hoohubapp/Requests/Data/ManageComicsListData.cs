@@ -6,7 +6,7 @@ namespace hoohub.Requests.Data
     /// <summary>
     /// Represents requested simple comic data to display to the user when fetching the list of existing comics for management.
     /// </summary>
-    public class ManageComicListData
+    public class ManageComicsListData
     {
         /// <summary>
         /// Uniquely identifies the comic.
@@ -19,10 +19,10 @@ namespace hoohub.Requests.Data
         public string DisplayName { get; init; }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="ManageComicListData"/> class.
+        /// Initialises a new instance of the <see cref="ManageComicsListData"/> class.
         /// </summary>
         /// <param name="comic">Base <see cref="Comic"/> to derive attributes from.</param>
-        public ManageComicListData(Comic comic)
+        public ManageComicsListData(Comic comic)
         {
             Guid = comic.Id;
             DisplayName = HttpUtility.HtmlEncode(comic.GetComicDisplayName());

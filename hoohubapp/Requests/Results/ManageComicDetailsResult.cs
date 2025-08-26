@@ -1,5 +1,4 @@
 ﻿using hoohub.Data;
-using hoohub.Migrations;
 
 namespace hoohub.Requests.Results
 {

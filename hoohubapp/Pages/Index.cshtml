@@ -42,8 +42,24 @@
     <div class="container">
         @if(Model.Comic != null)
         {
-            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow" title="Get link" onclick="copyToClipboard('@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id })')">link</div>
-            <div role="button" tabindex="0" class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" title="Comic info..." onclick="showModal('about-comic')">info</div>
+            <div 
+                role="button" 
+                tabindex="0" 
+                class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow" 
+                title="Get link" 
+                onclick="copyToClipboard('@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id })')"
+                onkeydown="onEnterKeyPress(event, copyToClipboard, '@Url.PageLink(pageName: "/Index", values: new { comic = Model.Comic.Id })')">
+                link
+            </div>
+            <div 
+                role="button" 
+                tabindex="0" 
+                class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2" 
+                title="Comic info..." 
+                onclick="showModal('about-comic')"
+                onkeydown="onEnterKeyPress(event, showModal, 'about-comic')">
+                info
+            </div>
             
             <div class="row">
                 <div class="col align-content-center">
@@ -52,7 +68,8 @@
                          tabindex="0"
                          class="row site-option material-symbols-outlined align-items-center justify-content-center box-shadow mt-2 mb-4 @(Model.ComicIsLiked ? "heart" : string.Empty)"
                          title="@(Model.ComicIsLiked ? "Unlike this comic..." : "Like this comic!")"
-                         onclick="heartComic(this, '@(Model.Comic.Id)')">
+                         onclick="heartComic(this, '@(Model.Comic.Id)')"
+                         onkeydown="onEnterKeyPress(event, heartComic, this, '@(Model.Comic.Id)')">
                         favorite
                     </div>
                 </div>
@@ -60,10 +77,6 @@
                     <p id="comic-like-count" class="heart box-shadow d-none">@(Model.Comic.ComicLikes.Count)</p>
                 </div>
             </div>
-        }
-        else
-        {
-            <div role="button" tabindex="0" class="row site-option disabled material-symbols-outlined align-items-center justify-content-center box-shadow mb-4">link</div>
         }
 
         @if (Model.Comic != null && !string.IsNullOrWhiteSpace(Model.NextComicId))

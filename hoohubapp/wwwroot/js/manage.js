@@ -217,9 +217,9 @@ function getManageComicsList(element) {
             },
             success: function (result) {
                 if (result.success) {
-                    $("#manage-comics-count").text(`Displaying ${result.manageComicListData.length} ${result.manageComicListData.length === 1 ? "comic" : "comics"}`)
+                    $("#manage-comics-count").text(`Displaying ${result.manageComicsListData.length} ${result.manageComicsListData.length === 1 ? "comic" : "comics"}`)
                     let manageComicsList = []
-                    result.manageComicListData.forEach(function(comic) {
+                    result.manageComicsListData.forEach(function(comic) {
                         manageComicsList.push(`
                             <div class="row w-100 mx-auto manage-comic-item" onclick="loadManageComic(this, '${comic.guid}')">
                                 <div class="col-5 fw-bold">${comic.displayName}</div>
@@ -532,6 +532,162 @@ function toggleComicIsHidden(element, comicType) {
                 hideLoading(loaderId)
                 $(element).removeClass("disabled")
                 setFormLockState(manageAppForm, false)
+            }
+        })
+    }, 500)
+}
+
+/**
+* Attempts to fetch the list of existing users and display them.
+* @param {any} element - The calling control to be disabled/enabled.
+*/
+function getManageUsersList(element) {
+    if (element != undefined) {
+        if ($(element).hasClass("disabled")) {
+            return
+        }
+        $(element).addClass("disabled")
+    }
+    $("#manage-users-list").css("filter", "brightness(80%)")
+    $("#manage-users-count").text("Fetching...")
+
+    setTimeout(function () {
+        $.ajax({
+            type: "GET",
+            url: "?handler=ManageUsersList",
+            dataType: "json",
+            data: {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+            },
+            success: function (result) {
+                if (result.success) {
+                    $("#manage-users-count").text(`Displaying ${result.manageUsersListData.length} ${result.manageUsersListData.length === 1 ? "user" : "users"}`)
+                    let manageUsersList = []
+                    result.manageUsersListData.forEach(function (user) {
+                        manageUsersList.push(`
+                            <div class="row w-100 mx-auto manage-user-item" onclick="loadManageUser(this, '${user.guid}')">
+                                <div class="col-5 fw-bold">${user.displayEmail}</div>
+                                <div class="col fst-italic">${user.guid}</div>
+                            </div>
+                        `)
+                    })
+                    $("#manage-users-list").html(manageUsersList.join(""))
+                }
+                else {
+                    displayAlert("Failed to load users")
+                }
+            },
+            failure: function () {
+                $("#manage-users-count").text("Failed to load users")
+                hideLoading(loaderId)
+                displayAlert("Failed to load users")
+            },
+            complete: function () {
+                $(element).removeClass("disabled")
+                $("#manage-users-list").css("filter", "none")
+            }
+        })
+    }, 500)
+}
+
+/**
+* Attempts to fetch the details and populate the user management form for the selected user.
+* @param {any} element - The calling control to be disabled/enabled.
+* @param {*} userGuid - The GUID of the user to load.
+*/
+function loadManageUser(element, userGuid) {
+    $(".manage-user-item").removeClass("selected")
+    setFormLockState($("#manage-user-form"), true)
+
+    $.ajax({
+        type: "GET",
+        url: "?handler=ManageUserDetails",
+        dataType: "json",
+        data: {
+            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+            userGuid: userGuid
+        },
+        success: function (result) {
+            if (result.success) {
+                setTimeout(function () {
+                    $(element).addClass("selected")
+                    setFormLockState($("#manage-user-form"), false)
+
+                    $("#manage-user-preview").attr("src", `data:image/jpg;base64,${result.displayPictureData}`)
+                    $("#manage-user-user-guid").val(result.guid)
+                    $("#manage-user-handle-info").text(result.handle)
+                    $("#manage-user-social-info").text(result.socialLink)
+                    $("#manage-user-social-link").attr("href", result.socialLink)
+
+                    $("#manage-user-last-login-info").text(result.lastLoginDate === null
+                        ? "User has never logged in"
+                        : `${UtcDateTimeToLocalDateTimeString(result.lastLoginDate)} from ${result.lastLoginIpAddress}`)
+                    $("#manage-user-is-locked").prop("checked", result.accountIsLocked)
+                    $("#manage-user-is-disabled").prop("checked", result.accountIsDisabled)
+                })
+
+                $("#manage-user-form").validate()
+                setFormLockState($("#manage-user-form"), false)
+                $("#manage-user-update").removeClass("disabled")
+            }
+            else {
+                displayAlert(result.message)
+            }
+        },
+        failure: function () {
+            displayAlert("Failed to load user")
+        }
+    })
+}
+
+/**
+* Attempts to update an existing user.
+* If successful, informs the user.
+* Otherwise, notifies of any errors.
+* @param {*} element - The calling control to be disabled/enabled.
+*/
+function patchUser(element) {
+    let manageUserForm = $("#manage-user-form")
+
+    $(manageUserForm).validate()
+    if ($(element).hasClass("disabled") || !$(manageUserForm).valid()) {
+        return
+    }
+
+    $(element).addClass("disabled")
+
+    let formData = new FormData()
+    formData.append("__RequestVerificationToken", $('input[name="__RequestVerificationToken"]').val())
+    formData.append("userGuid", $("#manage-user-user-guid").val())
+    formData.append("accountIsLocked", $("#manage-user-is-locked").is(":checked"))
+    formData.append("accountIsDisabled", $("#manage-user-is-disabled").is(":checked"))
+
+    setFormLockState(manageUserForm, true)
+    let loaderId = displayLoading()
+    setTimeout(function () {
+        $.ajax({
+            type: "PATCH",
+            url: "?handler=User",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result.success) {
+                    displayAlert("User updated!")
+                }
+                else {
+                    displayAlert(result.message)
+                }
+
+                getManageUsersList($("#manage-users-refresh"))
+            },
+            failure: function () {
+                displayAlert("Failed to update user")
+            },
+            complete: function () {
+                hideLoading(loaderId)
+                $(element).removeClass("disabled")
+                setFormLockState(manageUserForm, false)
             }
         })
     }, 500)

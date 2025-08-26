@@ -46,6 +46,7 @@
             --main-foreground-colour: @(isNightMode ? "#fff" : "#280501");
             --main-background-colour: @(isNightMode ? "#0b0128" : "#fff");
             --scrollbar-color: @(isNightMode ? "#fff #4f456e" : "#280501 #DFDAD9");
+            --link-color: @(isNightMode ? "#fcd023 !important" : "#963636 !important");
 
             --loader-background-a: @(isNightMode ? "#7285BB" : "#280501");
             --loader-background-b: @(isNightMode ? "#BDC7E5" : "#84706D");
@@ -94,7 +95,14 @@
         <a asp-page="/Index">
             <img role="button" tabindex="0" id="logo" class="d-inline-block mb-2 mt-2" src="~/img/@(logoPath)" title="Home..." alt="Hoo - Hate everything."/>
         </a>
-        <span id="site-nav" class="navbar-option interactive material-symbols-outlined align-middle mb-2 mt-2" onclick="toggleMenu(this)" title="Site navigation">menu</span>
+        <span 
+            role="button" 
+            tabindex="0" 
+            id="site-nav" 
+            class="navbar-option interactive material-symbols-outlined align-middle mb-2 mt-2" 
+            onclick="toggleMenu(this)"
+            onkeydown="onEnterKeyPress(event, toggleMenu, this)"
+            title="Site navigation">menu</span>
     </header>
 
     <div id="site-menu">

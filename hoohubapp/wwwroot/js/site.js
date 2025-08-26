@@ -8,6 +8,18 @@ $("html").on("click", function (event) {
 })
 
 /**
+ * Executes the given callback with the specified arguments when the enter key is pressed.
+ * @param {any} event - The event triggering the function.
+ * @param {any} callback - The callback to execute if the event was the enter key being pressed.
+ * @param {...any} args - Arguments to be supplied to the callback.
+ */
+function onEnterKeyPress(event, callback, ...args) {
+    if (event.key === "Enter" || event.keycode === 13) {
+        callback(...args)
+    }
+}
+
+/**
  * Toggles the site navigation menu visibility.
  * @param {*} elementButton summoning the navigation menu
  */

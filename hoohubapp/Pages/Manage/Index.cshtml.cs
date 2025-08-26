@@ -1,3 +1,4 @@
+using hoohub.Configuration;
 using hoohub.Data;
 using hoohub.Enums;
 using hoohub.Requests.Data;
@@ -19,6 +20,7 @@ namespace hoohub.Pages.Manage
     {
         private readonly HooHubContext _hooContext;
         private readonly UserManager<HooHubUser> _userManager;
+        private readonly AppSettings _appSettings;
         private readonly string[] _comicUploadFileExtensions = ["png", "jpg", "jpeg", "gif"];
 
         [BindProperty]
@@ -40,10 +42,12 @@ namespace hoohub.Pages.Manage
         /// </summary>
         /// <param name="hooContext">Injected app context.</param>
         /// <param name="userManager">Injected <see cref="UserManager{TUser}"/>.</param>
-        public IndexModel(HooHubContext hooContext, UserManager<HooHubUser> userManager)
+        /// <param name="appSettings">Injected app settings.</param>
+        public IndexModel(HooHubContext hooContext, UserManager<HooHubUser> userManager, AppSettings appSettings)
         {
             _hooContext = hooContext;
             _userManager = userManager;
+            _appSettings = appSettings;
         }
 
         /// <summary>
@@ -219,10 +223,22 @@ namespace hoohub.Pages.Manage
                 public TimeOnly ScheduledComicReleaseTime { get; set; }
             }
 
+            public class ManageUser
+            {
+                [Display(Name = "Account locked")]
+                [Required(ErrorMessage = "Account locked state must be provided")]
+                public bool AccountIsLocked { get; set; }
+
+                [Display(Name = "Account disabled")]
+                [Required(ErrorMessage = "Account disabled state must be provided")]
+                public bool AccountIsDisabled { get; set; }
+            }
+
             public NewComic NewComicInput;
             public ManageComic ManageComicInput;
             public ManageMe ManageMeInput;
             public ManageApp ManageAppInput;
+            public ManageUser ManageUserInput;
 
             public ManageInput()
             {
@@ -230,6 +246,7 @@ namespace hoohub.Pages.Manage
                 ManageComicInput = new ManageComic();
                 ManageMeInput = new ManageMe();
                 ManageAppInput = new ManageApp();
+                ManageUserInput = new ManageUser();
             }
         }
 
@@ -419,11 +436,11 @@ namespace hoohub.Pages.Manage
         {
             try
             {
-                return new JsonResult(new ManageComicListResult(
+                return new JsonResult(new ManageComicsListResult(
                     success: true,
-                    manageComicListData: _hooContext.Comics
+                    manageComicsListData: _hooContext.Comics
                         .OrderByDescending(comic => comic.ComicNumber)
-                        .Select(comic => new ManageComicListData(comic))
+                        .Select(comic => new ManageComicsListData(comic))
                         .ToList()));
             }
             catch (Exception exception) 
@@ -447,11 +464,19 @@ namespace hoohub.Pages.Manage
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(comicGuid))
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"Comic GUID must be specified"));
+                }
+
                 var comic = await _hooContext.Comics
                     .Include(comic => comic.LastEditedBy)
                     .Include(comic => comic.ComicLikes)
                     .AsSplitQuery()
                     .SingleOrDefaultAsync(comic => comic.Id == comicGuid);
+
                 if (comic == null)
                 {
                     return new JsonResult(new BaseResult(success: false, message: $"Comic GUID {comicGuid} not found"));
@@ -580,9 +605,9 @@ namespace hoohub.Pages.Manage
 
                 var comicNumberChange = comic.ComicNumber != comicNumber ? $"{comic.ComicNumber} -> {comicNumber}" : "(Unchanged)";
                 var comicTitleChange = comic.ComicTitle != comicTitle ? $"{comic.ComicTitle} -> {comicTitle}" : "(Unchanged)";
-                var comicDescriptionChange = comic.ComicDescription != comicDescription ? $"{comic.ComicDescription} -> {comicDescription}" : "(Unchanged)";
+                var comicDescriptionChange = comic.ComicDescription != comicDescription ? $"{(string.IsNullOrWhiteSpace(comic.ComicDescription) ? "N/A" : comic.ComicDescription)} -> {comicDescription}" : "(Unchanged)";
                 var comicAltDescriptionChange = comic.ComicAltDescription != comicAltDescription ? $"{comic.ComicAltDescription} -> {comicAltDescription}" : "(Unchanged)";
-                var comicTagsChange = comic.Tags != tags ? $"{comic.Tags} -> {tags}" : "(Unchanged)";
+                var comicTagsChange = comic.Tags != tags ? $"{(string.IsNullOrWhiteSpace(comic.Tags) ? "N/A" : comic.Tags)} -> {tags}" : "(Unchanged)";
                 var comicHiddenChange = comic.IsHidden != isHidden 
                     ? $"{FormattingService.GetBooleanAsYesNoString(comic.IsHidden)} -> {FormattingService.GetBooleanAsYesNoString(isHidden)}"
                     : "(Unchanged)";
@@ -871,6 +896,151 @@ namespace hoohub.Pages.Manage
                 await _hooContext.Events.AddAsync(new Event(
                     eventType: EventTypes.Error,
                     details: $"Failed to fetch log entries: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: false));
+            }
+        }
+
+        /// <summary>
+        /// Attempts to fetch a list of all users for selection in the management menu, returning a <see cref="JsonResult"/> representing the result of the request.
+        /// </summary>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
+        public async Task<JsonResult> OnGetManageUsersListAsync()
+        {
+            try
+            {
+                return new JsonResult(new ManageUsersListResult(
+                    success: true,
+                    manageUsersListData: _hooContext.Users
+                        .OrderBy(user => user.Email)
+                        .Select(user => new ManageUsersListData(user))
+                        .ToList()));
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to load users list: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: false));
+            }
+        }
+
+        /// <summary>
+        /// Attempts to fetch the details of a specific user for display/editing in the manage user menu, returning a <see cref="JsonResult"/> representing the result of the request.
+        /// </summary>
+        /// <param name="userGuid">The GUID of the <see cref="HooHubUser"/> to fetch details for.</param>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
+        public async Task<JsonResult> OnGetManageUserDetailsAsync(string userGuid)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(userGuid))
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"User GUID {userGuid} must be specified"));
+                }
+
+                var user = await _hooContext.Users.SingleOrDefaultAsync(user => user.Id == userGuid);
+                if (user == null)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"User GUID {userGuid} not found"));
+                }
+
+                return new JsonResult(new ManageUserDetailsResult(
+                    success: true,
+                    user: user));
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to fetch user details: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: false));
+            }
+        }
+
+        /// <summary>
+        /// Attempts to update the current user, returning a <see cref="JsonResult"/> representing the result of the request.
+        /// </summary>
+        /// <param name="userGuid">The GUID of the <see cref="HooHubUser"/> to update.</param>
+        /// <param name="accountIsLocked">The locked status to set.</param>
+        /// <param name="accountIsDisabled">The disabled status to set.</param>
+        /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
+        public async Task<JsonResult> OnPatchUserAsync(
+            string userGuid,
+            bool accountIsLocked,
+            bool accountIsDisabled)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(userGuid))
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"User GUID {userGuid} must be specified"));
+                }
+
+                var user = await _hooContext.Users.SingleOrDefaultAsync(user => user.Id == userGuid);
+                if (user == null)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"User GUID {userGuid} not found"));
+                }
+
+                var currentUser = await _userManager.GetUserAsync(User);
+                if (currentUser == null)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"You are not authorised to perform this action"));
+                }
+                if (currentUser.Id == user.Id)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"You may not update your own status"));
+                }
+
+                if (string.Equals(user.Email, _appSettings.SiteAdmin, StringComparison.InvariantCultureIgnoreCase)
+                    && user.Id == _userManager.GetUserId(User))
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: $"User GUID {userGuid} not found"));
+                }
+
+                var lockedOutChange = user.LockoutEnd.HasValue != accountIsLocked ? $"{user.LockoutEnd.HasValue} " +
+                    $"-> {FormattingService.GetBooleanAsYesNoString(accountIsLocked)}" : "(Unchanged)";
+                var disabledChange = user.IsDisabled != accountIsDisabled ? $"{FormattingService.GetBooleanAsYesNoString(user.IsDisabled)} " +
+                    $"-> {FormattingService.GetBooleanAsYesNoString(accountIsDisabled)}" : "(Unchanged)";
+
+                user.LockoutEnd = accountIsLocked ? DateTime.Today.AddYears(99).ToUniversalTime() : null;
+                user.IsDisabled = accountIsDisabled;
+
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: EventTypes.UserUpdated,
+                    details: $"{user.GetEventLogString()} account status was updated by {currentUser.GetEventLogString()}:" +
+                        "\n---" +
+                        $"\nLocked out: {lockedOutChange}" +
+                        $"\nDisabled: {disabledChange}"));
+                await _hooContext.SaveChangesAsync();
+                return new JsonResult(new BaseResult(success: true));
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to update user unlocked state: {exception.Message}",
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: false));

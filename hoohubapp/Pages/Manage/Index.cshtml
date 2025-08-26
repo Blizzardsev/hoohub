@@ -31,6 +31,9 @@
         <div role="button" tabindex="0" data-tab-id="5" class="col-auto tab-header" onclick="switchTab(5)" title="Edit app settings">
             <span>App</span>
         </div>
+        <div role="button" tabindex="0" data-tab-id="6" class="col-auto tab-header" onclick="switchTab(6);getManageUsersList($('#manage-users-refresh'))" title="Manage a user">
+            <span>Users</span>
+        </div>
     </div>
     <div class="row">
         <div data-tab-id="0" class="container tab-body selected">
@@ -339,6 +342,75 @@
                     <div class="row mt-4 d-flex justify-content-center mx-auto">
                         <div class="col-auto mx-auto">
                             <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="patchAppSettings(this)" title="Update">update</div>
+                            <br />
+                            <span class="option-tip">Update</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-tab-id="6" class="container tab-body">
+            <div class="row overflow-hidden">
+                <div class="col overflow-hidden">
+                    <h5 id="manage-users-count" class="mb-1">Displaying X users</h5>
+                    <div id="manage-users-list">
+                    </div>
+                    <div class="row mt-4 d-flex justify-content-center mx-auto">
+                        <div class="col-auto mx-auto">
+                            <div role="button" tabindex="0" id="manage-users-refresh" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" onclick="getManageUsersList(this)" title="Refresh">refresh</div>
+                            <br />
+                            <span class="option-tip">Refresh</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col mx-auto overflow-auto">
+                    <div class="row w-100">
+                        <form id="manage-user-form" class="w-100 mx-auto enctype="multipart/form-data">
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                            <input id="manage-user-user-guid" type="hidden"/>
+                            <div class="form-group mb-1">
+                                <img id="manage-user-preview" class="animate__animated animate__fadeIn" src="@($@"data:image/jpg;base64, {Properties.Resources.UploadPlaceholderBase64}")" />
+                            </div>
+                            <div class="form-group mb-1">
+                                <label class="form-label fw-bold">Current handle</label>
+                                <br />
+                                <label id="manage-user-handle-info" class="form-label fst-italic">N/A</label>
+                            </div>
+                            <div class="form-group mb-1">
+                                <label class="form-label fw-bold">Current social media URL</label>
+                                <br />
+                                <a id="manage-user-social-link" class="fw-bold" href="/Manage" target="_blank">
+                                    <label id="manage-user-social-info" class="form-label fst-italic">N/A</label>
+                                </a>
+                            </div>
+                            <div class="form-group mb-1">
+                                <label class="form-label fw-bold">Last login</label>
+                                <br />
+                                <label id="manage-user-last-login-info" class="form-label fst-italic">N/A</label>
+                            </div>
+                            <div class="form-group mb-1">
+                                <label class="form-label fw-bold" asp-for="ManageInputModel.ManageUserInput.AccountIsLocked"></label>
+                                <br />
+                                <label class="switch row justify-content-center scale-75">
+                                    <input id="manage-user-is-locked" type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="form-group mb-1">
+                                <label class="form-label fw-bold" asp-for="ManageInputModel.ManageUserInput.AccountIsDisabled"></label>
+                                <br />
+                                <label class="form-label fst-italic">Disabled users may never log in</label>
+                                <br />
+                                <label class="switch row justify-content-center scale-75">
+                                    <input id="manage-user-is-disabled" type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="row mt-4 d-flex justify-content-center mx-auto">
+                        <div class="col-auto mx-auto">
+                            <div role="button" tabindex="0" id="manage-user-update" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow disabled" onclick="patchUser(this)" title="Update">update</div>
                             <br />
                             <span class="option-tip">Update</span>
                         </div>
