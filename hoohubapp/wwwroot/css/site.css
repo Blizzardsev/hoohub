@@ -500,7 +500,8 @@ input:disabled + .slider {
 }
 
 .archive-comic-view-container,
-.about-comic-view-container {
+.about-comic-view-container,
+.full-comic-view-container {
     background: var(--archive-comic-view-container-background);
     height: 100vh;
     width: 100vw;
@@ -511,7 +512,8 @@ input:disabled + .slider {
 }
 
 .archive-comic-view-content,
-.about-comic-view-content {
+.about-comic-view-content,
+.full-comic-view-content {
     margin: auto;
     position: relative;
     top: 50%;
@@ -521,18 +523,27 @@ input:disabled + .slider {
     color: #fff;
 }
 
-    .archive-comic-view-content img,
     .about-comic-view-content img {
-        width: 62vh;
-        height: 62vh;
-        object-fit: contain;
-    }
-
-    .about-comic-view-content img {
+        /* Applies to uploader pfp only! */
+        object-fit: scale-down;
         width: 12vh;
         height: 12vh;
         border-radius: 100%;
         box-shadow: 0 5px 5px 0 rgba(0,0,0,.15);
+    }
+
+    .archive-comic-view-content img {
+        object-fit: scale-down;
+        aspect-ratio: 1/1;
+        max-height: 70vh;
+        max-width: 85%;
+    }
+
+    .full-comic-view-content img {
+        object-fit: scale-down;
+        aspect-ratio: 1/1;
+        max-height: 90vh;
+        max-width: 90%;
     }
 
 .box-shadow {

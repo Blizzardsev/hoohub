@@ -141,6 +141,7 @@ function showComicFullView(comic) {
                 <img class="mb-4" src="${$(comic).attr("src")}" alt="${$(comic).attr("alt-description")}">
                 <h5 class="fst-italic">${$(comic).data("description")}</h5>
                 <h5 class="fst-italic">Tags | ${$(comic).data("display-tags")}</h5>
+                <h5 class="fst-italic mt-1 opacity-50">Click anywhere to dismiss</h5>
             </div>
         </div>
     `)

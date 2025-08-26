@@ -4,6 +4,8 @@
 @{
     ViewData["Title"] = "Hoo.";
     var bannerPath = Model.IsNightMode ? "hoo_banner_night.png" : "hoo_banner.png";
+    var comicImageSource = Model.Comic != null ? $@"data:image/jpg;base64, {Model.Comic.GetImageAsBase64String()}" : "~/img/notfound.png";
+    var comicNotFoundClass = Model.Comic == null ? "athena" : string.Empty;
 }
 
 @section Styles {
@@ -18,7 +20,14 @@
         ? $@"data:image/jpg;base64,{Convert.ToBase64String(Model.Comic.UploadedBy.DisplayPicture)}" 
         : "~/img/notfound.png";
 
-    <div id="about-comic" class="about-comic-view-container animate__animated animate__fadeIn animate__faster" onclick="hideModal('about-comic')" style="display: none">
+    <div 
+        role="button"
+        tabindex="0"
+        id="about-comic" 
+        class="about-comic-view-container animate__animated animate__fadeIn animate__faster" 
+        onclick="hideModal('about-comic')"
+        onkeypress="onEnterKeyPress(event, hideModal, 'about-comic')"
+        style="display: none">
         <div class="about-comic-view-content">
             <h2>@Model.Comic.GetComicDisplayName()</h2>
             <input id="about-comic-publish-date-info" type="hidden" value="@(Model.Comic.PublishDate.HasValue? Model.Comic.PublishDate.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : string.Empty)" />
@@ -33,7 +42,26 @@
             <h5 class="fst-italic mt-4">@Model.Comic.GetComicDisplayDescription(false)</h5>
             <h5 class="fst-italic">Tags | @Model.Comic.GetComicDisplayTags()</h5>
 
-            <h5 class="fst-italic mt-5" style="filter: opacity(0.5)">Click anywhere to dismiss</h5>
+            <h5 class="fst-italic mt-5 opacity-50">Click anywhere to dismiss</h5>
+        </div>
+    </div>
+
+    <div 
+        role="button"
+        tabindex="0"
+        id="view-comic-full" 
+        class="full-comic-view-container animate__animated animate__fadeIn animate__faster" 
+        onclick="hideModal('view-comic-full')" 
+        onkeypress="onEnterKeyPress(event, hideModal, 'view-comic-full')"
+        style="display: none">
+        <div class="full-comic-view-content">
+            <img 
+                id="view-comic-full-display" 
+                class="d-block m-auto animate__animated animate__fadeIn animate__fast @(comicNotFoundClass)"
+                src="@(comicImageSource)" 
+                alt="@Model.Comic.ComicAltDescription"
+                title="Click anywhere to dismiss..."/>
+            <h5 class="fst-italic mt-2 opacity-50">Click anywhere to dismiss</h5>
         </div>
     </div>
 }
@@ -118,10 +146,14 @@
     <img id="banner" class="mt-2 mb-2 d-block m-auto animate__animated animate__fadeIn animate__fast" src="~/img/@(bannerPath)" alt="Hoo - Hate everything."/>
     @if (Model.Comic != null)
     {
-        string imageSource = Model.Comic != null ? $@"data:image/jpg;base64, {Model.Comic.GetImageAsBase64String()}" : "~/img/notfound.png";
-        var notFoundClass = Model.Comic == null ? "athena" : string.Empty;
-
-        <img id="comic-display" class="d-block m-auto animate__animated animate__fadeIn animate__fast @(notFoundClass)" src="@(imageSource)" alt="@Model.Comic.ComicAltDescription"/>
+        <img 
+            id="comic-display" 
+            class="d-block m-auto animate__animated animate__fadeIn animate__fast @(comicNotFoundClass)" 
+            src="@(comicImageSource)" 
+            alt="@Model.Comic.ComicAltDescription"
+            title="Click comic to enlarge..."
+            onclick="showModal('view-comic-full')"
+            onkeypress="onEnterKeyPress(event, showModal, 'view-comic-full')" />
     }
     else
     {
