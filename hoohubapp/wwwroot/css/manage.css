@@ -64,7 +64,8 @@
 }
 
     #manage-comic-preview,
-    #manage-me-preview {
+    #manage-me-preview,
+    #manage-user-preview{
         max-width: 50%;
         max-height: 50%;
         top: 10%;
@@ -78,10 +79,18 @@
         position: initial;
     }
 
-    #manage-me-preview {
+    #manage-me-preview,
+    #manage-user-preview {
         max-width: 300px;
         border-radius: 50%;
         object-fit: cover;
+    }
+
+    #manage-user-preview {
+        border: 2px solid var(--main-foreground-colour);
+        margin: auto;
+        display: block;
+        max-width: 150px;
     }
 
     #new-comic-preview:hover,
@@ -128,13 +137,14 @@ input {
     transition: 0.5s;
     cursor: pointer;
     user-select: text;
+    word-wrap: break-word;
 }
 
     .manage-comic-item:hover,
     .manage-events-item:hover,
-    .manage-comic-item.selected
+    .manage-comic-item.selected,
     .manage-user-item.selected {
-        filter: brightness(80%)
+        filter: brightness(70%)
     }
 
 input,

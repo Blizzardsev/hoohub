@@ -86,6 +86,8 @@ function getComics(newSearch=false, displayEndOfResultsPrompt=true) {
                             newComics.push(`
                                 <div class="col-auto d-flex align-middle animate__animated animate__fadeIn">
                                     <img 
+                                        role="button" 
+                                        tabindex="0"
                                         data-guid="${comic.guid}" 
                                         data-display-name="${comic.displayName}"
                                         data-display-publish-date="${comic.displayPublishDate != undefined ? UtcDateTimeToLocalDateTimeString(comic.displayPublishDate) : "(Not yet published)"}"
@@ -94,7 +96,8 @@ function getComics(newSearch=false, displayEndOfResultsPrompt=true) {
                                         data-display-tags="${comic.displayTags}"
                                         class="archive-comic" src="data:image/jpg;base64,${comic.imageData}" 
                                         title="View ${comic.displayName}..." 
-                                        onclick="showComicFullView(this)"/>
+                                        onclick="showComicFullView(this)"
+                                        onkeydown="onEnterKeyPress(showComicFullView, this)"/>
                                 </div>
                             `)
                         })
@@ -126,7 +129,12 @@ function getComics(newSearch=false, displayEndOfResultsPrompt=true) {
  */
 function showComicFullView(comic) {
     $("header").append(`
-        <div class="archive-comic-view-container animate__animated animate__fadeIn animate__faster" onclick="hideComicFullView(this)">
+        <div 
+            role="button" 
+            tabindex="0" 
+            class="archive-comic-view-container animate__animated animate__fadeIn animate__faster" 
+            onclick="hideComicFullView(this)"
+            onkeydown="onEnterKeyPress(hideComicFullView, this)">
             <div class="archive-comic-view-content">
                 <h2>${$(comic).data("display-name")}</h2>
                 <h5 class="fst-italic mb-4">${$(comic).data("display-publish-date")}</h5>

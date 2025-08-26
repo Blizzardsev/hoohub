@@ -589,3 +589,106 @@ function getManageUsersList(element) {
         })
     }, 500)
 }
+
+/**
+* Attempts to fetch the details and populate the user management form for the selected user.
+* @param {any} element - The calling control to be disabled/enabled.
+* @param {*} userGuid - The GUID of the user to load.
+*/
+function loadManageUser(element, userGuid) {
+    $(".manage-user-item").removeClass("selected")
+    setFormLockState($("#manage-user-form"), true)
+
+    $.ajax({
+        type: "GET",
+        url: "?handler=ManageUserDetails",
+        dataType: "json",
+        data: {
+            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+            userGuid: userGuid
+        },
+        success: function (result) {
+            if (result.success) {
+                setTimeout(function () {
+                    $(element).addClass("selected")
+                    setFormLockState($("#manage-user-form"), false)
+
+                    $("#manage-user-preview").attr("src", `data:image/jpg;base64,${result.displayPictureData}`)
+                    $("#manage-user-user-guid").val(result.guid)
+                    $("#manage-user-handle-info").text(result.handle)
+                    $("#manage-user-social-info").text(result.socialLink)
+                    $("#manage-user-social-link").attr("href", result.socialLink)
+
+                    $("#manage-user-last-login-info").text(result.lastLoginDate === null
+                        ? "User has never logged in"
+                        : `${UtcDateTimeToLocalDateTimeString(result.lastLoginDate)} from ${result.lastLoginIpAddress}`)
+                    $("#manage-user-is-locked").prop("checked", result.accountIsLocked)
+                    $("#manage-user-is-disabled").prop("checked", result.accountIsDisabled)
+                })
+
+                $("#manage-user-form").validate()
+                setFormLockState($("#manage-user-form"), false)
+                $("#manage-user-update").removeClass("disabled")
+            }
+            else {
+                displayAlert(result.message)
+            }
+        },
+        failure: function () {
+            displayAlert("Failed to load user")
+        }
+    })
+}
+
+/**
+* Attempts to update an existing user.
+* If successful, informs the user.
+* Otherwise, notifies of any errors.
+* @param {*} element - The calling control to be disabled/enabled.
+*/
+function patchUser(element) {
+    let manageUserForm = $("#manage-user-form")
+
+    $(manageUserForm).validate()
+    if ($(element).hasClass("disabled") || !$(manageUserForm).valid()) {
+        return
+    }
+
+    $(element).addClass("disabled")
+
+    let formData = new FormData()
+    formData.append("__RequestVerificationToken", $('input[name="__RequestVerificationToken"]').val())
+    formData.append("userGuid", $("#manage-user-user-guid").val())
+    formData.append("accountIsLocked", $("#manage-user-is-locked").is(":checked"))
+    formData.append("accountIsDisabled", $("#manage-user-is-disabled").is(":checked"))
+
+    setFormLockState(manageUserForm, true)
+    let loaderId = displayLoading()
+    setTimeout(function () {
+        $.ajax({
+            type: "PATCH",
+            url: "?handler=User",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result.success) {
+                    displayAlert("User updated!")
+                }
+                else {
+                    displayAlert(result.message)
+                }
+
+                getManageUsersList($("#manage-users-refresh"))
+            },
+            failure: function () {
+                displayAlert("Failed to update user")
+            },
+            complete: function () {
+                hideLoading(loaderId)
+                $(element).removeClass("disabled")
+                setFormLockState(manageUserForm, false)
+            }
+        })
+    }, 500)
+}

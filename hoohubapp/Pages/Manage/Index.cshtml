@@ -364,6 +364,50 @@
                     </div>
                 </div>
                 <div class="col mx-auto overflow-auto">
+                    <div class="row w-100">
+                        <form id="manage-user-form" class="w-100 mx-auto enctype="multipart/form-data">
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                            <input id="manage-user-user-guid" type="hidden"/>
+                            <div class="form-group mb-1">
+                                <img id="manage-user-preview" class="animate__animated animate__fadeIn" src="@($@"data:image/jpg;base64, {Properties.Resources.UploadPlaceholderBase64}")" />
+                            </div>
+                            <div class="form-group mb-1">
+                                <label class="form-label fw-bold">Current handle</label>
+                                <br />
+                                <label id="manage-user-handle-info" class="form-label fst-italic">N/A</label>
+                            </div>
+                            <div class="form-group mb-1">
+                                <label class="form-label fw-bold">Current social media URL</label>
+                                <br />
+                                <a id="manage-user-social-link" class="fw-bold" href="/Manage" target="_blank">
+                                    <label id="manage-user-social-info" class="form-label fst-italic">N/A</label>
+                                </a>
+                            </div>
+                            <div class="form-group mb-1">
+                                <label class="form-label fw-bold">Last login</label>
+                                <br />
+                                <label id="manage-user-last-login-info" class="form-label fst-italic">N/A</label>
+                            </div>
+                            <div class="form-group mb-1">
+                                <label class="form-label fw-bold" asp-for="ManageInputModel.ManageUserInput.AccountIsLocked"></label>
+                                <br />
+                                <label class="switch row justify-content-center scale-75">
+                                    <input id="manage-user-is-locked" type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="form-group mb-1">
+                                <label class="form-label fw-bold" asp-for="ManageInputModel.ManageUserInput.AccountIsDisabled"></label>
+                                <br />
+                                <label class="form-label fst-italic">Disabled users may never log in</label>
+                                <br />
+                                <label class="switch row justify-content-center scale-75">
+                                    <input id="manage-user-is-disabled" type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </form>
+                    </div>
                     <div class="row mt-4 d-flex justify-content-center mx-auto">
                         <div class="col-auto mx-auto">
                             <div role="button" tabindex="0" id="manage-user-update" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow disabled" onclick="patchUser(this)" title="Update">update</div>

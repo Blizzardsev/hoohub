@@ -105,6 +105,17 @@ h1 {
     font-size: 2.5em;
 }
 
+a {
+    cursor: pointer !important;
+    color: var(--link-color);
+    transition: 0.2s;
+}
+
+    a:hover {
+        color: var(--link-color);
+        filter: brightness(70%);
+    }
+
 .top-5 {
     top: 5%;
 }
