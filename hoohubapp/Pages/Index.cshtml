@@ -42,10 +42,20 @@
             <h5 class="fst-italic mt-4">@Model.Comic.GetComicDisplayDescription(false)</h5>
             <h5 class="fst-italic">Tags | @Model.Comic.GetComicDisplayTags()</h5>
 
-            <h5 class="fst-italic mt-5 opacity-50">Click anywhere to dismiss</h5>
+            <h5 class="fst-italic mt-5 opacity-50">@(Model.IsMobileClient ? "Tap anywhere or swipe up to dismiss" : "Click anywhere to dismiss")</h5>
         </div>
     </div>
 
+    @if (Model.Comic != null && !string.IsNullOrWhiteSpace(Model.NextComicId))
+    {
+        <a id="comic-swipe-next-link" asp-page="/Index" asp-route-comic="@Model.NextComicId" class="d-none" asp-route-fullScreen="true"></a>
+    }
+
+    @if (Model.Comic != null && !string.IsNullOrWhiteSpace(Model.PreviousComicId))
+    {
+        <a id="comic-swipe-previous-link" asp-page="/Index" asp-route-comic="@Model.PreviousComicId" class="d-none" asp-route-fullScreen="true"></a>
+    }
+    
     <div 
         role="button"
         tabindex="0"
@@ -53,7 +63,7 @@
         class="full-comic-view-container animate__animated animate__fadeIn animate__faster" 
         onclick="hideModal('view-comic-full')" 
         onkeypress="onEnterKeyPress(event, hideModal, 'view-comic-full')"
-        style="display: none">
+        style="@(Model.FullScreenDisplay ? string.Empty : "display: none")">
         <div class="full-comic-view-content">
             <img 
                 id="view-comic-full-display" 
@@ -61,7 +71,12 @@
                 src="@(comicImageSource)" 
                 alt="@Model.Comic.ComicAltDescription"
                 title="Click anywhere to dismiss..."/>
-            <h5 class="fst-italic mt-2 opacity-50">Click anywhere to dismiss</h5>
+
+            <h5 class="fst-italic mt-2 opacity-50">@(Model.IsMobileClient ? "Tap anywhere or swipe up to dismiss" : "Click anywhere to dismiss")</h5>
+            @if (Model.IsMobileClient)
+            {
+                <h5 class="fst-italic mt-2 opacity-50">Swipe left/right for more comics</h5>
+            }
         </div>
     </div>
 }

@@ -1,3 +1,4 @@
+using DeviceDetectorNET;
 using hoohub.Data;
 using hoohub.Enums;
 using hoohub.Requests.Results;
@@ -45,6 +46,16 @@ namespace hoohub.Pages
         public bool IsNightMode { get; private set; } = false;
 
         /// <summary>
+        /// Whether to display the comic in the full view mode on loading the page, for instance if the user is on mobile and swiping left/right.
+        /// </summary>
+        public bool FullScreenDisplay { get; private set; } = false;
+
+        /// <summary>
+        /// Whether the request is coming from a mobile client or not.
+        /// </summary>
+        public bool IsMobileClient { get; private set; } = true;
+
+        /// <summary>
         /// Initialises a new instance of the <see cref="IndexModel"/> class.
         /// </summary>
         /// <param name="hooContext">Injected app context.</param>
@@ -67,10 +78,11 @@ namespace hoohub.Pages
         /// </summary>
         /// <param name="comic">Optional comic GUID to render.</param>
         /// <returns>The main page.</returns>
-        public async Task<IActionResult> OnGetAsync(string comic = "")
+        public async Task<IActionResult> OnGetAsync(string comic = "", bool fullScreen = false)
         {
             try
             {
+                // Redirect if necessary
                 var redirectString = await GetOfflineRedirectAsync();
                 if (!string.IsNullOrWhiteSpace(redirectString))
                 {
@@ -88,6 +100,7 @@ namespace hoohub.Pages
                     IsNightMode = Request.Cookies["nightMode"] == "true";
                 }
 
+                // Determine the comic to render - if we have a GUID, try to retrieve it. Otherwise, just load the most recent, I guess
                 Comic? comicToDisplay = null;
                 if (!string.IsNullOrEmpty(comic))
                 {
@@ -115,12 +128,18 @@ namespace hoohub.Pages
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = comicToDisplay;
+                FullScreenDisplay = fullScreen;
 
                 var currentUser = await _userManager.GetUserAsync(User);
                 string? userGuid = currentUser != null
                     ? currentUser.Id
                     : Request.Cookies["uniqueId"];
                 ComicIsLiked = !string.IsNullOrWhiteSpace(userGuid) && Comic.ComicLikes.Any(comicItem => comicItem.UserGuid == userGuid);
+
+                // Some extra text for mobile devices, so check client
+                var deviceDetector = new DeviceDetector(userAgent: Request.Headers["User-Agent"]);
+                deviceDetector.Parse();
+                IsMobileClient = deviceDetector.IsMobile();
 
                 return Page();
             }
