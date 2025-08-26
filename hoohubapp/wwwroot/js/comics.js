@@ -23,16 +23,16 @@ $("html").click(function (event) {
 })
 
 /**
- * On swiping left, load the previous comic, if one exists.
+ * On swiping right, load the previous comic, if one exists.
  */
-document.getElementById("view-comic-full").addEventListener("swiped-left", function (event) {
+document.getElementById("view-comic-full").addEventListener("swiped-right", function (event) {
     document.getElementById("comic-swipe-previous-link").click()
 })
 
 /**
- * On swiping right, load the next comic, if one exists.
+ * On swiping left, load the next comic, if one exists.
  */
-document.getElementById("view-comic-full").addEventListener("swiped-right", function (event) {
+document.getElementById("view-comic-full").addEventListener("swiped-left", function (event) {
     document.getElementById("comic-swipe-next-link").click()
 })
 
