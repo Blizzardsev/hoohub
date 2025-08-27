@@ -4,6 +4,7 @@ using hoohub.Enums;
 using hoohub.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,25 @@ builder.Configuration.GetSection("SmtpSettings").Bind(smtpSettings);
 smtpSettings.Password = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
 builder.Services.Add(new ServiceDescriptor(typeof(SmtpService), new SmtpService(smtpSettings)));
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: $"{httpContext.Connection.RemoteIpAddress} {httpContext.Connection.LocalIpAddress}",
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 20,
+                QueueLimit = 0,
+                Window = TimeSpan.FromSeconds(2)
+            }));
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.Redirect("/RateLimited", false);
+    };
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -70,6 +90,8 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseRateLimiter();
+
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
