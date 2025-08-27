@@ -1,0 +1,21 @@
+﻿@page
+@model RateLimitedModel
+@{
+    ViewData["Title"] = "tHoo many requests";
+}
+
+<div class="container content-panel text-center">
+    <h1 class="text-center mb-4">tHoo many requests</h1>
+    <br />
+    <img id="comic-display" class="d-block m-auto mb-2 mt-2 athena" style="max-height: 50vh" src="~/img/notfound.png" asp-append-version=true alt="Athena panicking" />
+    <h5 class="text-center mt-4">Please try again later</h5>
+    <div class="row mt-4 d-flex justify-content-center mx-auto">
+        <div class="col-auto mx-auto text-center" style="margin-top: 5%">
+            <a asp-page="/Index">
+                <div role="button" tabindex="0" class="site-option option-button material-symbols-outlined align-items-center justify-content-center box-shadow" title="Home">keyboard_double_arrow_right</div>
+            </a>
+            <br />
+            <span class="option-tip">Home</span>
+        </div>
+    </div>
+</div>
