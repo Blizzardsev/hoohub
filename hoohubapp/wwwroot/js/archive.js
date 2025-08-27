@@ -130,6 +130,7 @@ function getComics(newSearch=false, displayEndOfResultsPrompt=true) {
 function showComicFullView(comic) {
     $("header").append(`
         <div 
+            id="archive-comic-full-view"
             role="button" 
             tabindex="0" 
             class="archive-comic-view-container animate__animated animate__fadeIn animate__faster" 
@@ -141,11 +142,14 @@ function showComicFullView(comic) {
                 <img class="mb-4" src="${$(comic).attr("src")}" alt="${$(comic).attr("alt-description")}">
                 <h5 class="fst-italic">${$(comic).data("description")}</h5>
                 <h5 class="fst-italic">Tags | ${$(comic).data("display-tags")}</h5>
-                <h5 class="fst-italic mt-1 opacity-50">Click anywhere to dismiss</h5>
+                <h5 class="fst-italic mt-1 opacity-50">${$("#archive-is-mobile-agent").val().toLowerCase() === "true" ? "Tap anywhere or swipe up" : "Click anywhere"} to dismiss</h5>
             </div>
         </div>
     `)
     $("body").addClass("no-scroll")
+    document.getElementById("archive-comic-full-view").addEventListener("swiped-up", function (event) {
+        hideComicFullView(document.getElementById("archive-comic-full-view"))
+    })
 }
 
 /**

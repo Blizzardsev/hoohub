@@ -1,3 +1,4 @@
+using DeviceDetectorNET;
 using hoohub.Data;
 using hoohub.Requests.Data;
 using hoohub.Requests.Results;
@@ -28,6 +29,11 @@ namespace hoohub.Pages
         /// Some assets may need replacement based on this.
         /// </summary>
         public bool IsNightMode { get; private set; } = false;
+
+        /// <summary>
+        /// Whether the request is coming from a mobile client or not.
+        /// </summary>
+        public bool IsMobileClient { get; private set; } = true;
 
         /// <summary>
         /// Initialises a new instance of the <see cref="ArchiveModel"/> page.
@@ -73,6 +79,11 @@ namespace hoohub.Pages
                 {
                     IsNightMode = Request.Cookies["nightMode"] == "true";
                 }
+
+                // Some extra text for mobile devices, so check client
+                var deviceDetector = new DeviceDetector(userAgent: Request.Headers["User-Agent"]);
+                deviceDetector.Parse();
+                IsMobileClient = deviceDetector.IsMobile();
 
                 return Page();
             }

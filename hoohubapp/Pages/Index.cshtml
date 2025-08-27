@@ -30,7 +30,10 @@
         style="display: none">
         <div class="about-comic-view-content">
             <h2>@Model.Comic.GetComicDisplayName()</h2>
-            <input id="about-comic-publish-date-info" type="hidden" value="@(Model.Comic.PublishDate.HasValue? Model.Comic.PublishDate.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : string.Empty)" />
+            <input 
+                id="about-comic-publish-date-info" 
+                type="hidden" 
+                value="@(Model.Comic.PublishDate.HasValue? Model.Comic.PublishDate.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") : string.Empty)" />
             <h5 id="about-comic-publish-date-display" class="fst-italic mb-4">First published (Unknown)</h5>
 
             @if (Model.Comic.UploadedBy != null)
