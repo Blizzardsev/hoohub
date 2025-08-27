@@ -26,6 +26,11 @@ $("html").click(function (event) {
  * On swiping right, load the previous comic, if one exists.
  */
 document.getElementById("view-comic-full").addEventListener("swiped-right", function (event) {
+    if (document.getElementById("comic-swipe-previous-link") === null) {
+        displayAlert("End of comics")
+        return
+    }
+    displayLoading()
     document.getElementById("comic-swipe-previous-link").click()
 })
 
@@ -33,6 +38,11 @@ document.getElementById("view-comic-full").addEventListener("swiped-right", func
  * On swiping left, load the next comic, if one exists.
  */
 document.getElementById("view-comic-full").addEventListener("swiped-left", function (event) {
+    if (document.getElementById("comic-swipe-next-link") === null) {
+        displayAlert("End of comics")
+        return
+    }
+    displayLoading()
     document.getElementById("comic-swipe-next-link").click()
 })
 

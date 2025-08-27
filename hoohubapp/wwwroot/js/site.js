@@ -92,7 +92,7 @@ function displayAlert(text, delay = 3000) {
             <div class="alert-content animate__animated animate__bounceInDown">${text}</div>
         </div>
     `)
-    $("header").append(alert)
+    $("body").append(alert)
     setTimeout(function () {
         $(`#${alertId}`).remove()
     }, delay)
@@ -109,7 +109,7 @@ function displayLoading() {
             <div class="loader">
         </div>
     `)
-    $("header").append(loader)
+    $("body").append(loader)
     return loaderId
 }
 
