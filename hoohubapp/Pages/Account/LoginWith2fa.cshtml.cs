@@ -74,8 +74,7 @@ namespace hoohub.Areas.Identity.Pages.Account
             HooHubUser user = null;
             try
             {
-                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
-                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                if (!HttpCheckService.IsValidUserAgentAndIpAddress(_appSettings, Request))
                 {
                     return NotFound("Sorry, we could not process your request: please try again later.");
                 }

@@ -49,10 +49,8 @@
         public string SiteAdmin { get; set; } = string.Empty;
 
         /// <summary>
-        /// Basic blacklist; not persisted on app restart.
+        /// Basic blacklist; not persisted on app restart. Only bots and scrapers that don't obey robots.txt and navigate to the bait link should end up here.
         /// </summary>
-        public List<string> BlockedIpAddressRange = [
-            "::ffff:10.244.5.106"
-        ];
+        public List<string> BlockedIpAddressRange = [];
     }
 }

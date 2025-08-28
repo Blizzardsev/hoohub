@@ -64,8 +64,7 @@ namespace hoohub.Areas.Identity.Pages.Account
         /// <returns>The forgotten password reset request page.</returns>
         public async Task<IActionResult> OnGetAsync(string? email = null)
         {
-            if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
-                || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+            if (!HttpCheckService.IsValidUserAgentAndIpAddress(_appSettings, Request))
             {
                 return NotFound("Sorry, we could not process your request: please try again later.");
             }

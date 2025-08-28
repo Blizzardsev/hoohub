@@ -1,4 +1,5 @@
 using hoohub.Configuration;
+using hoohub.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -32,8 +33,7 @@ namespace hoohub.Pages
         /// </summary>
         public async Task<IActionResult> OnGetAsync()
         {
-            if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
-                || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+            if (!HttpCheckService.IsValidUserAgentAndIpAddress(_appSettings, Request))
             {
                 return NotFound("Sorry, we could not process your request: please try again later.");
             }

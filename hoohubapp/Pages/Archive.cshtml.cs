@@ -3,6 +3,7 @@ using hoohub.Configuration;
 using hoohub.Data;
 using hoohub.Requests.Data;
 using hoohub.Requests.Results;
+using hoohub.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -58,8 +59,7 @@ namespace hoohub.Pages
         {
             try
             {
-                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
-                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                if (!HttpCheckService.IsValidUserAgentAndIpAddress(_appSettings, Request))
                 {
                     return NotFound("Sorry, we could not process your request: please try again later.");
                 }
@@ -121,8 +121,7 @@ namespace hoohub.Pages
         {
             try
             {
-                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
-                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                if (!HttpCheckService.IsValidUserAgentAndIpAddress(_appSettings, Request))
                 {
                     return new JsonResult(new BaseResult(
                         success: false,
