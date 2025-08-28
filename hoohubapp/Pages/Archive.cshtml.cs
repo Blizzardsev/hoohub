@@ -1,4 +1,5 @@
 using DeviceDetectorNET;
+using hoohub.Configuration;
 using hoohub.Data;
 using hoohub.Requests.Data;
 using hoohub.Requests.Results;
@@ -17,6 +18,7 @@ namespace hoohub.Pages
     {
         private readonly HooHubContext _hooContext;
         private readonly SignInManager<HooHubUser> _signInManager;
+        private readonly AppSettings _appSettings;
 
         [DataType(DataType.Text)]
         [MaxLength(200)]
@@ -40,10 +42,12 @@ namespace hoohub.Pages
         /// </summary>
         /// <param name="hooContext">Injected app context.</param>
         /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/>.</param>
-        public ArchiveModel(HooHubContext hooContext, SignInManager<HooHubUser> signInManager)
+        /// <param name="appSettings">Injected <see cref="AppSettings"/>.</param>
+        public ArchiveModel(HooHubContext hooContext, SignInManager<HooHubUser> signInManager, AppSettings appSettings)
         {
             _hooContext = hooContext;
             _signInManager = signInManager;
+            _appSettings = appSettings;
         }
 
         /// <summary>
@@ -54,6 +58,12 @@ namespace hoohub.Pages
         {
             try
             {
+                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                {
+                    return NotFound("Sorry, we could not process your request: please try again later.");
+                }
+
                 var settings = _hooContext.Settings.FirstOrDefault();
                 if (settings != null)
                 {
@@ -111,6 +121,14 @@ namespace hoohub.Pages
         {
             try
             {
+                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "Sorry, we could not process your request: please try again later."));
+                }
+
                 var allComics = _hooContext.Comics
                     .AsEnumerable()
                     .Where(comic => !comic.IsHidden)

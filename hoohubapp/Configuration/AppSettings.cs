@@ -9,7 +9,13 @@
         /// <summary>
         /// The list of IP addresses that are considered trusted locations, requiring no 2FA.
         /// </summary>
-        public List<string> TrustedLocations { get; set; } = new List<string>();
+        public string[] TrustedLocations { get; set; } = [];
+
+        /// <summary>
+        /// The list of user agents that should be blocked from accessing main site content.<br/>
+        /// Any user agent containing this text will be served a dummy page.
+        /// </summary>
+        public string[] BlockedUserAgents { get; set; } = [];
 
         /// <summary>
         /// The email address of the artist to assign credit for.
@@ -41,5 +47,10 @@
         /// The administrator cannot be managed by other users.
         /// </summary>
         public string SiteAdmin { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Basic blacklist; not persisted on app restart.
+        /// </summary>
+        public List<string> BlockedIpAddressRange = [];
     }
 }

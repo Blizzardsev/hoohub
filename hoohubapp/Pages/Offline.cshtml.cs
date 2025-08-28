@@ -1,3 +1,4 @@
+using hoohub.Configuration;
 using hoohub.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +14,7 @@ namespace hoohub.Pages
     {
         private readonly HooHubContext _context;
         private readonly SignInManager<HooHubUser> _signInManager;
+        private readonly AppSettings _appSettings;
 
         /// <summary>
         /// Whether or not the app is considered to be in Night Mode.<br/>
@@ -25,10 +27,12 @@ namespace hoohub.Pages
         /// </summary>
         /// <param name="context">Injected app context.</param>
         /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/>.</param>
-        public OfflineModel(HooHubContext context, SignInManager<HooHubUser> signInManager)
+        /// <param name="appSettings">Injected <see cref="AppSettings"/>.</param>
+        public OfflineModel(HooHubContext context, SignInManager<HooHubUser> signInManager, AppSettings appSettings)
         {
             _context = context;
             _signInManager = signInManager;
+            _appSettings = appSettings;
         }
 
         /// <summary>
@@ -36,6 +40,12 @@ namespace hoohub.Pages
         /// </summary>
         public async Task<IActionResult> OnGetAsync()
         {
+            if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+            {
+                return NotFound("Sorry, we could not process your request: please try again later.");
+            }
+
             var settings = _context.Settings.FirstOrDefault();
             if (settings.PublicAccessEnabled)
             {

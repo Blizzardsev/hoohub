@@ -1,4 +1,5 @@
 using DeviceDetectorNET;
+using hoohub.Configuration;
 using hoohub.Data;
 using hoohub.Enums;
 using hoohub.Requests.Results;
@@ -17,6 +18,7 @@ namespace hoohub.Pages
         private readonly HooHubContext _hooContext;
         private readonly SignInManager<HooHubUser> _signInManager;
         private readonly UserManager<HooHubUser> _userManager;
+        private readonly AppSettings _appSettings;
 
         /// <summary>
         /// The comic to render on the page.<br/>
@@ -61,14 +63,17 @@ namespace hoohub.Pages
         /// <param name="hooContext">Injected app context.</param>
         /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/>.</param>
         /// <param name="userManager">Injected <see cref="UserManager{TUser}"/>.</param>
+        /// <param name="appSettings">Injected <see cref="AppSettings"/>.</param>
         public IndexModel(
             HooHubContext hooContext,
             SignInManager<HooHubUser> signInManager,
-            UserManager<HooHubUser> userManager)
+            UserManager<HooHubUser> userManager,
+            AppSettings appSettings)
         {
             _hooContext = hooContext;
             _signInManager = signInManager;
             _userManager = userManager;
+            _appSettings = appSettings;
         }
 
         /// <summary>
@@ -83,6 +88,12 @@ namespace hoohub.Pages
         {
             try
             {
+                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                {
+                    return NotFound("Sorry, we could not process your request: please try again later.");
+                }
+
                 // Redirect if necessary
                 var redirectString = await GetOfflineRedirectAsync();
                 if (!string.IsNullOrWhiteSpace(redirectString))
@@ -184,6 +195,12 @@ namespace hoohub.Pages
         {
 			try
 			{
+                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                {
+                    return NotFound("Sorry, we could not process your request: please try again later.");
+                }
+
                 var redirectString = await GetOfflineRedirectAsync();
                 if (!string.IsNullOrWhiteSpace(redirectString))
                 {
@@ -264,6 +281,12 @@ namespace hoohub.Pages
         {
             try
             {
+                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                {
+                    return NotFound("Sorry, we could not process your request: please try again later.");
+                }
+
                 var redirectString = await GetOfflineRedirectAsync();
                 if (!string.IsNullOrWhiteSpace(redirectString))
                 {
@@ -318,6 +341,12 @@ namespace hoohub.Pages
         {
             try
             {
+                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                {
+                    return NotFound("Sorry, we could not process your request: please try again later.");
+                }
+
                 var redirectString = await GetOfflineRedirectAsync();
                 if (!string.IsNullOrWhiteSpace(redirectString))
                 {
@@ -373,6 +402,12 @@ namespace hoohub.Pages
         {
             try
             {
+                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                {
+                    return NotFound("Sorry, we could not process your request: please try again later.");
+                }
+
                 string? nightModeSetting = Request.Cookies["nightMode"];
                 if (string.IsNullOrWhiteSpace(nightModeSetting))
                 {
@@ -409,6 +444,14 @@ namespace hoohub.Pages
         {
             try
             {
+                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "Sorry, we could not process your request: please try again later."));
+                }
+
                 var comic = await _hooContext.Comics
                     .Include(comicItem => comicItem.ComicLikes)
                     .AsSplitQuery()
@@ -476,6 +519,38 @@ namespace hoohub.Pages
                     stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
                 await _hooContext.SaveChangesAsync();
                 return new JsonResult(new BaseResult(success: false));
+            }
+        }
+
+        /// <summary>
+        /// On requesting this action, the user is restricted from accessing the app as a basic anti-scraping measure.
+        /// </summary>
+        /// <returns>User is restricted from accessing the app as a basic anti-scraping measure.</returns>
+        public async Task<IActionResult> OnGetHooHoo()
+        {
+            try
+            {
+                var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                if (!string.IsNullOrWhiteSpace(remoteIpAddress) && !_appSettings.BlockedIpAddressRange.Contains(remoteIpAddress))
+                {
+                    _appSettings.BlockedIpAddressRange.Add(remoteIpAddress);    
+                    await _hooContext.Events.AddAsync(new Event(
+                        eventType: EventTypes.IpAddressRestricted,
+                        details: $"Remote IP address {remoteIpAddress} accessed the blacklist method and is now temporarily restricted."));
+                    await _hooContext.SaveChangesAsync();
+                }
+
+                return NotFound("Sorry, we could not process your request: please try again later.");
+            }
+            catch (Exception exception)
+            {
+                await _hooContext.Events.AddAsync(new Event(
+                    eventType: EventTypes.Error,
+                    details: $"Failed to restrict remote IP address {Request.HttpContext.Connection.RemoteIpAddress} after blacklist method access: {exception.Message}",
+                    stackTrace: JsonConvert.SerializeObject(value: exception.StackTrace, formatting: Formatting.Indented)));
+                await _hooContext.SaveChangesAsync();
+
+                return NotFound("Sorry, we could not process your request: please try again later.");
             }
         }
 

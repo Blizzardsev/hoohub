@@ -81,5 +81,8 @@ namespace hoohub.Enums
 
         [Description("Unique user visit")]
         UniqueUserVisit,
+
+        [Description("IP address restricted")]
+        IpAddressRestricted,
     }
 }

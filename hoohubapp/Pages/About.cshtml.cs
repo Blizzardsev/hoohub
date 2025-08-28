@@ -49,6 +49,12 @@ namespace hoohub.Pages
         {
             try
             {
+                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                {
+                    return NotFound("Sorry, we could not process your request: please try again later.");
+                }
+
                 var settings = await _hooContext.Settings.FirstOrDefaultAsync();
                 if (settings != null)
                 {

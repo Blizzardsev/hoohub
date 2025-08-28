@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
+using hoohub.Configuration;
 using hoohub.Data;
 using hoohub.Enums;
 using hoohub.Services;
@@ -19,6 +20,7 @@ namespace hoohub.Areas.Identity.Pages.Account
         private readonly SignInManager<HooHubUser> _signInManager;
         private readonly UserManager<HooHubUser> _userManager;
         private readonly SmtpService _smtpService;
+        private readonly AppSettings _appSettings;
 
         /// <summary>
         /// Initialises the <see cref="LoginWith2faModel"/> class.
@@ -27,16 +29,19 @@ namespace hoohub.Areas.Identity.Pages.Account
         /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/> service.</param>
         /// <param name="userManager">Injected <see cref="UserManager{TUser}"/> service.</param>
         /// <param name="smtpService">Injected <see cref="SmtpService"/> service.</param>
+        /// <param name="appSettings">Injected <see cref="AppSettings"/>.</param>
         public LoginWith2faModel(
             HooHubContext context,
             SignInManager<HooHubUser> signInManager,
             UserManager<HooHubUser> userManager,
-            SmtpService smtpService)
+            SmtpService smtpService,
+            AppSettings appSettings)
         {
             _context = context;
             _signInManager = signInManager;
             _userManager = userManager;
             _smtpService = smtpService;
+            _appSettings = appSettings;
         }
 
         [BindProperty]
@@ -69,6 +74,12 @@ namespace hoohub.Areas.Identity.Pages.Account
             HooHubUser user = null;
             try
             {
+                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                {
+                    return NotFound("Sorry, we could not process your request: please try again later.");
+                }
+
                 // Ensure the user has gone through the username & password screen first
                 user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
 

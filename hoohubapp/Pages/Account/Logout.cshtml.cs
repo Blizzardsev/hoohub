@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
+using hoohub.Configuration;
 using hoohub.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,14 +13,17 @@ namespace hoohub.Areas.Identity.Pages.Account
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<HooHubUser> _signInManager;
+        private readonly AppSettings _appSettings;
 
         /// <summary>
         /// Initialises a new instance of the <see cref="LoginModel"/> class.
         /// </summary>
         /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/> service.</param>
-        public LogoutModel(SignInManager<HooHubUser> signInManager)
+        /// <param name="appSettings">Injected <see cref="AppSettings"/>.</param>
+        public LogoutModel(SignInManager<HooHubUser> signInManager, AppSettings appSettings)
         {
             _signInManager = signInManager;
+            _appSettings = appSettings;
         }
 
         /// <summary>

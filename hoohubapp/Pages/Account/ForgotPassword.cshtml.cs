@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
+using hoohub.Configuration;
 using hoohub.Data;
 using hoohub.Enums;
 using hoohub.Services;
@@ -19,6 +20,8 @@ namespace hoohub.Areas.Identity.Pages.Account
         private readonly HooHubContext _context;
         private readonly UserManager<HooHubUser> _userManager;
         private readonly SmtpService _smtpService;
+        private readonly AppSettings _appSettings;
+
 
         /// <summary>
         /// Initialises a new instance of the <see cref="ForgotPasswordModel"/>.
@@ -26,11 +29,17 @@ namespace hoohub.Areas.Identity.Pages.Account
         /// <param name="context">Injected app context.</param>
         /// <param name="userManager">Injected <see cref="UserManager{TUser}"/> instance.</param>
         /// <param name="smtpService">Injected <see cref="SmtpService"/> instance.</param>
-        public ForgotPasswordModel(HooHubContext context, UserManager<HooHubUser> userManager, SmtpService smtpService)
+        /// <param name="appSettings">Injected <see cref="AppSettings"/>.</param>
+        public ForgotPasswordModel(
+            HooHubContext context, 
+            UserManager<HooHubUser> userManager, 
+            SmtpService smtpService,
+            AppSettings appSettings)
         {
             _context = context;
             _userManager = userManager;
             _smtpService = smtpService;
+            _appSettings = appSettings;
         }
 
         [BindProperty]
@@ -55,6 +64,12 @@ namespace hoohub.Areas.Identity.Pages.Account
         /// <returns>The forgotten password reset request page.</returns>
         public async Task<IActionResult> OnGetAsync(string? email = null)
         {
+            if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+            {
+                return NotFound("Sorry, we could not process your request: please try again later.");
+            }
+
             Input = new InputModel
             {
                 Login = string.IsNullOrWhiteSpace(email) ? string.Empty : email
