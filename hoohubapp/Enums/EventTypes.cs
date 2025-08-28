@@ -84,5 +84,8 @@ namespace hoohub.Enums
 
         [Description("IP address restricted")]
         IpAddressRestricted,
+
+        [Description("Debug")]
+        Debug,
     }
 }

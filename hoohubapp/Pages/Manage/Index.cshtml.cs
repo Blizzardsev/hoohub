@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace hoohub.Pages.Manage
 {
@@ -264,7 +265,22 @@ namespace hoohub.Pages.Manage
                 if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
                 || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
                 {
-                    return NotFound("Sorry, we could not process your request: please try again later.");
+                    var userAgentIsBlocked = _appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower();
+                    var ipAddressIsBlocked = _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString();
+
+                    await _hooContext.Events.AddAsync(new Event(
+                        eventType: EventTypes.Debug,
+                        details: $"DEBUG: Access would have been restricted; userAgentIsBlocked: {userAgentIsBlocked} | ipAddressIsBlocked: {ipAddressIsBlocked}" +
+                            $"\nUser-Agent was: {Request.Headers["User-Agent"].ToString().ToLower()}" +
+                            $"\nIP Address was: {Request.HttpContext.Connection.RemoteIpAddress.ToString()}"));
+
+                    await _hooContext.Events.AddAsync(new Event(
+                        eventType: EventTypes.Debug,
+                        details: $"DEBUG: BlockedUserAgents: {JsonConvert.SerializeObject(_appSettings.BlockedUserAgents, Formatting.Indented)}"));
+
+                    await _hooContext.Events.AddAsync(new Event(
+                        eventType: EventTypes.Debug,
+                        details: $"DEBUG: BlockedIpAddressRange: {JsonConvert.SerializeObject(_appSettings.BlockedIpAddressRange, Formatting.Indented)}"));
                 }
 
                 string? nightModeSetting = Request.Cookies["nightMode"];
