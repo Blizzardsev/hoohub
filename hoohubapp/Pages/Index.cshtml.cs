@@ -149,7 +149,7 @@ namespace hoohub.Pages
                         await _hooContext.Events.AddAsync(new Event(
                             eventType: EventTypes.UniqueUserVisit,
                             details: $"A unique guest user visit was detected as the guest user has no existing unique ID;" +
-                                $" remote address is {Request.HttpContext.Connection.RemoteIpAddress}"));
+                                $" remote address is {Request.HttpContext.Connection.RemoteIpAddress} (User agent: {Request.Headers["User-Agent"]})"));
                         await _hooContext.SaveChangesAsync();
                     }
                 }
@@ -228,7 +228,20 @@ namespace hoohub.Pages
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = randomComic;
-                ComicIsLiked = Comic.ComicLikes.Any(comicItem => comicItem.IpAddress == Request.HttpContext.Connection.RemoteIpAddress.ToString());
+
+                var currentUser = await _userManager.GetUserAsync(User);
+                string? userGuid = currentUser != null
+                    ? currentUser.Id
+                    : Request.Cookies["uniqueId"];
+
+                if (string.IsNullOrWhiteSpace(userGuid))
+                {
+                    // No unregistered user GUID; create it
+                    userGuid = Guid.NewGuid().ToString();
+                    Response.Cookies.Append("uniqueId", userGuid);
+                }
+
+                ComicIsLiked = Comic.ComicLikes.Any(comicItem => comicItem.UserGuid == userGuid);
 
                 return Page();
             }
@@ -269,7 +282,20 @@ namespace hoohub.Pages
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = firstComic;
-                ComicIsLiked = Comic.ComicLikes.Any(comicItem => comicItem.IpAddress == Request.HttpContext.Connection.RemoteIpAddress.ToString());
+
+                var currentUser = await _userManager.GetUserAsync(User);
+                string? userGuid = currentUser != null
+                    ? currentUser.Id
+                    : Request.Cookies["uniqueId"];
+
+                if (string.IsNullOrWhiteSpace(userGuid))
+                {
+                    // No unregistered user GUID; create it
+                    userGuid = Guid.NewGuid().ToString();
+                    Response.Cookies.Append("uniqueId", userGuid);
+                }
+
+                ComicIsLiked = Comic.ComicLikes.Any(comicItem => comicItem.UserGuid == userGuid);
 
                 return Page();
             }
@@ -310,7 +336,20 @@ namespace hoohub.Pages
                 NextComicId = nextPreviousComicIds.Item1;
                 PreviousComicId = nextPreviousComicIds.Item2;
                 Comic = lastComic;
-                ComicIsLiked = Comic.ComicLikes.Any(comicItem => comicItem.IpAddress == Request.HttpContext.Connection.RemoteIpAddress.ToString());
+
+                var currentUser = await _userManager.GetUserAsync(User);
+                string? userGuid = currentUser != null
+                    ? currentUser.Id
+                    : Request.Cookies["uniqueId"];
+
+                if (string.IsNullOrWhiteSpace(userGuid))
+                {
+                    // No unregistered user GUID; create it
+                    userGuid = Guid.NewGuid().ToString();
+                    Response.Cookies.Append("uniqueId", userGuid);
+                }
+
+                ComicIsLiked = Comic.ComicLikes.Any(comicItem => comicItem.UserGuid == userGuid);
 
                 return Page();
             }
@@ -408,7 +447,8 @@ namespace hoohub.Pages
 
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.ComicLikeCreated,
-                        details: $"Comic GUID {comicGuid} was hearted by {(currentUser != null ? currentUser.GetEventLogString() : $"Guest user (GUID: {userGuid})")}"));
+                        details: $"Comic GUID {comicGuid} was hearted by {(currentUser != null ? currentUser.GetEventLogString() 
+                            : $"Guest user (GUID: {userGuid}, User agent: {Request.Headers["User-Agent"]})")}"));
                 }
                 else
                 {
@@ -416,7 +456,8 @@ namespace hoohub.Pages
                     _hooContext.ComicLikes.Remove(existingLike);
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.ComicLikeDeleted,
-                        details: $"Comic GUID {comicGuid} was unhearted by {(currentUser != null ? currentUser.GetEventLogString() : $"Guest user (GUID: {userGuid})")}"));
+                        details: $"Comic GUID {comicGuid} was unhearted by {(currentUser != null ? currentUser.GetEventLogString() 
+                            : $"Guest user (GUID: {userGuid}, User agent: {Request.Headers["User-Agent"]})")}"));
                 }
 
                 await _hooContext.SaveChangesAsync(); // Force a save so the upcoming count is current
