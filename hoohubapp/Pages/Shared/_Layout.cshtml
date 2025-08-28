@@ -1,6 +1,9 @@
 ﻿@inject SignInManager<HooHubUser> _signInManager
 @inject UserManager<HooHubUser> _userManager
 
+
+<a style="display: none; color: red; position: absolute; z-index: 3000" asp-page="/Index" asp-page-handler="HooHoo">hoot</a>
+
 @{
     var signedIn = _signInManager.IsSignedIn(User);
     var user = _userManager.GetUserAsync(User).Result;

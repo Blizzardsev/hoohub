@@ -261,6 +261,12 @@ namespace hoohub.Pages.Manage
         {
             try
             {
+                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                {
+                    return NotFound("Sorry, we could not process your request: please try again later.");
+                }
+
                 string? nightModeSetting = Request.Cookies["nightMode"];
                 if (string.IsNullOrWhiteSpace(nightModeSetting))
                 {

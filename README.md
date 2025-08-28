@@ -50,6 +50,7 @@ Use the relevant `appsettings.json` file to configure _HooHub_:
 
 - AppSettings:
     - TrustedLocations: IP addresses for which two-factor should not apply. This should only consist of the loopback address when running _HooHub_ locally!
+    - BlockedUserAgents: List of user agent string for which access should be restricted; note that the user agent needs only to contain an entry in this list. All entries should be in lowecase.
     - ArtistCredit: The email address of the HooHubUser to link for artist credit on the About page
     - WriterCredit: The email address of the HooHubUser to link for writer credit on the About page
     - SiteBaseUrl: The base site URL to use when sending emails, in a context that doesn't have access to a web request

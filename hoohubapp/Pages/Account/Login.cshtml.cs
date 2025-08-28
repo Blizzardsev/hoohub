@@ -59,6 +59,12 @@ namespace hoohub.Areas.Identity.Pages.Account
         /// <returns>The login page.</returns>
         public async Task<IActionResult> OnGetAsync(string returnUrl = null)
         {
+            if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
+                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+            {
+                return NotFound("Sorry, we could not process your request: please try again later.");
+            }
+
             if (_signInManager.IsSignedIn(User))
             {
                 ReturnUrl = string.Empty;
