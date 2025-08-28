@@ -507,6 +507,7 @@ function toggleComicIsHidden(element, comicType) {
     formData.append("archiveMaximumComicsPerFetch", $("#manage-app-max-comics-per-fetch").val())
     formData.append("manageEventsMaximumHistory", $("#manage-app-max-event-history").val())
     formData.append("scheduledComicReleaseTime", $("#manage-app-comic-release-time").val())
+    formData.append("newGuestUserLoggingEnabled", $("#manage-app-guest-user-logging").val())
 
     setFormLockState(manageAppForm, true)
     let loaderId = displayLoading()

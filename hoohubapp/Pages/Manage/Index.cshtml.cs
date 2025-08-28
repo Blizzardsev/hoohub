@@ -201,7 +201,7 @@ namespace hoohub.Pages.Manage
             public class ManageApp
             {
                 [Display(Name = "Site public access enabled")]
-                [Required(ErrorMessage = "Site public access state must be provided")]
+                [Required(ErrorMessage = "Site public access enabled state must be provided")]
                 public bool PublicAccessEnabled { get; set; }
 
                 [Display(Name = "Archive access")]
@@ -221,6 +221,10 @@ namespace hoohub.Pages.Manage
                 [Display(Name = "Scheduled comic release time")]
                 [Required(ErrorMessage = "Scheduled comic release time must be provided")]
                 public TimeOnly ScheduledComicReleaseTime { get; set; }
+
+                [Display(Name = "New guest user logging enabled")]
+                [Required(ErrorMessage = "New guest user logging enabled state must be provided")]
+                public bool NewGuestUserLoggingEnabled { get; set; }
             }
 
             public class ManageUser
@@ -284,6 +288,7 @@ namespace hoohub.Pages.Manage
                 ManageInputModel.ManageAppInput.ArchiveMaximumComicsPerFetch = appSettings != null ? appSettings.ArchiveMaximumComicsPerFetch : 20;
                 ManageInputModel.ManageAppInput.ManageEventsMaximumHistory = appSettings != null ? appSettings.ManageEventsMaximumHistory : 1000;
                 ManageInputModel.ManageAppInput.ScheduledComicReleaseTime = appSettings != null ? appSettings.ScheduledComicReleaseTime : new TimeOnly(hour: 12, minute: 00);
+                ManageInputModel.ManageAppInput.NewGuestUserLoggingEnabled = appSettings != null ? appSettings.NewGuestUserLoggingEnabled : false;
 
                 return Page();
             }
@@ -740,18 +745,20 @@ namespace hoohub.Pages.Manage
         /// <summary>
         /// Attempts to update the current app settings, returning a <see cref="JsonResult"/> representing the result of the request.
         /// </summary>
-        /// <param name="publicAccessEnabled">The public access state to set.</param>
+        /// <param name="publicAccessEnabled">The public access enabled state to set.</param>
         /// <param name="archiveAccess">The archive access state to set.</param>
         /// <param name="archiveMaximumComicsPerFetch">The maximum comics per scroll value to set.</param>
         /// <param name="manageEventsMaximumHistory">The manage events maximum history value to set.</param>
         /// <param name="scheduledComicReleaseTime">The scheduled comic release time value to set.</param>
+        /// <param name="newGuestUserLoggingEnabled">The new guest user logging enabled state to set.</param>
         /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
         public async Task<JsonResult> OnPatchAppSettingsAsync(
             bool publicAccessEnabled,
             AccessTypes archiveAccess,
             int archiveMaximumComicsPerFetch,
             int manageEventsMaximumHistory,
-            TimeOnly scheduledComicReleaseTime)
+            TimeOnly scheduledComicReleaseTime,
+            bool newGuestUserLoggingEnabled)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             var settings = _hooContext.Settings.FirstOrDefault();
@@ -787,7 +794,8 @@ namespace hoohub.Pages.Manage
                         archiveAccess: archiveAccess,
                         archiveMaximumComicsPerFetch: archiveMaximumComicsPerFetch,
                         manageEventsMaximumHistory: manageEventsMaximumHistory,
-                        scheduledComicReleaseTime: scheduledComicReleaseTime);
+                        scheduledComicReleaseTime: scheduledComicReleaseTime,
+                        newGuestUserLoggingEnabled: newGuestUserLoggingEnabled);
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.AppSettingsCreated,
                         details: $"App settings created by {currentUser.GetEventLogString()}" +
@@ -796,7 +804,8 @@ namespace hoohub.Pages.Manage
                             $"\nArchive access: {FormattingService.GetEnumDescription(archiveAccess)}" +
                             $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetch}" +
                             $"\nManage events maximum history: {manageEventsMaximumHistory}" +
-                            $"\nScheduled comic release time: {scheduledComicReleaseTime}"));
+                            $"\nScheduled comic release time: {scheduledComicReleaseTime}" +
+                            $"\nNew guest user logging: {FormattingService.GetBooleanAsYesNoString(newGuestUserLoggingEnabled)}"));
 
                     updateComicScheduledDates = true;
                 }
@@ -817,6 +826,9 @@ namespace hoohub.Pages.Manage
                     var scheduledComicReleaseTimeChange = settings.ScheduledComicReleaseTime != scheduledComicReleaseTime
                         ? $"{settings.ScheduledComicReleaseTime} -> {scheduledComicReleaseTime}"
                         : "(Unchanged)";
+                    var newGuestUserLoggingEnabledChange = settings.NewGuestUserLoggingEnabled != newGuestUserLoggingEnabled
+                        ? $"{FormattingService.GetBooleanAsYesNoString(settings.NewGuestUserLoggingEnabled)} -> {FormattingService.GetBooleanAsYesNoString(newGuestUserLoggingEnabled)}"
+                        : "(Unchanged)";
                     updateComicScheduledDates = settings.ScheduledComicReleaseTime != scheduledComicReleaseTime;
 
                     settings.PublicAccessEnabled = publicAccessEnabled;
@@ -825,6 +837,7 @@ namespace hoohub.Pages.Manage
                     settings.ManageEventsMaximumHistory = manageEventsMaximumHistory;
                     settings.ScheduledComicReleaseTime = scheduledComicReleaseTime;
                     settings.LastModifiedDate = DateTime.UtcNow;
+                    settings.NewGuestUserLoggingEnabled = newGuestUserLoggingEnabled;
 
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.AppSettingsUpdated,
@@ -834,7 +847,8 @@ namespace hoohub.Pages.Manage
                             $"\nArchive access: {archiveAccessChange}" +
                             $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetchChange}" +
                             $"\nManage events maximum history: {manageEventsMaximumHistoryChange}" + 
-                            $"\nScheduled comic release time: {scheduledComicReleaseTimeChange}"));
+                            $"\nScheduled comic release time: {scheduledComicReleaseTimeChange}" +
+                            $"\nNew guest user logging: {newGuestUserLoggingEnabledChange}"));
                 }
 
                 if (updateComicScheduledDates)

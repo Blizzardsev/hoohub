@@ -44,6 +44,11 @@ namespace hoohub.Data
         public DateTime LastModifiedDate { get; set; } = DateTime.UtcNow;
 
         /// <summary>
+        /// Whether the arrival of new guest users (those without an assigned unique ID in their cookies) should be logged.
+        /// </summary>
+        public bool NewGuestUserLoggingEnabled { get; set; } = false;
+
+        /// <summary>
         /// Default constructor.
         /// </summary>
         public HooHubSettings()
@@ -58,12 +63,14 @@ namespace hoohub.Data
         /// <param name="archiveMaximumComicsPerFetch">The archive maximum comics per fetch value to set.</param>
         /// <param name="manageEventsMaximumHistory">The manage events maximum history value to set.</param>
         /// <param name="scheduledComicReleaseTime">The scheduled comic release time to set.</param>
+        /// <param name="newGuestUserLoggingEnabled">The new guest user logging enabled state to set.</param>
         public HooHubSettings(
             bool publicAccessEnabled,
             AccessTypes archiveAccess,
             int archiveMaximumComicsPerFetch,
             int manageEventsMaximumHistory,
-            TimeOnly scheduledComicReleaseTime)
+            TimeOnly scheduledComicReleaseTime,
+            bool newGuestUserLoggingEnabled)
         {
             PublicAccessEnabled = publicAccessEnabled;
             ArchiveAccess = archiveAccess;
@@ -71,6 +78,7 @@ namespace hoohub.Data
             ManageEventsMaximumHistory = manageEventsMaximumHistory;
             ScheduledComicReleaseTime = scheduledComicReleaseTime;
             LastModifiedDate = DateTime.UtcNow;
+            NewGuestUserLoggingEnabled = newGuestUserLoggingEnabled;
         }
     }
 }

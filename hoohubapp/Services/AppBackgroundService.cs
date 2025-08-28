@@ -5,6 +5,7 @@ using hoohub.Configuration;
 using hoohub.Data;
 using hoohub.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NUglify.Helpers;
 
@@ -35,7 +36,7 @@ namespace hoohub.Services
             while (!stoppingToken.IsCancellationRequested)
             {
                 using var _scope = _scopeFactory.CreateScope();
-                var _hooContext = _scope.ServiceProvider.GetRequiredService<Data.HooHubContext>();
+                var _hooContext = _scope.ServiceProvider.GetRequiredService<HooHubContext>();
                 var _appSettings = _scope.ServiceProvider.GetService<AppSettings>();
                 var _userManager = _scope.ServiceProvider.GetService<UserManager<HooHubUser>>();
                 var _smtpService = _scope.ServiceProvider.GetService<SmtpService>();
@@ -73,13 +74,14 @@ namespace hoohub.Services
                         details: $"One or more maintenance tasks failed: {maintenanceException.Message}",
                         stackTrace: JsonConvert.SerializeObject(value: maintenanceException.StackTrace, formatting: Formatting.Indented)));
 
-                    foreach (var user in _hooContext.Users.ToList())
+                    var adminUser = await _hooContext.Users.SingleOrDefaultAsync(user => string.Equals(user.Email, _appSettings.SiteAdmin, StringComparison.InvariantCultureIgnoreCase));
+                    if (adminUser != null)
                     {
                         try
                         {
                             _smtpService.SendEmail(
-                                name: user.Handle,
-                                address: user.Email,
+                                name: adminUser.Handle,
+                                address: adminUser.Email,
                                 subject: "One or more errors have occurred",
                                 body: TemplateService.GetTemplateSubstitutions(
                                     template: Properties.Resources.ErrorsTemplate,
@@ -93,14 +95,14 @@ namespace hoohub.Services
                         {
                             await _hooContext.Events.AddAsync(new Event(
                                 eventType: EventTypes.Error,
-                                details: $"Failed to send email to {user.Email}: {emailException.Message}",
+                                details: $"Failed to send email to {adminUser.Email}: {emailException.Message}",
                                 stackTrace: JsonConvert.SerializeObject(value: emailException.StackTrace, formatting: Formatting.Indented)));
                         }
                     }
                 }
 
                 await _hooContext.SaveChangesAsync();
-                await Task.Delay(60 * 1000, stoppingToken);
+                await Task.Delay(300 * 1000, stoppingToken);
             }
         }
     }
