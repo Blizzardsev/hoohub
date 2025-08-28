@@ -3,4 +3,5 @@
 	height: 10vh;
 	border-radius: 100%;
 	box-shadow: 0 5px 5px 0 rgba(0,0,0,.15);
+	object-fit: cover;
 }

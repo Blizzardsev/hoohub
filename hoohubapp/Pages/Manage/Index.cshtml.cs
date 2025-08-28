@@ -1053,7 +1053,7 @@ namespace hoohub.Pages.Manage
                         message: $"User GUID {userGuid} not found"));
                 }
 
-                var lockedOutChange = user.LockoutEnd.HasValue != accountIsLocked ? $"{user.LockoutEnd.HasValue} " +
+                var lockedOutChange = user.LockoutEnd.HasValue != accountIsLocked ? $"{FormattingService.GetBooleanAsYesNoString(user.LockoutEnd.HasValue)} " +
                     $"-> {FormattingService.GetBooleanAsYesNoString(accountIsLocked)}" : "(Unchanged)";
                 var disabledChange = user.IsDisabled != accountIsDisabled ? $"{FormattingService.GetBooleanAsYesNoString(user.IsDisabled)} " +
                     $"-> {FormattingService.GetBooleanAsYesNoString(accountIsDisabled)}" : "(Unchanged)";

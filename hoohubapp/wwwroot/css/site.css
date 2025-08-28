@@ -525,7 +525,7 @@ input:disabled + .slider {
 
     .about-comic-view-content img {
         /* Applies to uploader pfp only! */
-        object-fit: scale-down;
+        object-fit: cover;
         width: 12vh;
         height: 12vh;
         border-radius: 100%;
