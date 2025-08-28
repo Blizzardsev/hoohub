@@ -52,7 +52,7 @@
         /// Basic blacklist; not persisted on app restart.
         /// </summary>
         public List<string> BlockedIpAddressRange = [
-            "10.244.5.106"
+            "::ffff:10.244.5.106"
         ];
     }
 }
