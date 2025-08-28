@@ -78,5 +78,8 @@ namespace hoohub.Enums
 
         [Description("App settings updated")]
         AppSettingsUpdated,
+
+        [Description("Unique user visit")]
+        UniqueUserVisit,
     }
 }

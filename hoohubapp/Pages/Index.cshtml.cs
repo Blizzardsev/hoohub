@@ -72,9 +72,10 @@ namespace hoohub.Pages
         }
 
         /// <summary>
-        /// Returns the main page.</br>
+        /// Returns the main page.<br/>
         /// If a comic ID is specified in the request (E.G if going forward/backward), load the associated comic if possible for rendering.<br/>
-        /// Otherwise, default to today's comic.
+        /// Otherwise, default to today's comic.<br/>
+        /// Lastly, logs new guest users if configured to do so.
         /// </summary>
         /// <param name="comic">Optional comic GUID to render.</param>
         /// <returns>The main page.</returns>
@@ -134,7 +135,28 @@ namespace hoohub.Pages
                 string? userGuid = currentUser != null
                     ? currentUser.Id
                     : Request.Cookies["uniqueId"];
-                ComicIsLiked = !string.IsNullOrWhiteSpace(userGuid) && Comic.ComicLikes.Any(comicItem => comicItem.UserGuid == userGuid);
+
+                if (string.IsNullOrWhiteSpace(userGuid))
+                {
+                    // No unregistered user GUID; create it
+                    userGuid = Guid.NewGuid().ToString();
+                    Response.Cookies.Append("uniqueId", userGuid);
+
+                    // Log the new guest if enabled
+                    var settings = await _hooContext.Settings.FirstOrDefaultAsync();
+                    if (settings != null && settings.NewGuestUserLoggingEnabled)
+                    {
+                        await _hooContext.Events.AddAsync(new Event(
+                            eventType: EventTypes.UniqueUserVisit,
+                            details: $"A unique guest user visit was detected as the guest user has no existing unique ID;" +
+                                $" remote address is {Request.HttpContext.Connection.RemoteIpAddress}"));
+                        await _hooContext.SaveChangesAsync();
+                    }
+                }
+                else
+                {
+                    ComicIsLiked = !string.IsNullOrWhiteSpace(userGuid) && Comic.ComicLikes.Any(comicItem => comicItem.UserGuid == userGuid);
+                }
 
                 // Some extra text for mobile devices, so check client
                 var deviceDetector = new DeviceDetector(userAgent: Request.Headers["User-Agent"]);
