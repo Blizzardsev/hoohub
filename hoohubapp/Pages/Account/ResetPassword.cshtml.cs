@@ -1,6 +1,7 @@
 ﻿using hoohub.Configuration;
 using hoohub.Data;
 using hoohub.Enums;
+using hoohub.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -77,8 +78,7 @@ namespace hoohub.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnGet(string code = null)
         {
-            if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
-                    || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+            if (!HttpCheckService.IsValidUserAgentAndIpAddress(_appSettings, Request))
             {
                 return NotFound("Sorry, we could not process your request: please try again later.");
             }

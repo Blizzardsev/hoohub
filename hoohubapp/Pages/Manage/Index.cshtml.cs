@@ -12,7 +12,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace hoohub.Pages.Manage
 {
@@ -262,15 +261,14 @@ namespace hoohub.Pages.Manage
         {
             try
             {
-                if (_appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower())
-                || _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString()))
+                if (!HttpCheckService.IsValidUserAgentAndIpAddress(_appSettings, Request))
                 {
                     var userAgentIsBlocked = _appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower());
                     var ipAddressIsBlocked = _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString());
 
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.Debug,
-                        details: $"DEBUG: Access would have been restricted; userAgentIsBlocked: {userAgentIsBlocked} | ipAddressIsBlocked: {ipAddressIsBlocked}" +
+                        details: $"DEBUG: Access would have been restricted due to failing HttpCheckService IsValidUserAgentAndIpAddress:" +
                             $"\nUser-Agent was: {Request.Headers["User-Agent"].ToString().ToLower()}" +
                             $"\nIP Address was: {Request.HttpContext.Connection.RemoteIpAddress.ToString()}"));
 
