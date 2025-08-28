@@ -1059,6 +1059,7 @@ namespace hoohub.Pages.Manage
                     $"-> {FormattingService.GetBooleanAsYesNoString(accountIsDisabled)}" : "(Unchanged)";
 
                 user.LockoutEnd = accountIsLocked ? DateTime.Today.AddYears(99).ToUniversalTime() : null;
+                user.AccessFailedCount = accountIsLocked ? user.AccessFailedCount : 0;
                 user.IsDisabled = accountIsDisabled;
 
                 await _hooContext.Events.AddAsync(new Event(
