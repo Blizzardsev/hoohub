@@ -109,11 +109,11 @@ namespace hoohub.Pages.Manage
 
                 public NewComic()
                 {
-                    var utcNow = DateTime.UtcNow;
+                    var nextDay = DateTime.UtcNow.AddDays(1);
                     ScheduleFor = new DateTime(
-                        year: utcNow.Year,
-                        month: utcNow.Month,
-                        day: utcNow.Day + 1,
+                        year: nextDay.Year,
+                        month: nextDay.Month,
+                        day: nextDay.Day,
                         hour: 16,
                         minute: 00,
                         second: 00).ToUniversalTime();
