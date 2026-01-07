@@ -24,7 +24,7 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Release",
-        "SMTP_PASSWORD": "sfjd oeqw egzh kmiu ",
+        "SMTP_PASSWORD": "<insert password>",
         "DB_STRING": "Host=localhost;Port=5432;Database=hoohubdb;Username=postgres;Password=blizz;"
       }
     }
