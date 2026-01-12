@@ -228,11 +228,10 @@ namespace hoohub.Pages.Manage
                 public bool NewGuestUserLoggingEnabled { get; set; }
 
                 [Display(Name = "Patreon support link")]
-                [RegularExpression("(^(https?:\\/\\/)?([\\w\\-]+\\.)+[\\w\\-]+(\\/[\\w\\-.,@?^=%&:/~+#]*)?$||^$)", ErrorMessage = "Patreon support link must be a valid URL or an empty string")]
-                [Required(AllowEmptyStrings = true)]
-                [MinLength(0)]
                 [MaxLength(100)]
-                public string PatreonSupportLink { get; set; }
+                [DataType(DataType.Text)]
+                [RegularExpression("^(https?:\\/\\/[\\w\\-_]+(\\.[\\w\\-_]+)+([\\w\\-\\.,@?^=%&amp;:/~\\+#]*[\\w\\-\\@?^=%&amp;/~\\+#])?)$|^$", ErrorMessage = "Patreon support link must be a valid URL or an empty string")]
+                public string? PatreonSupportLink { get; set; }
             }
 
             public class ManageUser
@@ -816,6 +815,7 @@ namespace hoohub.Pages.Manage
                         message: "Manage events maximum history must be a valid value"));
                 }
 
+                patreonSupportLink = string.IsNullOrWhiteSpace(patreonSupportLink) ? string.Empty : patreonSupportLink;
                 if (patreonSupportLink.Length > 100)
                 {
                     return new JsonResult(new BaseResult(
@@ -846,7 +846,7 @@ namespace hoohub.Pages.Manage
                             $"\nManage events maximum history: {manageEventsMaximumHistory}" +
                             $"\nScheduled comic release time: {scheduledComicReleaseTime}" +
                             $"\nNew guest user logging: {FormattingService.GetBooleanAsYesNoString(newGuestUserLoggingEnabled)}" +
-                            $"\nPatreon support link: {patreonSupportLink}"));
+                            $"\nPatreon support link: {(string.IsNullOrWhiteSpace(patreonSupportLink) ? "(None)" : patreonSupportLink)}"));
 
                     updateComicScheduledDates = true;
                 }
@@ -895,7 +895,7 @@ namespace hoohub.Pages.Manage
                             $"\nManage events maximum history: {manageEventsMaximumHistoryChange}" + 
                             $"\nScheduled comic release time: {scheduledComicReleaseTimeChange}" +
                             $"\nNew guest user logging: {newGuestUserLoggingEnabledChange}" +
-                            $"\nPatreon support link: {patreonSupportLinkChange}"));
+                            $"\nPatreon support link: {(string.IsNullOrWhiteSpace(patreonSupportLink) ? "(None)" : patreonSupportLink)}"));
                 }
 
                 if (updateComicScheduledDates)
