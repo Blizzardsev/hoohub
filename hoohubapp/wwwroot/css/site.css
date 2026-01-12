@@ -95,6 +95,10 @@ footer {
         margin-bottom: 2px;
     }
 
+    .footer-item.support-link {
+        background-color: #F2613F !important;
+    }
+
 .content-panel {
     position: fixed;
     top: 50%;

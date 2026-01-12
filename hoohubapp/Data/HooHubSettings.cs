@@ -49,6 +49,11 @@ namespace hoohub.Data
         public bool NewGuestUserLoggingEnabled { get; set; } = false;
 
         /// <summary>
+        /// The Patreon support link for the site to be navigate to when clicked on the site footer.
+        /// </summary>
+        public string PatreonSupportLink { get; set; } = string.Empty;
+
+        /// <summary>
         /// Default constructor.
         /// </summary>
         public HooHubSettings()
@@ -64,13 +69,16 @@ namespace hoohub.Data
         /// <param name="manageEventsMaximumHistory">The manage events maximum history value to set.</param>
         /// <param name="scheduledComicReleaseTime">The scheduled comic release time to set.</param>
         /// <param name="newGuestUserLoggingEnabled">The new guest user logging enabled state to set.</param>
+        /// <param name="patreonSupportLink">The Patreon support link to set.</param>
+        /// 
         public HooHubSettings(
             bool publicAccessEnabled,
             AccessTypes archiveAccess,
             int archiveMaximumComicsPerFetch,
             int manageEventsMaximumHistory,
             TimeOnly scheduledComicReleaseTime,
-            bool newGuestUserLoggingEnabled)
+            bool newGuestUserLoggingEnabled,
+            string patreonSupportLink)
         {
             PublicAccessEnabled = publicAccessEnabled;
             ArchiveAccess = archiveAccess;
@@ -79,6 +87,7 @@ namespace hoohub.Data
             ScheduledComicReleaseTime = scheduledComicReleaseTime;
             LastModifiedDate = DateTime.UtcNow;
             NewGuestUserLoggingEnabled = newGuestUserLoggingEnabled;
+            PatreonSupportLink = patreonSupportLink;
         }
     }
 }

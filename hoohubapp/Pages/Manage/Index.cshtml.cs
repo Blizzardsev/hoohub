@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Identity;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
@@ -225,6 +226,13 @@ namespace hoohub.Pages.Manage
                 [Display(Name = "New guest user logging enabled")]
                 [Required(ErrorMessage = "New guest user logging enabled state must be provided")]
                 public bool NewGuestUserLoggingEnabled { get; set; }
+
+                [Display(Name = "Patreon support link")]
+                [RegularExpression("(^(https?:\\/\\/)?([\\w\\-]+\\.)+[\\w\\-]+(\\/[\\w\\-.,@?^=%&:/~+#]*)?$||^$)", ErrorMessage = "Patreon support link must be a valid URL or an empty string")]
+                [Required(AllowEmptyStrings = true)]
+                [MinLength(0)]
+                [MaxLength(100)]
+                public string PatreonSupportLink { get; set; }
             }
 
             public class ManageUser
@@ -309,6 +317,7 @@ namespace hoohub.Pages.Manage
                 ManageInputModel.ManageAppInput.ManageEventsMaximumHistory = appSettings != null ? appSettings.ManageEventsMaximumHistory : 1000;
                 ManageInputModel.ManageAppInput.ScheduledComicReleaseTime = appSettings != null ? appSettings.ScheduledComicReleaseTime : new TimeOnly(hour: 12, minute: 00);
                 ManageInputModel.ManageAppInput.NewGuestUserLoggingEnabled = appSettings != null ? appSettings.NewGuestUserLoggingEnabled : false;
+                ManageInputModel.ManageAppInput.PatreonSupportLink = appSettings != null ? appSettings.PatreonSupportLink : string.Empty;
 
                 return Page();
             }
@@ -771,6 +780,7 @@ namespace hoohub.Pages.Manage
         /// <param name="manageEventsMaximumHistory">The manage events maximum history value to set.</param>
         /// <param name="scheduledComicReleaseTime">The scheduled comic release time value to set.</param>
         /// <param name="newGuestUserLoggingEnabled">The new guest user logging enabled state to set.</param>
+        /// <param name="patreonSupportLink">The Patreon support link to set.</param>
         /// <returns><see cref="JsonResult"/> representing the result of the request.</returns>
         public async Task<JsonResult> OnPatchAppSettingsAsync(
             bool publicAccessEnabled,
@@ -778,7 +788,8 @@ namespace hoohub.Pages.Manage
             int archiveMaximumComicsPerFetch,
             int manageEventsMaximumHistory,
             TimeOnly scheduledComicReleaseTime,
-            bool newGuestUserLoggingEnabled)
+            bool newGuestUserLoggingEnabled,
+            string patreonSupportLink)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             var settings = _hooContext.Settings.FirstOrDefault();
@@ -805,6 +816,13 @@ namespace hoohub.Pages.Manage
                         message: "Manage events maximum history must be a valid value"));
                 }
 
+                if (patreonSupportLink.Length > 100)
+                {
+                    return new JsonResult(new BaseResult(
+                        success: false,
+                        message: "Patreon support link must be a valid value"));
+                }
+
                 var updateComicScheduledDates = false;
 
                 if (settings == null)
@@ -815,7 +833,9 @@ namespace hoohub.Pages.Manage
                         archiveMaximumComicsPerFetch: archiveMaximumComicsPerFetch,
                         manageEventsMaximumHistory: manageEventsMaximumHistory,
                         scheduledComicReleaseTime: scheduledComicReleaseTime,
-                        newGuestUserLoggingEnabled: newGuestUserLoggingEnabled);
+                        newGuestUserLoggingEnabled: newGuestUserLoggingEnabled,
+                        patreonSupportLink: patreonSupportLink);
+
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.AppSettingsCreated,
                         details: $"App settings created by {currentUser.GetEventLogString()}" +
@@ -825,7 +845,8 @@ namespace hoohub.Pages.Manage
                             $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetch}" +
                             $"\nManage events maximum history: {manageEventsMaximumHistory}" +
                             $"\nScheduled comic release time: {scheduledComicReleaseTime}" +
-                            $"\nNew guest user logging: {FormattingService.GetBooleanAsYesNoString(newGuestUserLoggingEnabled)}"));
+                            $"\nNew guest user logging: {FormattingService.GetBooleanAsYesNoString(newGuestUserLoggingEnabled)}" +
+                            $"\nPatreon support link: {patreonSupportLink}"));
 
                     updateComicScheduledDates = true;
                 }
@@ -849,6 +870,10 @@ namespace hoohub.Pages.Manage
                     var newGuestUserLoggingEnabledChange = settings.NewGuestUserLoggingEnabled != newGuestUserLoggingEnabled
                         ? $"{FormattingService.GetBooleanAsYesNoString(settings.NewGuestUserLoggingEnabled)} -> {FormattingService.GetBooleanAsYesNoString(newGuestUserLoggingEnabled)}"
                         : "(Unchanged)";
+                    var patreonSupportLinkChange = settings.PatreonSupportLink != patreonSupportLink
+                        ? $"{settings.PatreonSupportLink} -> {patreonSupportLink}"
+                        : "(Unchanged)";
+
                     updateComicScheduledDates = settings.ScheduledComicReleaseTime != scheduledComicReleaseTime;
 
                     settings.PublicAccessEnabled = publicAccessEnabled;
@@ -858,6 +883,7 @@ namespace hoohub.Pages.Manage
                     settings.ScheduledComicReleaseTime = scheduledComicReleaseTime;
                     settings.LastModifiedDate = DateTime.UtcNow;
                     settings.NewGuestUserLoggingEnabled = newGuestUserLoggingEnabled;
+                    settings.PatreonSupportLink = patreonSupportLink;
 
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.AppSettingsUpdated,
@@ -868,7 +894,8 @@ namespace hoohub.Pages.Manage
                             $"\nArchive maximum comics per scroll: {archiveMaximumComicsPerFetchChange}" +
                             $"\nManage events maximum history: {manageEventsMaximumHistoryChange}" + 
                             $"\nScheduled comic release time: {scheduledComicReleaseTimeChange}" +
-                            $"\nNew guest user logging: {newGuestUserLoggingEnabledChange}"));
+                            $"\nNew guest user logging: {newGuestUserLoggingEnabledChange}" +
+                            $"\nPatreon support link: {patreonSupportLinkChange}"));
                 }
 
                 if (updateComicScheduledDates)

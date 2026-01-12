@@ -1,12 +1,13 @@
 ﻿@inject SignInManager<HooHubUser> _signInManager
 @inject UserManager<HooHubUser> _userManager
-
+@inject HooHubContext _hooHubContext;
 
 <a style="display: none; color: red; position: absolute; z-index: 3000" asp-page="/Index" asp-page-handler="HooHoo">hoot</a>
 
 @{
     var signedIn = _signInManager.IsSignedIn(User);
     var user = _userManager.GetUserAsync(User).Result;
+    var hooHubSettings = _hooHubContext.Settings.FirstOrDefault();
     var displayPicture = user != null ? $@"data:image/jpg;base64,{Convert.ToBase64String(user.DisplayPicture)}" : "~/img/notfound.png";
 
     var isNightMode = Context.Request.Cookies["nightMode"] == "true";
@@ -158,9 +159,19 @@
 
     <footer class="footer text-muted">
         <div class="container text-center mx-auto">
-            <span role="button" tabindex="0" class="footer-item" title="Contact us..."><img class="twitter" src="~/img/twitter.png" /><a href="https://x.com/HooDoodles" target="_blank">Contact</a></span>
+            <span role="button" tabindex="0" class="footer-item" title="Contact us...">
+                <img class="twitter" src="~/img/twitter.png" />
+                <a href="https://x.com/HooDoodles" target="_blank">Contact</a>
+                </span>
             <span role="button" tabindex="0" class="footer-item" title="About us..."><a asp-page="/About">About</a></span>
             <span role="button" tabindex="0" class="footer-item" title="Cookies..."><a asp-page="/Cookies">Cookies</a></span>
+            @if(hooHubSettings != null && !string.IsNullOrWhiteSpace(hooHubSettings.PatreonSupportLink))
+            {
+                <span role="button" tabindex="0" class="footer-item support-link" title="Support us on Patreon!">
+                    <img class="twitter" src="~/img/patreon.png" />
+                    <a href="@hooHubSettings.PatreonSupportLink" target="_blank">Support us on Patreon!</a>
+                </span>
+            }
         </div>
     </footer>
 
