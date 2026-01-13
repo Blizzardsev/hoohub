@@ -2,7 +2,7 @@
 @inject UserManager<HooHubUser> _userManager
 @inject HooHubContext _hooHubContext;
 
-<a style="display: none; color: red; position: absolute; z-index: 3000" asp-page="/Index" asp-page-handler="HooHoo">hoot</a>
+<a style="display: none !important; color: red; position: absolute; z-index: 3000" asp-page="/Index" asp-page-handler="HooHoo">hoot</a> <!--Should not be visible to humans-->
 
 @{
     var signedIn = _signInManager.IsSignedIn(User);

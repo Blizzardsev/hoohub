@@ -1,6 +1,7 @@
 ﻿let mouseX = 0
 let mouseY = 0
 
+// These are the default values for confetti anim when liking comic
 const defaults = {
     spread: 15,
     ticks: 10,

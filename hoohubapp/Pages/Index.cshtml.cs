@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using NUglify.Helpers;
 
 namespace hoohub.Pages
 {
@@ -154,7 +155,9 @@ namespace hoohub.Pages
                     Response.Cookies.Append("uniqueId", userGuid);
 
                     // Log the new guest if enabled
-                    var settings = await _hooContext.Settings.FirstOrDefaultAsync();
+                    var settings = await _hooContext.Settings
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync();
                     if (settings != null && settings.NewGuestUserLoggingEnabled)
                     {
                         await _hooContext.Events.AddAsync(new Event(
@@ -394,7 +397,7 @@ namespace hoohub.Pages
         /// Toggles the Night Mode function of the app.<br/>
         /// Night mode features a softer theme ideal for night browsing.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The page the user was just on; functionally this is like a refresh so we can fetch the page in alt styling.</returns>
         public async Task<IActionResult> OnGetToggleNightModeAsync(string returnUrl = null)
         {
             try
@@ -519,12 +522,18 @@ namespace hoohub.Pages
 
         /// <summary>
         /// On requesting this action, the user is restricted from accessing the app as a basic anti-scraping measure.
+        /// Silly handler name so this isn't (too) obvious on the hidden link...
         /// </summary>
         /// <returns>User is restricted from accessing the app as a basic anti-scraping measure.</returns>
         public async Task<IActionResult> OnGetHooHoo()
         {
             try
             {
+                if (Request.HttpContext.Connection.RemoteIpAddress == null)
+                {
+                    return Page();
+                }
+
                 var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
                 if (!string.IsNullOrWhiteSpace(remoteIpAddress) && !_appSettings.BlockedIpAddressRange.Contains(remoteIpAddress)) // Don't want to block requests here unless already caught!
                 {
@@ -571,7 +580,9 @@ namespace hoohub.Pages
         /// <returns>Redirection string if the site is considered closed, or an empty string otherwise.</returns>
         public async Task<string> GetOfflineRedirectAsync()
         {
-            var settings = await _hooContext.Settings.FirstOrDefaultAsync();
+            var settings = await _hooContext.Settings
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
             if (settings != null)
             {
                 if (!settings.PublicAccessEnabled && !_signInManager.IsSignedIn(User))

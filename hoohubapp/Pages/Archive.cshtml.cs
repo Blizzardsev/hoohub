@@ -129,6 +129,7 @@ namespace hoohub.Pages
                 }
 
                 var allComics = _hooContext.Comics
+                    .AsNoTracking()
                     .AsEnumerable()
                     .Where(comic => !comic.IsHidden)
                     .OrderByDescending(comic => comic.ComicNumber)
@@ -154,7 +155,9 @@ namespace hoohub.Pages
                     ? allComics.IndexOf(startFromComic)
                     : -1;
 
-                var settings = await _hooContext.Settings.FirstOrDefaultAsync();
+                var settings = await _hooContext.Settings
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync();
                 var takeComics = settings != null ? settings.ArchiveMaximumComicsPerFetch : 20;
                 var archiveComics = allComics.Skip(startIndex + 1).Take(takeComics);
 

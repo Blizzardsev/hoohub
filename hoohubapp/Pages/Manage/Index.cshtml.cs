@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Identity;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
@@ -472,6 +471,7 @@ namespace hoohub.Pages.Manage
                 return new JsonResult(new ManageComicsListResult(
                     success: true,
                     manageComicsListData: _hooContext.Comics
+                        .AsNoTracking()
                         .OrderByDescending(comic => comic.ComicNumber)
                         .Select(comic => new ManageComicsListData(comic))
                         .ToList()));
@@ -505,6 +505,7 @@ namespace hoohub.Pages.Manage
                 }
 
                 var comic = await _hooContext.Comics
+                    .AsNoTracking()
                     .Include(comic => comic.LastEditedBy)
                     .Include(comic => comic.ComicLikes)
                     .AsSplitQuery()
@@ -974,6 +975,7 @@ namespace hoohub.Pages.Manage
                 return new JsonResult(new ManageUsersListResult(
                     success: true,
                     manageUsersListData: _hooContext.Users
+                        .AsNoTracking()
                         .OrderBy(user => user.Email)
                         .Select(user => new ManageUsersListData(user))
                         .ToList()));
@@ -1006,7 +1008,9 @@ namespace hoohub.Pages.Manage
                         message: $"User GUID {userGuid} must be specified"));
                 }
 
-                var user = await _hooContext.Users.SingleOrDefaultAsync(user => user.Id == userGuid);
+                var user = await _hooContext.Users
+                    .AsNoTracking()
+                    .SingleOrDefaultAsync(user => user.Id == userGuid);
                 if (user == null)
                 {
                     return new JsonResult(new BaseResult(

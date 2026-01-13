@@ -2,7 +2,6 @@ using hoohub.Configuration;
 using hoohub.Data;
 using hoohub.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -14,7 +13,6 @@ namespace hoohub.Pages
     public class OfflineModel : PageModel
     {
         private readonly HooHubContext _context;
-        private readonly SignInManager<HooHubUser> _signInManager;
         private readonly AppSettings _appSettings;
 
         /// <summary>
@@ -27,12 +25,10 @@ namespace hoohub.Pages
         /// Initialises a new instance of the <see cref="OfflineModel"/> class.
         /// </summary>
         /// <param name="context">Injected app context.</param>
-        /// <param name="signInManager">Injected <see cref="SignInManager{TUser}"/>.</param>
         /// <param name="appSettings">Injected <see cref="AppSettings"/>.</param>
-        public OfflineModel(HooHubContext context, SignInManager<HooHubUser> signInManager, AppSettings appSettings)
+        public OfflineModel(HooHubContext context, AppSettings appSettings)
         {
             _context = context;
-            _signInManager = signInManager;
             _appSettings = appSettings;
         }
 

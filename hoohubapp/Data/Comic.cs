@@ -41,7 +41,7 @@ namespace hoohub.Data
         /// <summary>
         /// The actual image file data associated with the comic.
         /// </summary>
-        public byte[] ImageData { get; set; } = new byte[0];
+        public byte[] ImageData { get; set; } = [];
 
         /// <summary>
         /// Comma-separated tag list associated with the comic. This should be a maximum of three tags for consistency with the comic number.
@@ -105,7 +105,7 @@ namespace hoohub.Data
             byte[] imageData, 
             string tags,
             bool isHidden,
-            HooHubUser uploadedBy = null,
+            HooHubUser uploadedBy,
             DateTime? scheduledDate = null)
         {
             LastModifiedDate = DateTime.UtcNow;

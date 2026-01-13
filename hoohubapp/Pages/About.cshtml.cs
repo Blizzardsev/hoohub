@@ -55,7 +55,9 @@ namespace hoohub.Pages
                     return NotFound("Sorry, we could not process your request: please try again later.");
                 }
 
-                var settings = await _hooContext.Settings.FirstOrDefaultAsync();
+                var settings = await _hooContext.Settings
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync();
                 if (settings != null)
                 {
                     if (!settings.PublicAccessEnabled && !_signInManager.IsSignedIn(User))
