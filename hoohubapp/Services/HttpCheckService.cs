@@ -36,7 +36,7 @@ namespace hoohub.Services
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(ipAddress) || appSettings.BlockedIpAddressRange.Any(blockedIpAddress => blockedIpAddress == ipAddress))
+            if (string.IsNullOrWhiteSpace(ipAddress) || appSettings.BlockedIpAddressRange.Any(blockedIpAddress => blockedIpAddress.IpAddress == ipAddress))
             {
                 return false;
             }

@@ -51,6 +51,6 @@
         /// <summary>
         /// Basic blacklist; not persisted on app restart. Only bots and scrapers that don't obey robots.txt and navigate to the bait link should end up here.
         /// </summary>
-        public List<string> BlockedIpAddressRange = [];
+        public List<BlockedIpAddress> BlockedIpAddressRange = [];
     }
 }

@@ -526,9 +526,11 @@ namespace hoohub.Pages
             try
             {
                 var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-                if (!string.IsNullOrWhiteSpace(remoteIpAddress) && !_appSettings.BlockedIpAddressRange.Contains(remoteIpAddress)) // Don't want to block requests here unless already caught!
+                var blockedAddress = _appSettings.BlockedIpAddressRange.FirstOrDefault(blockedIpAddress => blockedIpAddress.IpAddress == remoteIpAddress);
+
+                if (!string.IsNullOrWhiteSpace(remoteIpAddress) && blockedAddress == null) // Don't want to block requests here unless already caught!
                 {
-                    _appSettings.BlockedIpAddressRange.Add(remoteIpAddress);    
+                    _appSettings.BlockedIpAddressRange.Add(new BlockedIpAddress(remoteIpAddress, DateTimeOffset.Now));    
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.IpAddressRestricted,
                         details: $"Remote IP address {remoteIpAddress} accessed the blacklist method and is now temporarily restricted; user agent was: {Request.Headers["User-Agent"].ToString()}"));

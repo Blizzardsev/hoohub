@@ -264,7 +264,7 @@ namespace hoohub.Pages.Manage
                 if (!HttpCheckService.IsValidUserAgentAndIpAddress(_appSettings, Request))
                 {
                     var userAgentIsBlocked = _appSettings.BlockedUserAgents.Contains(Request.Headers["User-Agent"].ToString().ToLower());
-                    var ipAddressIsBlocked = _appSettings.BlockedIpAddressRange.Contains(Request.HttpContext.Connection.RemoteIpAddress.ToString());
+                    var ipAddressIsBlocked = _appSettings.BlockedIpAddressRange.Any(blockedIpAddress => blockedIpAddress.IpAddress == Request.HttpContext.Connection.RemoteIpAddress.ToString());
 
                     await _hooContext.Events.AddAsync(new Event(
                         eventType: EventTypes.Debug,

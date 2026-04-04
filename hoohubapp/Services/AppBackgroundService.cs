@@ -66,6 +66,9 @@ namespace hoohub.Services
                             eventType: EventTypes.ComicReleased,
                             details: $"Comic GUID {comic.Id} ({comic.GetComicDisplayName()}) met scheduled date and was released."));
                     });
+
+                    // Make sure the blacklist stays manageable
+                    _appSettings.BlockedIpAddressRange.RemoveAll(blockedIpAddress => (DateTimeOffset.Now - blockedIpAddress.BlockedDate).TotalDays >= 1);
                 }
                 catch (Exception maintenanceException)
                 {
